@@ -27,4 +27,10 @@ class TaxonomyTerm extends Model
     {
         return $this->belongsToMany(Manga::class, 'manga_taxonomy_terms');
     }
+
+    // Alias for consistency with Manga model
+    public function manga(): BelongsToMany
+    {
+        return $this->mangas();
+    }
 }

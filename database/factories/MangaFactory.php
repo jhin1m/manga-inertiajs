@@ -18,6 +18,8 @@ class MangaFactory extends Factory
     public function definition(): array
     {
         $name = fake()->words(rand(2, 4), true);
+        $rating = fake()->randomFloat(1, 6.0, 10.0);
+        $totalRating = fake()->numberBetween(100, 20000);
         
         return [
             'name' => $name,
@@ -28,6 +30,8 @@ class MangaFactory extends Factory
             'description' => fake()->paragraphs(rand(3, 5), true),
             'status' => fake()->randomElement(['ongoing', 'completed', 'hiatus', 'cancelled']),
             'views' => fake()->numberBetween(100, 1000000),
+            'rating' => $rating,
+            'total_rating' => $totalRating,
             'cover' => fake()->imageUrl(400, 600, 'manga'),
             'slug' => Str::slug($name),
         ];

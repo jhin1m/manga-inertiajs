@@ -19,6 +19,7 @@ class Chapter extends Model
         'volume_number',
         'pages_count',
         'published_at',
+        'views',
     ];
 
     protected $casts = [
@@ -26,6 +27,7 @@ class Chapter extends Model
         'volume_number' => 'integer',
         'pages_count' => 'integer',
         'published_at' => 'datetime',
+        'views' => 'integer',
     ];
 
     public function manga(): BelongsTo

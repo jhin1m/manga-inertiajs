@@ -14,6 +14,7 @@ class Taxonomy extends Model
         'name',
         'slug',
         'description',
+        'type',
     ];
 
     public function terms(): HasMany

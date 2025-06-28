@@ -20,11 +20,15 @@ class Manga extends Model
         'views',
         'cover',
         'slug',
+        'rating',
+        'total_rating',
     ];
 
     protected $casts = [
         'alternative_names' => 'array',
         'views' => 'integer',
+        'rating' => 'decimal:2',
+        'total_rating' => 'integer',
     ];
 
     public function chapters(): HasMany
@@ -75,6 +79,12 @@ class Manga extends Model
         return $query->orderBy('views', 'desc');
     }
 
+    public function scopeTopRated(Builder $query): Builder
+    {
+        return $query->orderBy('rating', 'desc')
+                    ->orderBy('total_rating', 'desc');
+    }
+
     public function scopeRecent(Builder $query): Builder
     {
         return $query->orderBy('created_at', 'desc');
@@ -83,6 +93,30 @@ class Manga extends Model
     public function incrementViews(): void
     {
         $this->increment('views');
+    }
+
+    public function updateRating(float $newRating): void
+    {
+        $currentTotal = $this->total_rating;
+        $currentRating = $this->rating;
+        
+        $newTotal = $currentTotal + 1;
+        $newAverageRating = (($currentRating * $currentTotal) + $newRating) / $newTotal;
+        
+        $this->update([
+            'rating' => round($newAverageRating, 2),
+            'total_rating' => $newTotal
+        ]);
+    }
+
+    public function getAverageRatingAttribute(): float
+    {
+        return $this->rating;
+    }
+
+    public function getTotalRatingsAttribute(): int
+    {
+        return $this->total_rating;
     }
 
     public function getLatestChapterAttribute()

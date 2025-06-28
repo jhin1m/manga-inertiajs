@@ -1,0 +1,147 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Frontend Design Rules - Manga Reader Project
+
+## 🎨 Design Philosophy
+- **Minimalism First**: Clean, simple, uncluttered interfaces
+- **Performance Focused**: Lightweight components, optimized rendering
+- **Mobile-First**: Responsive design starting from mobile
+- **User Experience**: Intuitive navigation, fast interactions
+
+## 🛠️ Technical Stack
+- **Framework**: React 18 with hooks
+- **Styling**: TailwindCSS only - no custom CSS files
+- **Icons**: Heroicons or Lucide React
+- **Components**: Functional components with hooks
+- **State**: React hooks + Inertia shared data
+
+## 📐 Design Principles
+
+### Layout & Spacing
+- Use Tailwind spacing scale: `p-4`, `m-6`, `gap-4`
+- Consistent spacing: 4, 6, 8, 12, 16, 24 units
+- Grid layouts: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
+- Flexbox for alignment: `flex items-center justify-between`
+
+### Typography
+- Font sizes: `text-sm`, `text-base`, `text-lg`, `text-xl`, `text-2xl`
+- Font weights: `font-normal`, `font-medium`, `font-semibold`
+- Line heights: `leading-tight`, `leading-normal`, `leading-relaxed`
+- Text colors: `text-gray-900`, `text-gray-600`, `text-gray-400`
+
+### Colors - Dark Theme
+- Primary: `bg-primary-600`, `text-primary-500`, `border-primary-600`
+- Background: `bg-gray-900`, `bg-gray-800`, `bg-gray-700`
+- Text: `text-gray-100`, `text-gray-300`, `text-gray-400`
+- Secondary: `bg-gray-800`, `text-gray-300`, `border-gray-700`
+- Success: `bg-emerald-600`, `text-emerald-400`, `border-emerald-600`
+- Error: `bg-red-600`, `text-red-400`, `border-red-600`
+- Warning: `bg-amber-600`, `text-amber-400`, `border-amber-600`
+- Neutral: `bg-gray-800`, `bg-gray-700`, `bg-gray-600`
+- Card backgrounds: `bg-gray-800/50`, `bg-gray-900/90`
+- Borders: `border-gray-700`, `border-gray-600`, `border-gray-500`
+
+### Components Style
+- Buttons: `px-4 py-2 rounded-md font-medium transition-colors`
+- Cards: `bg-white rounded-lg shadow-sm border border-gray-200 p-6`
+- Inputs: `px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`
+- Images: `rounded-lg object-cover` with aspect ratios
+
+## 🎯 Component Guidelines
+
+### Manga Cards
+```jsx
+<div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden hover:shadow-xl hover:border-primary-600 transition-all">
+  <img className="w-full h-64 object-cover" />
+  <div className="p-4">
+    <h3 className="font-semibold text-gray-100 mb-2">Title</h3>
+    <p className="text-sm text-gray-300">Description</p>
+    <div className="flex items-center mt-3">
+      <span className="px-2 py-1 bg-primary-600 text-primary-100 text-xs rounded-full">Action</span>
+    </div>
+  </div>
+</div>
+```
+
+### Navigation
+```jsx
+<nav className="bg-gray-900 border-b border-gray-700">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex justify-between h-16">
+      <div className="flex items-center">
+        <Logo className="h-8 w-8 text-primary-500" />
+        <span className="ml-2 text-xl font-semibold text-gray-100">Manga Reader</span>
+      </div>
+    </div>
+  </div>
+</nav>
+```
+
+### Reader Interface
+```jsx
+<div className="min-h-screen bg-gray-900">
+  <div className="max-w-4xl mx-auto px-4 py-8">
+    <img className="w-full rounded-lg shadow-lg border border-gray-700" />
+    <div className="flex justify-between items-center mt-6 p-4 bg-gray-800 rounded-lg">
+      <button className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md transition-colors">Previous</button>
+      <span className="text-gray-300 font-medium">Page 1 of 20</span>
+      <button className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md transition-colors">Next</button>
+    </div>
+  </div>
+</div>
+```
+
+## 🚀 Performance Rules
+- Use `className` not `style` props
+- Lazy load images: `loading="lazy"`
+- Minimize DOM nesting
+- Use semantic HTML elements
+- Avoid unnecessary re-renders
+
+## 📱 Responsive Breakpoints
+- Mobile: Default (no prefix)
+- Tablet: `md:` (768px+)
+- Desktop: `lg:` (1024px+)
+- Large: `xl:` (1280px+)
+
+## 🎨 Animation & Transitions
+- Hover effects: `hover:shadow-md`, `hover:bg-gray-50`
+- Transitions: `transition-colors`, `transition-shadow`
+- Loading states: `animate-pulse`, `animate-spin`
+- Keep animations subtle and fast (200-300ms)
+
+## ❌ Avoid
+- Custom CSS files
+- Inline styles
+- Complex animations
+- Heavy third-party UI libraries
+- Nested ternary operators in JSX
+- Large component files (>200 lines)
+
+## ✅ Prefer
+- Tailwind utility classes
+- Small, focused components
+- Consistent spacing and colors
+- Clean, readable JSX
+- Early returns in components
+- Destructured props
+
+// Buttons - Dark Theme
+<button className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md font-medium transition-colors">
+  Primary Action
+</button>
+<button className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-100 border border-gray-600 rounded-md font-medium transition-colors">
+  Secondary Action
+</button>
+
+// Input Fields - Dark
+<input className="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder-gray-400" />
+
+// Search Bar - Dark
+<div className="relative">
+  <input className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-600 text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-gray-400" placeholder="Search manga..." />
+  <SearchIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+</div>
