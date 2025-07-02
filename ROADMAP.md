@@ -70,49 +70,75 @@ Xây dựng nền tảng backend với Web Controllers và Services sử dụng 
 ## 🎨 Phase 2: Frontend Core (Week 3-4)
 
 ### 🎯 Mục tiêu
-Xây dựng components và layout cơ bản cho frontend React
+Setup shadcn/ui và xây dựng components layout cho frontend React
 
 ### 📋 Tasks
 
-#### 2.1 Layout System
-- [ ] **AppLayout** - Layout chính với header, sidebar, footer
-- [ ] **Header** - Navigation bar với search, user menu
-- [ ] **Sidebar** - Categories navigation, filters panel
-- [ ] **Footer** - Links và thông tin website
-- [ ] **Breadcrumb** - Navigation breadcrumb component
+#### 2.1 Shadcn/UI Setup
+- [ ] **Install shadcn/ui** - Setup shadcn/ui với Tailwind CSS
+- [ ] **Configure components** - Setup components.json và utils
+- [ ] **Base components** - Install Button, Card, Input, Badge, Avatar
+- [ ] **Navigation components** - Install NavigationMenu, Breadcrumb, Sheet
+- [ ] **Data components** - Install Table, Pagination, Dialog, Tabs
+- [ ] **Form components** - Install Form, Select, Checkbox, RadioGroup
+- [ ] **Feedback components** - Install Toast, Alert, Skeleton, Progress
 
-#### 2.2 Manga Components
-- [ ] **MangaCard** - Card component hiển thị manga info
-- [ ] **MangaList** - Grid/List view cho danh sách manga
-- [ ] **MangaDetail** - Component hiển thị chi tiết manga
-- [ ] **MangaFilters** - Filters component cho genres, status, etc.
-- [ ] **MangaSearch** - Search input với suggestions
+#### 2.2 Layout System với Shadcn/UI
+- [ ] **AppLayout** - Layout chính sử dụng shadcn/ui components
+- [ ] **Header** - NavigationMenu với Command search, DropdownMenu user
+- [ ] **Sidebar** - Sheet component cho mobile, ScrollArea cho filters
+- [ ] **Footer** - Simple footer với shadcn/ui styling
+- [ ] **Breadcrumb** - Breadcrumb component cho navigation
 
-#### 2.3 Chapter Components
-- [ ] **ChapterList** - List component cho chapters của manga
-- [ ] **ChapterCard** - Card component cho chapter info
-- [ ] **ChapterReader** - Main reader interface component
-- [ ] **PageNavigation** - Navigation controls giữa pages
+#### 2.3 Manga Components với Shadcn/UI
+- [ ] **MangaCard** - Card component với Badge, Avatar, Button
+- [ ] **MangaList** - Grid layout với shadcn/ui Card components
+- [ ] **MangaDetail** - Tabs, Badge, Button, Separator components
+- [ ] **MangaFilters** - Select, Checkbox, RadioGroup, Slider components
+- [ ] **MangaSearch** - Command component với search suggestions
 
-#### 2.4 Common Components
-- [ ] **LoadingSpinner** - Loading states cho async operations
+#### 2.4 Chapter Components với Shadcn/UI
+- [ ] **ChapterList** - Table hoặc Card layout với Pagination
+- [ ] **ChapterCard** - Card với Progress, Badge components
+- [ ] **ChapterReader** - Custom reader với shadcn/ui controls
+- [ ] **PageNavigation** - Button, Slider components cho navigation
+
+#### 2.5 Common Components từ Shadcn/UI
+- [ ] **LoadingSpinner** - Skeleton components cho loading states
 - [ ] **Pagination** - Pagination component cho lists
-- [ ] **Modal** - Modal dialogs cho confirmations
-- [ ] **Toast** - Toast notifications system
-- [ ] **ImageWithFallback** - Image component với fallback
+- [ ] **Modal** - Dialog component cho confirmations
+- [ ] **Toast** - Toast notifications system từ shadcn/ui
+- [ ] **ImageWithFallback** - Custom component với shadcn/ui styling
 
-#### 2.5 Pages Components
-- [ ] **Home** - Homepage với featured content
-- [ ] **MangaIndex** - Browse all manga page
-- [ ] **MangaShow** - Manga detail page
-- [ ] **ChapterShow** - Chapter reader page
-- [ ] **Search** - Search results page
-- [ ] **NotFound** - 404 error page
+#### 2.6 Pages Components với Shadcn/UI
+- [x] **Home Basic** - Homepage cơ bản với Card, Badge, Button layouts
+- [ ] **Home Advanced** - Homepage với Hot Slider + Sidebar + Rankings
+- [ ] **MangaIndex** - Browse page với Table, Pagination, Filters
+- [ ] **MangaShow** - Detail page với Tabs, Badge, Button components
+- [ ] **ChapterShow** - Reader page với custom controls + shadcn/ui
+- [ ] **Search** - Search page với Command, Card components
+- [ ] **NotFound** - 404 page với shadcn/ui styling
+
+#### 2.7 Home Advanced Layout (New)
+- [ ] **Hot Manga Slider** - Horizontal scroll với responsive breakpoints
+  - Mobile: 2 items (`w-[calc(50%-8px)]`)
+  - Tablet: 3 items (`w-[calc(33.333%-16px)]`)
+  - Desktop: 5 items (`w-[calc(20%-16px)]`)
+  - Large: 6 items (`w-[calc(16.666%-16px)]`)
+- [ ] **Main Grid Layout** - CSS Grid `grid-cols-1 lg:grid-cols-[2fr_1fr]`
+- [ ] **Latest Update Grid** - Responsive manga grid với hover effects
+- [ ] **Sidebar Components**:
+  - Rankings Card với top manga list
+  - Recent Comments Card với avatar + preview
+  - Recommended Manga Card với ratings + genres
+- [ ] **Responsive Behavior** - Mobile/Tablet/Desktop optimized
+- [ ] **Animations** - Smooth transitions và hover effects
 
 ### 🎁 Deliverables
-- Complete UI component library
-- Responsive layout system
-- Basic navigation working với Inertia
+- Shadcn/ui setup hoàn chỉnh với all essential components
+- Responsive layout system sử dụng shadcn/ui components
+- Custom manga components built trên shadcn/ui foundation
+- Basic navigation working với Inertia + shadcn/ui
 
 ---
 
@@ -255,8 +281,9 @@ Tối ưu hiệu suất và hoàn thiện ứng dụng
 ### Frontend
 - **Framework**: React 18 với hooks
 - **Bridge**: InertiaJS 2.0 (NO API layer)
-- **Styling**: Tailwind CSS với custom components
-- **Icons**: Heroicons/Lucide React
+- **UI Library**: Shadcn/ui components với Tailwind CSS
+- **Styling**: Tailwind CSS với shadcn/ui theming
+- **Icons**: Lucide React (từ shadcn/ui)
 - **State**: React hooks + Inertia shared data
 - **Build**: Vite với code splitting
 
@@ -282,48 +309,79 @@ Tối ưu hiệu suất và hoàn thiện ứng dụng
 
 ## 🎯 Next Steps
 
-### Bước tiếp theo ngay (Phase 1.1):
-1. **Tạo Web Controllers** - `php artisan make:controller MangaController`
-2. **Setup Routes** - Define web routes với Inertia
-3. **Tạo Request Validation** - `php artisan make:request MangaRequest`
-4. **Tạo Services** - Business logic classes
-5. **Tạo Seeders** - Sample data cho testing
+### Bước tiếp theo ngay (Phase 2.2):
+1. **Home Advanced Layout** - Hot Slider + Sidebar components
+2. **Responsive Grid System** - Mobile/Tablet/Desktop breakpoints
+3. **Sidebar Cards** - Rankings, Comments, Recommendations
+4. **Smooth Animations** - Hover effects và transitions
+5. **Data Integration** - Connect với backend sample data
 
 ### Commands cần chạy:
 ```bash
-# Tạo web controllers (không --resource vì custom methods)
-php artisan make:controller MangaController
-php artisan make:controller ChapterController
-php artisan make:controller PageController
-php artisan make:controller TaxonomyController
+# Install additional components for advanced homepage
+pnpx shadcn@latest add carousel
+pnpx shadcn@latest add aspect-ratio
 
-# Tạo request validation
-php artisan make:request MangaRequest
-php artisan make:request ChapterRequest
-php artisan make:request PageRequest
+# Create advanced homepage components
+mkdir -p resources/js/Components/Home
+mkdir -p resources/js/Components/Sidebar
 
-# Tạo services directory
-mkdir app/Services
+# Test current setup
+php artisan serve
+pnpm run dev
 
-# Tạo seeders
-php artisan make:seeder MangaSeeder
-php artisan make:seeder ChapterSeeder
-php artisan make:seeder PageSeeder
+# Kiểm tra sample data
+php artisan tinker
+>>> App\Models\Manga::with('taxonomyTerms')->take(10)->get()
 ```
 
-### Example Controller Structure:
-```php
-// MangaController
-public function index()
-{
-    return Inertia::render('Manga/Index', [
-        'manga' => Manga::with(['chapters', 'taxonomyTerms'])
-            ->when(request('search'), fn($q) => $q->where('title', 'like', '%'.request('search').'%'))
-            ->paginate(20)
-            ->withQueryString(),
-        'filters' => request()->only(['search', 'genre', 'status'])
-    ]);
+### Example Home Advanced Layout Structure:
+```jsx
+// Home.jsx với advanced layout
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Star, TrendingUp, MessageCircle } from "lucide-react"
+
+export function HomeAdvanced({ hotManga, latestUpdates, rankings, comments }) {
+    return (
+        <AppLayout>
+            {/* Hot Manga Slider */}
+            <section className="py-8">
+                <div className="overflow-x-auto">
+                    <div className="flex gap-4 pb-4">
+                        {hotManga.map(manga => (
+                            <div key={manga.id} className="w-[calc(50%-8px)] md:w-[calc(33.333%-16px)] lg:w-[calc(20%-16px)] xl:w-[calc(16.666%-16px)] flex-shrink-0">
+                                <HotMangaCard manga={manga} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
+                {/* Latest Updates */}
+                <section>
+                    <h2 className="text-2xl font-bold mb-6">Cập nhật mới nhất</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {latestUpdates.map(manga => (
+                            <MangaCard key={manga.id} manga={manga} />
+                        ))}
+                    </div>
+                </section>
+
+                {/* Sidebar */}
+                <aside className="space-y-6">
+                    <RankingsCard rankings={rankings} />
+                    <RecentCommentsCard comments={comments} />
+                    <RecommendedCard />
+                </aside>
+            </div>
+        </AppLayout>
+    )
 }
 ```
 
-Sẵn sàng bắt đầu với Phase 1.1 không đại ca? 🚀 
+Sẵn sàng bắt đầu với Phase 2.2 - Home Advanced Layout không đại ca? 🚀 

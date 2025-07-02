@@ -1,6 +1,6 @@
 # ✅ Project Checklist - Manga Reader
 
-## 📊 Overall Progress: 35% Complete
+## 📊 Overall Progress: 42% Complete
 
 ### ✅ Foundation (Completed)
 - [x] Database schema design
@@ -39,42 +39,62 @@
 
 ---
 
-## 🎨 Phase 2: Frontend Core (0/25 tasks)
+## 🎨 Phase 2: Frontend Core với Shadcn/UI (13/41 tasks)
 
-### Layout System (0/5)
-- [ ] AppLayout component
-- [ ] Header với navigation
-- [ ] Sidebar với filters
-- [ ] Footer component
-- [ ] Breadcrumb navigation
+### Shadcn/UI Setup (7/7) ✅
+- [x] Install shadcn/ui với Tailwind CSS
+- [x] Configure components.json và utils
+- [x] Install base components (Button, Card, Input, Badge, Avatar)
+- [x] Install navigation components (NavigationMenu, Breadcrumb, Sheet)
+- [x] Install data components (Table, Pagination, Dialog, Tabs)
+- [x] Install form components (Form, Select, Checkbox, RadioGroup)
+- [x] Install feedback components (Toast, Alert, Skeleton, Progress)
 
-### Manga Components (0/5)
-- [ ] MangaCard component
-- [ ] MangaList component
-- [ ] MangaDetail component
-- [ ] MangaFilters component
-- [ ] MangaSearch component
+### Layout System với Shadcn/UI (5/5) ✅
+- [x] AppLayout với shadcn/ui components
+- [x] Header với NavigationMenu, Command search, DropdownMenu
+- [x] Sidebar với Sheet component, ScrollArea filters
+- [x] Footer với shadcn/ui styling
+- [x] Breadcrumb navigation component
 
-### Chapter Components (0/4)
-- [ ] ChapterList component
-- [ ] ChapterCard component
-- [ ] ChapterReader component
-- [ ] PageNavigation component
+### Manga Components với Shadcn/UI (0/5)
+- [ ] MangaCard với Card, Badge, Avatar, Button
+- [ ] MangaList với Grid layout + shadcn/ui Cards
+- [ ] MangaDetail với Tabs, Badge, Button, Separator
+- [ ] MangaFilters với Select, Checkbox, RadioGroup, Slider
+- [ ] MangaSearch với Command component + suggestions
 
-### Common Components (0/5)
-- [ ] LoadingSpinner component
-- [ ] Pagination component
-- [ ] Modal component
-- [ ] Toast notifications
-- [ ] ImageWithFallback component
+### Chapter Components với Shadcn/UI (0/4)
+- [ ] ChapterList với Table/Card layout + Pagination
+- [ ] ChapterCard với Card, Progress, Badge components
+- [ ] ChapterReader với custom controls + shadcn/ui
+- [ ] PageNavigation với Button, Slider components
 
-### Pages (0/6)
-- [ ] Home page
-- [ ] MangaIndex page
-- [ ] MangaShow page
-- [ ] ChapterShow page
-- [ ] Search page
-- [ ] 404 Error page
+### Common Components từ Shadcn/UI (0/5)
+- [ ] LoadingSpinner với Skeleton components
+- [ ] Pagination component từ shadcn/ui
+- [ ] Modal với Dialog component
+- [ ] Toast notifications từ shadcn/ui
+- [ ] ImageWithFallback với shadcn/ui styling
+
+### Pages với Shadcn/UI (1/6)
+- [x] Home với Card, Badge, Button layouts (Basic version completed)
+- [ ] Home Advanced Layout (Hot Slider + Sidebar + Rankings)
+- [ ] MangaIndex với Table, Pagination, Filters
+- [ ] MangaShow với Tabs, Badge, Button components
+- [ ] ChapterShow với custom reader + shadcn/ui controls
+- [ ] Search với Command, Card components
+- [ ] 404 Error với shadcn/ui styling
+
+### Home Advanced Layout Components (0/8)
+- [ ] Hot Manga Slider với responsive breakpoints
+- [ ] Main Content Grid (2fr + 1fr layout)
+- [ ] Latest Update Manga Grid với hover effects
+- [ ] Rankings Card với top manga list
+- [ ] Recent Comments Card với avatar + preview
+- [ ] Recommended Manga Card với ratings
+- [ ] Responsive behavior (Mobile/Tablet/Desktop)
+- [ ] Smooth animations và transitions
 
 ---
 
@@ -187,15 +207,15 @@
   - ✅ Request Validation
   - ✅ Sample Data với 10 manga, 1000+ chapters, 20k+ pages
 
-### Current Sprint (Phase 2.1)
-**Goal**: Setup Layout System và Common Components
-**Duration**: Week 3
-**Tasks**: 5/25 Phase 2 tasks
+### Current Sprint (Phase 2.2)
+**Goal**: Home Advanced Layout và Sidebar Components
+**Duration**: Week 3-4
+**Tasks**: 8/41 Phase 2 tasks (Home Advanced Layout Components)
 
-### Next Sprint (Phase 2.2)
-**Goal**: Manga và Chapter Components
-**Duration**: Week 4
-**Tasks**: Remaining Phase 2 tasks
+### Next Sprint (Phase 2.3)
+**Goal**: Manga, Chapter Components và Pages
+**Duration**: Week 4-5
+**Tasks**: Remaining 24/41 Phase 2 tasks
 
 ---
 
@@ -205,8 +225,8 @@
 # Phase 1 - COMPLETED ✅
 # Web Controllers, Services, Sample Data đã sẵn sàng
 
-# Phase 2.1 - Frontend Components
-# Tạo React components cho layout và UI
+# Phase 2.1 - Shadcn/UI Setup + Layout Components
+# Setup shadcn/ui và tạo layout system
 
 # Test current setup
 php artisan serve
@@ -229,5 +249,6 @@ php artisan tinker
 - Database có đầy đủ sample data để test frontend
 - Web routes đã setup với Inertia responses
 - Services layer sẵn sàng cho business logic
-- Sẵn sàng chuyển sang Phase 2: Frontend Core
-- Tập trung vào React components và UI/UX trong phase tiếp theo 
+- Sẵn sàng chuyển sang Phase 2: Frontend Core với Shadcn/UI
+- Tập trung vào setup shadcn/ui và build components trên foundation này
+- Shadcn/UI sẽ giúp tăng tốc development và đảm bảo UI consistency 
