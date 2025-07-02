@@ -160,4 +160,37 @@ class MangaController extends Controller
         return redirect()->route('manga.index')
             ->with('success', 'Manga đã được xóa thành công!');
     }
+
+    public function getLatestUpdates($limit = 12)
+    {
+        return Manga::with([
+            'taxonomyTerms.taxonomy',
+            'chapters' => function ($query) {
+                $query->orderBy('updated_at', 'desc')
+                      ->limit(3);
+            }
+        ])
+        ->whereHas('chapters')
+        ->orderBy('updated_at', 'desc')
+        ->limit($limit)
+        ->get()
+        ->map(function ($manga) {
+            return [
+                'id' => $manga->id,
+                'name' => $manga->name,
+                'slug' => $manga->slug,
+                'cover' => $manga->cover,
+                'status' => $manga->status,
+                'recent_chapters' => $manga->chapters->map(function ($chapter) {
+                    return [
+                        'chapter_number' => $chapter->chapter_number,
+                        'title' => $chapter->title,
+                        'slug' => $chapter->slug,
+                        'updated_at' => $chapter->updated_at,
+                        'created_at' => $chapter->created_at,
+                    ];
+                })
+            ];
+        });
+    }
 }

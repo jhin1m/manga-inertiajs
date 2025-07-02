@@ -39,7 +39,7 @@
 
 ---
 
-## 🎨 Phase 2: Frontend Core với Shadcn/UI (13/41 tasks)
+## 🎨 Phase 2: Frontend Core với Shadcn/UI (15/41 tasks)
 
 ### Shadcn/UI Setup (7/7) ✅
 - [x] Install shadcn/ui với Tailwind CSS
@@ -57,9 +57,9 @@
 - [x] Footer với shadcn/ui styling
 - [x] Breadcrumb navigation component
 
-### Manga Components với Shadcn/UI (0/5)
-- [ ] MangaCard với Card, Badge, Avatar, Button
-- [ ] MangaList với Grid layout + shadcn/ui Cards
+### Manga Components với Shadcn/UI (2/5)
+- [x] MangaCard với Card, Badge, Button
+- [x] MangaList với Grid layout + shadcn/ui Cards
 - [ ] MangaDetail với Tabs, Badge, Button, Separator
 - [ ] MangaFilters với Select, Checkbox, RadioGroup, Slider
 - [ ] MangaSearch với Command component + suggestions
@@ -86,8 +86,8 @@
 - [ ] Search với Command, Card components
 - [ ] 404 Error với shadcn/ui styling
 
-### Home Advanced Layout Components (0/8)
-- [ ] Hot Manga Slider với responsive breakpoints
+### Home Advanced Layout Components (1/8)
+- [x] Hot Manga Slider với responsive breakpoints
 - [ ] Main Content Grid (2fr + 1fr layout)
 - [ ] Latest Update Manga Grid với hover effects
 - [ ] Rankings Card với top manga list

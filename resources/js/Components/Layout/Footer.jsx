@@ -149,33 +149,6 @@ export default function Footer() {
                     </div>
                 </div>
 
-                {/* Newsletter Subscription - Mobile Friendly */}
-                <Card className="mt-8 lg:mt-12 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-                    <CardContent className="p-6">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4">
-                            <div className="flex-1">
-                                <h4 className="font-semibold text-foreground mb-1">
-                                    Cập nhật manga mới
-                                </h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Nhận thông báo về manga mới và cập nhật hàng tuần
-                                </p>
-                            </div>
-                            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-                                <input
-                                    type="email"
-                                    placeholder="Email của bạn"
-                                    className="flex h-9 w-full sm:w-64 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                />
-                                <Button size="sm" className="w-full sm:w-auto">
-                                    <Mail className="mr-2 h-4 w-4" />
-                                    Đăng ký
-                                </Button>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
                 <Separator className="my-8" />
 
                 {/* Bottom Footer */}
