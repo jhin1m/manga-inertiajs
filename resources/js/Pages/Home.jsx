@@ -1,8 +1,8 @@
 import { Head } from '@inertiajs/react';
 import { AppLayout } from '@/Layouts/AppLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card.jsx";
+import { Button } from "@/Components/ui/button.jsx";
+import { Badge } from "@/Components/ui/badge.jsx";
 import { MangaList } from '@/Components/Manga';
 import { HotMangaSlider, RankingsCard, RecommendedCard } from '@/Components/Home';
 import { 
