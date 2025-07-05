@@ -1,15 +1,28 @@
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/Components/ui/button.jsx";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card.jsx";
+import { Checkbox } from "@/Components/ui/checkbox.jsx";
+import { Label } from "@/Components/ui/label.jsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select.jsx";
+import { Slider } from "@/Components/ui/slider.jsx";
+import { Badge } from "@/Components/ui/badge.jsx";
+import { ScrollArea } from "@/Components/ui/scroll-area.jsx";
+import { Separator } from "@/Components/ui/separator.jsx";
+import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group.jsx";
 import { X, Filter, RotateCcw } from 'lucide-react';
+
+const sortOptions = [
+    { value: 'latest', label: 'Mới nhất' },
+    { value: 'oldest', label: 'Cũ nhất' },
+    { value: 'views', label: 'Xem nhiều nhất' },
+    { value: 'rating', label: 'Đánh giá cao nhất' },
+    { value: 'name_asc', label: 'Tên A-Z' },
+    { value: 'name_desc', label: 'Tên Z-A' },
+];
+
+const currentYear = new Date().getFullYear();
+const years = Array.from({ length: currentYear - 1989 }, (_, i) => currentYear - i);
+
 
 export default function MangaFilters({ 
     filters = {}, 
@@ -57,6 +70,15 @@ export default function MangaFilters({
     };
 
     const hasActiveFilters = () => {
+        return (
+            localFilters.genres?.length > 0 ||
+            localFilters.status ||
+            localFilters.author ||
+            (localFilters.rating?.[0] > 0) ||
+            localFilters.year ||
+            localFilters.sortBy !== 'latest'
+        );
+    };
 
     return (
         <Card className={className}>
@@ -183,7 +205,7 @@ export default function MangaFilters({
                             )}
                         </Label>
                         <div className="space-y-2 max-h-48 overflow-y-auto">
-                            {genresData.map((genre) => (
+                            {genres.map((genre) => (
                                 <div key={genre.id} className="flex items-center space-x-2">
                                     <Checkbox
                                         id={`genre-${genre.id}`}
@@ -210,7 +232,7 @@ export default function MangaFilters({
                             <Label className="text-sm font-medium">Đã chọn:</Label>
                             <div className="flex flex-wrap gap-1">
                                 {localFilters.genres.map((genreId) => {
-                                    const genre = genresData.find(g => g.id === genreId);
+                                    const genre = genres.find(g => g.id === genreId);
                                     return genre ? (
                                         <Badge
                                             key={genreId}
@@ -230,4 +252,4 @@ export default function MangaFilters({
             </CardContent>
         </Card>
     );
-} 
+}
