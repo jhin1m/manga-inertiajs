@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->enum('status', ['ongoing', 'completed', 'hiatus', 'cancelled'])->default('ongoing');
             $table->unsignedBigInteger('views')->default(0);
+            $table->decimal('rating', 3, 2)->default(0)->comment('Rating from 0 to 10');
             $table->string('cover')->nullable();
             $table->string('slug')->unique();
             $table->timestamps();

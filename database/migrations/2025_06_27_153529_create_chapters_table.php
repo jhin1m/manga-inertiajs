@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->decimal('chapter_number', 8, 2);
             $table->integer('volume_number')->nullable();
+            $table->unsignedBigInteger('views')->default(0);
             $table->integer('pages_count')->default(0);
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
