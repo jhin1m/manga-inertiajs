@@ -78,7 +78,7 @@ export default function HotMangaSlider({ hotManga = [], title = "Manga Hot 🔥"
     }
 
     return (
-        <section className="py-8 bg-gradient-to-r from-red-50/50 via-orange-50/30 to-yellow-50/50 dark:from-red-950/20 dark:via-orange-950/10 dark:to-yellow-950/20">
+        <section className="py-8 bg-gradient-to-r from-red-50/50 via-orange-50/30 to-yellow-50/50">
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
@@ -104,7 +104,7 @@ export default function HotMangaSlider({ hotManga = [], title = "Manga Hot 🔥"
                             size="sm"
                             onClick={() => scroll('left')}
                             disabled={!canScrollLeft}
-                            className="h-8 w-8 p-0 hover:bg-red-50 dark:hover:bg-red-950"
+                            className="h-8 w-8 p-0 hover:bg-red-50"
                             aria-label="Scroll left"
                         >
                             <ChevronLeft className="h-4 w-4" />
@@ -114,7 +114,7 @@ export default function HotMangaSlider({ hotManga = [], title = "Manga Hot 🔥"
                             size="sm"
                             onClick={() => scroll('right')}
                             disabled={!canScrollRight}
-                            className="h-8 w-8 p-0 hover:bg-red-50 dark:hover:bg-red-950"
+                            className="h-8 w-8 p-0 hover:bg-red-50"
                             aria-label="Scroll right"
                         >
                             <ChevronRight className="h-4 w-4" />

@@ -80,9 +80,6 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="text-2xl font-bold">{chapter.title}</h1>
-                                <p className="text-muted-foreground mt-1">
-                                    Chapter {chapter.chapter_number} • {pages.length} trang
-                                </p>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Eye className="h-4 w-4" />
@@ -102,9 +99,6 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                             <div className="flex flex-col gap-4">
                                 <div className="text-center">
                                     <h3 className="font-semibold text-lg">{chapter.title}</h3>
-                                    <p className="text-sm text-muted-foreground">
-                                        Đã đọc xong {pages.length} trang
-                                    </p>
                                 </div>
                                 
                                 {/* Desktop Navigation */}

@@ -46,7 +46,7 @@ export default function Footer() {
         { name: 'Facebook', href: '#', icon: Facebook, color: 'text-blue-600' },
         { name: 'Twitter', href: '#', icon: Twitter, color: 'text-sky-500' },
         { name: 'Instagram', href: '#', icon: Instagram, color: 'text-pink-500' },
-        { name: 'Github', href: '#', icon: Github, color: 'text-gray-900 dark:text-gray-100' },
+        { name: 'Github', href: '#', icon: Github, color: 'text-gray-900' },
     ];
 
     return (
@@ -73,7 +73,7 @@ export default function Footer() {
                             <Badge variant="outline" className="text-xs">
                                 Beta
                             </Badge>
-                            <Badge variant="default" className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                            <Badge variant="default" className="text-xs bg-green-100 text-green-800">
                                 Online
                             </Badge>
                         </div>
