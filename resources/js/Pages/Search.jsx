@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { AppLayout } from '@/Layouts/AppLayout';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/Components/ui/button.jsx";
+import { Card, CardContent } from "@/Components/ui/card.jsx";
+import { Badge } from "@/Components/ui/badge.jsx";
+import { Input } from "@/Components/ui/input.jsx";
 import { 
     Search, 
     BookOpen, 

@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card.jsx";
+import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar.jsx";
 import { MessageCircle, Clock } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import { formatRelativeTime } from "@/lib/formatters";

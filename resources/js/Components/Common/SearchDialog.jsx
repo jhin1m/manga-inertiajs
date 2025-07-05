@@ -9,8 +9,8 @@ import {
     CommandItem,
     CommandList,
     CommandSeparator,
-} from "@/components/ui/command";
-import { Badge } from "@/components/ui/badge";
+} from "@/Components/ui/command.jsx";
+import { Badge } from "@/Components/ui/badge.jsx";
 import { 
     Search, 
     BookOpen, 

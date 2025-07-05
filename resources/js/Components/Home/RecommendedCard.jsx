@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card.jsx";
+import { Badge } from "@/Components/ui/badge.jsx";
+import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar.jsx";
 import { Star, Heart, Sparkles } from "lucide-react";
 import { Link } from "@inertiajs/react";
 

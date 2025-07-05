@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import { AppLayout } from '@/Layouts/AppLayout';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@/Components/ui/button.jsx";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card.jsx";
+import { Badge } from "@/Components/ui/badge.jsx";
+import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar.jsx";
+import { Separator } from "@/Components/ui/separator.jsx";
 import FilterSidebar from '@/Components/Sidebar/FilterSidebar';
 import MobileFilterButton from '@/Components/Sidebar/MobileFilterButton';
 import { useIsMobile } from '@/hooks/useIsMobile';

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/Components/ui/button.jsx";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/Components/ui/sheet.jsx";
+import { Badge } from "@/Components/ui/badge.jsx";
 import { Filter, SlidersHorizontal, X } from 'lucide-react';
 import MangaFilters from './MangaFilters';
 

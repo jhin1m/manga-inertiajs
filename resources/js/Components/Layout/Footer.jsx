@@ -1,8 +1,8 @@
 import { Link } from '@inertiajs/react';
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/Components/ui/badge.jsx";
+import { Button } from "@/Components/ui/button.jsx";
+import { Separator } from "@/Components/ui/separator.jsx";
+import { Card, CardContent } from "@/Components/ui/card.jsx";
 import { 
     BookOpen, 
     Heart, 

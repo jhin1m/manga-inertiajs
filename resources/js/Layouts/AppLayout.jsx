@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/Components/ui/button.jsx";
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar.jsx";
 import { 
     DropdownMenu,
     DropdownMenuContent,
@@ -9,10 +9,10 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
+} from "@/Components/ui/dropdown-menu.jsx";
+import { Sheet, SheetContent, SheetTrigger } from "@/Components/ui/sheet.jsx";
+import { ScrollArea } from "@/Components/ui/scroll-area.jsx";
+import { Separator } from "@/Components/ui/separator.jsx";
 import { 
     NavigationMenu,
     NavigationMenuContent,
@@ -20,8 +20,8 @@ import {
     NavigationMenuLink,
     NavigationMenuList,
     NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { Badge } from "@/components/ui/badge";
+} from "@/Components/ui/navigation-menu.jsx";
+import { Badge } from "@/Components/ui/badge.jsx";
 import { 
     BookOpen, 
     Home, 

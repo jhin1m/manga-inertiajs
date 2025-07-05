@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/Components/ui/button.jsx";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/Components/ui/sheet.jsx";
+import { ScrollArea } from "@/Components/ui/scroll-area.jsx";
+import { Badge } from "@/Components/ui/badge.jsx";
 import { Filter, SlidersHorizontal } from 'lucide-react';
 import MangaFilters from './MangaFilters';
 

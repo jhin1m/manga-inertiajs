@@ -8,15 +8,15 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@/Components/ui/breadcrumb.jsx";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+} from "@/Components/ui/dropdown-menu.jsx";
+import { Button } from "@/Components/ui/button.jsx";
+import { Sheet, SheetContent, SheetTrigger } from "@/Components/ui/sheet.jsx";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { ChevronDown, Home } from 'lucide-react';
 
