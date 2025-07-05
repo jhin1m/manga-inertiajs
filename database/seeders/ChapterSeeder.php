@@ -25,8 +25,8 @@ class ChapterSeeder extends Seeder
                     'title' => $this->generateChapterTitle($mangaItem->name, $i),
                     'chapter_number' => $i,
                     'volume_number' => ceil($i / 10), // Assume 10 chapters per volume
-                    'pages_count' => rand(15, 25),
-                    'published_at' => now()->subDays(rand(1, 365))
+                    'published_at' => now()->subDays(rand(1, 365)),
+                    'views' => rand(100, 5000)
                 ]);
             }
         }

@@ -66,38 +66,38 @@ class MangaController extends Controller
                 'order' => $sortOrder,
             ],
             'genres' => $genres,
-            'statuses' => [
-                'ongoing' => 'Đang tiến hành',
-                'completed' => 'Hoàn thành',
-                'hiatus' => 'Tạm dừng',
-                'cancelled' => 'Đã hủy'
-            ]
+            'statuses' => Manga::getStatuses(),
         ]);
     }
 
-    public function show(Manga $manga)
+    public function show(Manga $manga, Request $request)
     {
         $manga->load([
             'taxonomyTerms.taxonomy',
-            'chapters' => function ($query) {
-                $query->orderBy('chapter_number', 'desc');
-            }
         ]);
+
+        // Load chapters with pagination
+        $chapters = $manga->chapters()
+            ->orderBy('chapter_number', 'desc')
+            ->paginate(50);
 
         // Increment view count
         $manga->increment('views');
 
-        // Get related manga
-        $relatedManga = Manga::whereHas('taxonomyTerms', function ($query) use ($manga) {
-            $query->whereIn('taxonomy_term_id', $manga->taxonomyTerms->pluck('id'));
-        })
-        ->where('id', '!=', $manga->id)
-        ->limit(6)
-        ->get();
+        // Get genres, authors, tags separately for better organization
+        $genres = $manga->taxonomyTerms->filter(function ($term) {
+            return $term->taxonomy->type === 'genre';
+        })->values();
+
+        $authors = $manga->taxonomyTerms->filter(function ($term) {
+            return $term->taxonomy->type === 'author';
+        })->values();
 
         return Inertia::render('Manga/Show', [
-            'manga' => $manga,
-            'relatedManga' => $relatedManga
+            'manga' => $manga->load([
+                'taxonomyTerms.taxonomy',
+            ]),
+            'chapters' => $chapters,
         ]);
     }
 
@@ -192,5 +192,79 @@ class MangaController extends Controller
                 })
             ];
         });
+    }
+
+    /**
+     * Lấy danh sách Hot Manga dựa trên views và rating
+     */
+    public function getHotManga($limit = 10)
+    {
+        return Manga::with([
+            'chapters' => function ($query) {
+                $query->orderBy('chapter_number', 'desc')
+                      ->limit(1); // Lấy chapter mới nhất
+            }
+        ])
+        ->where('views', '>', 1000) // Chỉ lấy manga có views > 1000
+        ->orderByRaw('(views * 0.7) + (rating * total_rating * 0.3) DESC') // Công thức tính hot score
+        ->limit($limit)
+        ->get()
+        ->map(function ($manga) {
+            return [
+                'id' => $manga->id,
+                'name' => $manga->name,
+                'slug' => $manga->slug,
+                'cover' => $manga->cover ?: '/api/placeholder/200/280',
+                'status' => $manga->status,
+                'latest_chapter' => $manga->chapters->first() ? [
+                    'chapter_number' => $manga->chapters->first()->chapter_number,
+                    'title' => $manga->chapters->first()->title,
+                    'updated_at' => $manga->chapters->first()->updated_at->format('Y-m-d')
+                ] : null
+            ];
+        });
+    }
+
+    /**
+     * Lấy danh sách Rankings theo rating cao nhất
+     */
+    public function getRankings($limit = 10)
+    {
+        return Manga::select('id', 'name', 'slug', 'cover', 'rating', 'views')
+            ->orderBy('rating', 'desc')
+            ->orderBy('total_rating', 'desc')
+            ->limit($limit)
+            ->get()
+            ->map(function ($manga, $index) {
+                return [
+                    'rank' => $index + 1,
+                    'id' => $manga->id,
+                    'name' => $manga->name,
+                    'slug' => $manga->slug,
+                    'cover' => $manga->cover ?: '/api/placeholder/100/140',
+                    'rating' => $manga->rating,
+                    'views' => $manga->views
+                ];
+            });
+    }
+
+    /**
+     * Lấy danh sách Recommended manga
+     */
+    public function getRecommended($limit = 6)
+    {
+        return Manga::where('rating', '>=', 4.0)
+            ->orderBy('rating', 'desc')
+            ->limit($limit)
+            ->get()
+            ->map(function ($manga) {
+                return [
+                    'id' => $manga->id,
+                    'name' => $manga->name,
+                    'slug' => $manga->slug,
+                    'cover' => $manga->cover ?: '/api/placeholder/150/200',
+                    'rating' => $manga->rating
+                ];
+            });
     }
 }

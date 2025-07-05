@@ -12,59 +12,20 @@ class HomeController extends Controller
     public function index()
     {
         $mangaController = new MangaController();
-        $latestUpdates = $mangaController->getLatestUpdates(12);
         
-        // Sample hot manga data for testing (sẽ được thay thế bằng dữ liệu thật sau)
-        $hotManga = [
-            [
-                'id' => 1,
-                'name' => 'Jujutsu Kaisen',
-                'slug' => 'jujutsu-kaisen',
-                'cover' => '/api/placeholder/200/280',
-                'rating' => 4.9,
-                'views' => 2500000,
-                'status' => 'ongoing',
-                'total_chapters' => 245,
-                'genres' => [
-                    ['name' => 'Action'],
-                    ['name' => 'Supernatural'],
-                    ['name' => 'School']
-                ],
-                'latest_chapter' => [
-                    'chapter_number' => 245,
-                    'updated_at' => '2024-01-20'
-                ]
-            ],
-            [
-                'id' => 2,
-                'name' => 'Demon Slayer',
-                'slug' => 'demon-slayer',
-                'cover' => '/api/placeholder/200/280',
-                'rating' => 4.8,
-                'views' => 3200000,
-                'status' => 'completed',
-                'total_chapters' => 205,
-                'genres' => [
-                    ['name' => 'Action'],
-                    ['name' => 'Historical'],
-                    ['name' => 'Supernatural']
-                ],
-                'latest_chapter' => [
-                    'chapter_number' => 205,
-                    'updated_at' => '2024-01-18'
-                ]
-            ]
-        ];
-
         return Inertia::render('Home', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
-            'hotManga' => $hotManga,
-            'latestUpdates' => $latestUpdates,
+            'hotManga' => $mangaController->getHotManga(10),
+            'latestUpdates' => $mangaController->getLatestUpdates(12),
             'featuredManga' => [],
-            'rankings' => [],
+            'rankings' => $mangaController->getRankings(10),
             'recentComments' => [],
-            'recommended' => []
+            'recommended' => $mangaController->getRecommended(6),
+            'translations' => [
+                'latest_updates_title' => __('page.home.latest_updates_title'),
+                'view_all' => __('page.home.view_all'),
+            ]
         ]);
     }
 }

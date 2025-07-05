@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
-import AppLayout from '@/Layouts/AppLayout';
+import { AppLayout } from '@/Layouts/AppLayout';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,88 +22,6 @@ export default function MangaBrowse({
     const [filters, setFilters] = useState(currentFilters);
     const [viewMode, setViewMode] = useState('grid'); // grid or list
     const isMobile = useIsMobile();
-
-    // Sample manga data nếu không có từ backend
-    const sampleMangas = mangas.length > 0 ? mangas : [
-        {
-            id: 1,
-            title: "One Piece",
-            slug: "one-piece",
-            cover_image: "/placeholder-manga.jpg",
-            description: "Câu chuyện về Monkey D. Luffy và băng hải tặc Mũ Rơm...",
-            status: "ongoing",
-            rating: 9.5,
-            total_chapters: 1095,
-            updated_at: "2024-01-15",
-            genres: ["Action", "Adventure", "Comedy"],
-            author: "Oda Eiichiro"
-        },
-        {
-            id: 2,
-            title: "Naruto",
-            slug: "naruto",
-            cover_image: "/placeholder-manga.jpg",
-            description: "Câu chuyện về ninja Uzumaki Naruto...",
-            status: "completed",
-            rating: 9.0,
-            total_chapters: 700,
-            updated_at: "2024-01-10",
-            genres: ["Action", "Adventure", "Martial Arts"],
-            author: "Kishimoto Masashi"
-        },
-        {
-            id: 3,
-            title: "Attack on Titan",
-            slug: "attack-on-titan",
-            cover_image: "/placeholder-manga.jpg",
-            description: "Nhân loại chiến đấu chống lại những titan khổng lồ...",
-            status: "completed",
-            rating: 9.2,
-            total_chapters: 139,
-            updated_at: "2024-01-08",
-            genres: ["Action", "Drama", "Horror"],
-            author: "Hajime Isayama"
-        },
-        {
-            id: 4,
-            title: "Demon Slayer",
-            slug: "demon-slayer",
-            cover_image: "/placeholder-manga.jpg",
-            description: "Tanjiro trở thành thợ săn quỷ để cứu em gái...",
-            status: "completed",
-            rating: 8.8,
-            total_chapters: 205,
-            updated_at: "2024-01-05",
-            genres: ["Action", "Supernatural", "Historical"],
-            author: "Koyoharu Gotouge"
-        },
-        {
-            id: 5,
-            title: "My Hero Academia",
-            slug: "my-hero-academia",
-            cover_image: "/placeholder-manga.jpg",
-            description: "Trong thế giới mà hầu hết mọi người đều có siêu năng lực...",
-            status: "ongoing",
-            rating: 8.5,
-            total_chapters: 400,
-            updated_at: "2024-01-12",
-            genres: ["Action", "School", "Superhero"],
-            author: "Kohei Horikoshi"
-        },
-        {
-            id: 6,
-            title: "Death Note",
-            slug: "death-note",
-            cover_image: "/placeholder-manga.jpg",
-            description: "Light Yagami tìm thấy quyển sổ tử thần...",
-            status: "completed",
-            rating: 9.1,
-            total_chapters: 108,
-            updated_at: "2024-01-01",
-            genres: ["Psychological", "Supernatural", "Thriller"],
-            author: "Tsugumi Ohba"
-        }
-    ];
 
     const handleFiltersChange = (newFilters) => {
         setFilters(newFilters);
@@ -127,7 +45,7 @@ export default function MangaBrowse({
                     </h3>
                     <div className="flex items-center gap-2 mb-2">
                         <Badge variant="outline" className="text-xs">
-                            {manga.status === 'ongoing' ? 'Đang tiến hành' : 'Hoàn thành'}
+                            {manga.status_label || manga.status}
                         </Badge>
                         <div className="flex items-center gap-1">
                             <span className="text-yellow-500">★</span>
@@ -174,7 +92,7 @@ export default function MangaBrowse({
                         </p>
                         <div className="flex items-center gap-2 mb-2">
                             <Badge variant="outline" className="text-xs">
-                                {manga.status === 'ongoing' ? 'Đang tiến hành' : 'Hoàn thành'}
+                                {manga.status_label || manga.status}
                             </Badge>
                             <div className="flex items-center gap-1">
                                 <span className="text-yellow-500">★</span>
@@ -276,20 +194,20 @@ export default function MangaBrowse({
                     <main>
                         {viewMode === 'grid' ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                {sampleMangas.map((manga) => (
+                                {mangas.map((manga) => (
                                     <MangaCard key={manga.id} manga={manga} />
                                 ))}
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {sampleMangas.map((manga) => (
+                                {mangas.map((manga) => (
                                     <MangaListItem key={manga.id} manga={manga} />
                                 ))}
                             </div>
                         )}
 
                         {/* Empty State */}
-                        {sampleMangas.length === 0 && (
+                        {mangas.length === 0 && (
                             <Card className="text-center py-12">
                                 <CardContent>
                                     <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />

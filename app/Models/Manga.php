@@ -7,10 +7,29 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Manga extends Model
 {
     use HasFactory;
+
+    const STATUS_KEYS = ['ongoing', 'completed', 'hiatus', 'cancelled'];
+
+    public static function getStatuses(): array
+    {
+        $statuses = [];
+        foreach (self::STATUS_KEYS as $key) {
+            $statuses[$key] = __('manga.statuses.' . $key);
+        }
+        return $statuses;
+    }
+
+    protected function statusLabel(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => __('manga.statuses.' . $this->status, [], app()->getLocale()),
+        );
+    }
 
     protected $fillable = [
         'name',
@@ -33,7 +52,7 @@ class Manga extends Model
 
     public function chapters(): HasMany
     {
-        return $this->hasMany(Chapter::class)->orderBy('chapter_number');
+        return $this->hasMany(Chapter::class);
     }
 
     public function taxonomyTerms(): BelongsToMany
@@ -127,5 +146,13 @@ class Manga extends Model
     public function getTotalChaptersAttribute(): int
     {
         return $this->chapters()->count();
+    }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
     }
 }

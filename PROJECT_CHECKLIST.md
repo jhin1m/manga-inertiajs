@@ -1,6 +1,6 @@
 # ✅ Project Checklist - Manga Reader
 
-## 📊 Overall Progress: 42% Complete
+## 📊 Overall Progress: 48% Complete
 
 ### ✅ Foundation (Completed)
 - [x] Database schema design
@@ -60,7 +60,7 @@
 ### Manga Components với Shadcn/UI (2/5)
 - [x] MangaCard với Card, Badge, Button
 - [x] MangaList với Grid layout + shadcn/ui Cards
-- [ ] MangaDetail với Tabs, Badge, Button, Separator
+- [x] MangaDetail với Tabs, Badge, Button, Separator
 - [ ] MangaFilters với Select, Checkbox, RadioGroup, Slider
 - [ ] MangaSearch với Command component + suggestions
 
@@ -88,17 +88,16 @@
 
 ### Home Advanced Layout Components (1/8)
 - [x] Hot Manga Slider với responsive breakpoints
-- [ ] Main Content Grid (2fr + 1fr layout)
-- [ ] Latest Update Manga Grid với hover effects
-- [ ] Rankings Card với top manga list
-- [ ] Recent Comments Card với avatar + preview
-- [ ] Recommended Manga Card với ratings
-- [ ] Responsive behavior (Mobile/Tablet/Desktop)
-- [ ] Smooth animations và transitions
+- [x] Main Content Grid (2fr + 1fr layout)
+- [x] Latest Update Manga Grid với hover effects
+- [x] Rankings Card với top manga list
+- [x] Recommended Manga Card với ratings
+- [x] Responsive behavior (Mobile/Tablet/Desktop)
+- [x] Smooth animations và transitions
 
 ---
 
-## ⚡ Phase 3: Core Features (0/20 tasks)
+## ⚡ Phase 3: Core Features (6/20 tasks)
 
 ### Manga Listing & Filtering (0/6)
 - [ ] Homepage với featured manga
@@ -108,20 +107,20 @@
 - [ ] Sort options
 - [ ] Pagination
 
-### Manga Detail Page (0/5)
-- [ ] Manga info display
-- [ ] Chapter list
-- [ ] Related manga
-- [ ] Tags & genres
-- [ ] Statistics
+### Manga Detail Page (5/5)
+- [x] Manga info display
+- [x] Chapter list
+- [x] Related manga
+- [x] Tags & genres
+- [x] Statistics
 
-### Chapter Reader (0/6)
-- [ ] Page viewer
-- [ ] Navigation controls
-- [ ] Reading modes
-- [ ] Zoom functionality
-- [ ] Keyboard shortcuts
-- [ ] Progress tracking
+### Chapter Reader (6/6) ✅
+- [x] Page viewer
+- [x] Navigation controls (home, prev, chapter list (select chapter), next), sticky navigation when scroll down
+- [x] Reading modes (vertical only)
+- [x] Keyboard shortcuts (next, previous)
+- [x] Chapter Show page component
+- [x] Error handling & lazy loading
 
 ### Search & Discovery (0/3)
 - [ ] Advanced search

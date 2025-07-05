@@ -15,7 +15,7 @@ export default {
     	extend: {
     		fontFamily: {
     			sans: [
-    				'Figtree',
+    				'Nunito',
                     ...defaultTheme.fontFamily.sans
                 ]
     		},

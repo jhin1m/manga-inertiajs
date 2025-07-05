@@ -156,7 +156,6 @@ class ChapterService
     // public function getChapterStats(Chapter $chapter): array
     // {
     //     return [
-    //         'pages_count' => $chapter->pages()->count(),
     //         'views' => $chapter->views,
     //         'published_at' => $chapter->published_at,
     //         'reading_time_estimate' => $this->estimateReadingTime($chapter)

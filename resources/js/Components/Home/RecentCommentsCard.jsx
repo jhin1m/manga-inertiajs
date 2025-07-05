@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MessageCircle, Clock } from "lucide-react";
 import { Link } from "@inertiajs/react";
+import { formatRelativeTime } from "@/lib/formatters";
 
 export function RecentCommentsCard({ comments = [] }) {
     // Demo data nếu không có data từ backend
@@ -74,20 +75,7 @@ export function RecentCommentsCard({ comments = [] }) {
 
     const displayComments = comments.length > 0 ? comments : defaultComments;
 
-    const formatTimeAgo = (dateString) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-        
-        if (diffInHours < 1) {
-            return "Vừa xong";
-        } else if (diffInHours < 24) {
-            return `${diffInHours}h trước`;
-        } else {
-            const diffInDays = Math.floor(diffInHours / 24);
-            return `${diffInDays}d trước`;
-        }
-    };
+
 
     const truncateContent = (content, maxLength = 60) => {
         if (content.length <= maxLength) return content;
@@ -121,7 +109,7 @@ export function RecentCommentsCard({ comments = [] }) {
                             </span>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground ml-auto">
                                 <Clock className="h-3 w-3" />
-                                {formatTimeAgo(comment.created_at)}
+                                {formatRelativeTime(comment.created_at)}
                             </div>
                         </div>
 

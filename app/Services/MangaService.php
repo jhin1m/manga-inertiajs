@@ -243,12 +243,7 @@ class MangaService
                 $q->where('type', 'author');
             })->orderBy('name')->get(['id', 'name', 'slug']),
             
-            'statuses' => [
-                'ongoing' => 'Đang tiến hành',
-                'completed' => 'Hoàn thành',
-                'hiatus' => 'Tạm dừng',
-                'cancelled' => 'Đã hủy'
-            ],
+            'statuses' => Manga::getStatuses(),
             
             'years' => Manga::selectRaw('DISTINCT publication_year')
                 ->whereNotNull('publication_year')

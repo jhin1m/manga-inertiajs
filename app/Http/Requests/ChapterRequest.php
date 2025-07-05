@@ -36,7 +36,6 @@ class ChapterRequest extends FormRequest
                     ->ignore($chapterId)
             ],
             'volume_number' => 'nullable|integer|min:1',
-            'pages_count' => 'nullable|integer|min:0',
             'published_at' => 'nullable|date|before_or_equal:now',
             'views' => 'nullable|integer|min:0'
         ];
@@ -53,8 +52,6 @@ class ChapterRequest extends FormRequest
             'chapter_number.unique' => 'Số chương này đã tồn tại cho manga này.',
             'volume_number.integer' => 'Số tập phải là một số nguyên.',
             'volume_number.min' => 'Số tập phải lớn hơn 0.',
-            'pages_count.integer' => 'Số trang phải là một số nguyên.',
-            'pages_count.min' => 'Số trang không được nhỏ hơn 0.',
             'published_at.date' => 'Ngày xuất bản phải là một ngày hợp lệ.',
             'published_at.before_or_equal' => 'Ngày xuất bản không được lớn hơn ngày hiện tại.',
             'views.integer' => 'Số lượt xem phải là một số nguyên.',
@@ -68,7 +65,6 @@ class ChapterRequest extends FormRequest
             'title' => 'tiêu đề chương',
             'chapter_number' => 'số chương',
             'volume_number' => 'số tập',
-            'pages_count' => 'số trang',
             'published_at' => 'ngày xuất bản',
             'views' => 'số lượt xem'
         ];

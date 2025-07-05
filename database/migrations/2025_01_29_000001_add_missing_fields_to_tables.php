@@ -22,7 +22,7 @@ return new class extends Migration
 
         // Add views field to chapters table
         Schema::table('chapters', function (Blueprint $table) {
-            $table->unsignedBigInteger('views')->default(0)->after('pages_count');
+            $table->unsignedBigInteger('views')->default(0)->after('volume_number');
             $table->index(['views', 'created_at']);
         });
     }

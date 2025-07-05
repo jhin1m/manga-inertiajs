@@ -236,12 +236,7 @@ class SearchService
                 ->orderBy('name')
                 ->get(['id', 'name', 'slug', 'manga_count']),
 
-            'statuses' => [
-                'ongoing' => 'Đang tiến hành',
-                'completed' => 'Hoàn thành',
-                'hiatus' => 'Tạm dừng',
-                'cancelled' => 'Đã hủy'
-            ],
+            'statuses' => Manga::getStatuses(),
 
             'years' => Manga::selectRaw('DISTINCT publication_year')
                 ->whereNotNull('publication_year')

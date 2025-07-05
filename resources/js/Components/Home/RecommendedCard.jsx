@@ -5,7 +5,7 @@ import { Star, Heart, Sparkles } from "lucide-react";
 import { Link } from "@inertiajs/react";
 
 export function RecommendedCard({ recommended = [] }) {
-    // Demo data nếu không có data từ backend
+    // Demo data chỉ dùng khi không có dữ liệu từ backend
     const defaultRecommended = [
         {
             id: 1,
@@ -13,10 +13,6 @@ export function RecommendedCard({ recommended = [] }) {
             slug: "jujutsu-kaisen",
             cover: "/api/placeholder/80/100",
             rating: 4.8,
-            genres: [
-                { name: "Action" },
-                { name: "Supernatural" }
-            ],
             reason: "Dựa trên lịch sử đọc của bạn"
         },
         {
@@ -25,10 +21,6 @@ export function RecommendedCard({ recommended = [] }) {
             slug: "demon-slayer",
             cover: "/api/placeholder/80/100",
             rating: 4.7,
-            genres: [
-                { name: "Action" },
-                { name: "Historical" }
-            ],
             reason: "Manga trending"
         },
         {
@@ -37,10 +29,6 @@ export function RecommendedCard({ recommended = [] }) {
             slug: "my-hero-academia",
             cover: "/api/placeholder/80/100",
             rating: 4.6,
-            genres: [
-                { name: "Action" },
-                { name: "School" }
-            ],
             reason: "Tương tự manga đã đọc"
         },
         {
@@ -49,22 +37,24 @@ export function RecommendedCard({ recommended = [] }) {
             slug: "tokyo-ghoul",
             cover: "/api/placeholder/80/100",
             rating: 4.5,
-            genres: [
-                { name: "Action" },
-                { name: "Horror" }
-            ],
             reason: "Đánh giá cao"
         }
     ];
 
+    // Ưu tiên dữ liệu từ backend, fallback về demo data
     const displayRecommended = recommended.length > 0 ? recommended : defaultRecommended;
 
+    // Debug log chỉ trong development
+    if (process.env.NODE_ENV === 'development') {
+        console.log('Recommended Data:', displayRecommended.slice(0, 3));
+    }
+
     const getReasonIcon = (reason) => {
-        if (reason.includes("lịch sử")) {
+        if (reason && reason.includes("lịch sử")) {
             return <Heart className="h-3 w-3 text-red-500" />;
-        } else if (reason.includes("trending")) {
+        } else if (reason && reason.includes("trending")) {
             return <Sparkles className="h-3 w-3 text-purple-500" />;
-        } else if (reason.includes("tương tự")) {
+        } else if (reason && reason.includes("tương tự")) {
             return <Star className="h-3 w-3 text-blue-500" />;
         }
         return <Star className="h-3 w-3 text-yellow-500" />;
@@ -113,26 +103,15 @@ export function RecommendedCard({ recommended = [] }) {
                                 </span>
                             </div>
 
-                            {/* Genres */}
-                            <div className="flex flex-wrap gap-1 mb-2">
-                                {manga.genres.slice(0, 2).map((genre, index) => (
-                                    <Badge 
-                                        key={index} 
-                                        variant="secondary" 
-                                        className="text-xs px-1.5 py-0.5 h-auto"
-                                    >
-                                        {genre.name}
-                                    </Badge>
-                                ))}
-                            </div>
-
                             {/* Recommendation Reason */}
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                {getReasonIcon(manga.reason)}
-                                <span className="line-clamp-1">
-                                    {manga.reason}
-                                </span>
-                            </div>
+                            {(manga.reason || manga.rating >= 4.5) && (
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                    {getReasonIcon(manga.reason)}
+                                    <span className="line-clamp-1">
+                                        {manga.reason || `Đánh giá ${manga.rating}/5`}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </Link>
                 ))}

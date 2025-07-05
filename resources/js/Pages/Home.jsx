@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import AppLayout from '@/Layouts/AppLayout';
+import { AppLayout } from '@/Layouts/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,15 +16,16 @@ import {
     Heart
 } from 'lucide-react';
 
-export default function Home({ 
-    canLogin, 
-    canRegister, 
-    featuredManga = [], 
+export default function Home({
+    canLogin,
+    canRegister,
+    featuredManga = [],
     hotManga = [],
     latestUpdates = [],
     rankings = [],
     recentComments = [],
-    recommended = []
+    recommended = [],
+    translations
 }) {
     // Demo data fallback nếu không có data từ backend
     const defaultManga = [
@@ -80,22 +81,19 @@ export default function Home({
             <HotMangaSlider hotManga={hotManga} />
 
             {/* Main Content Grid (2fr + 1fr layout) */}
-            <div className="container mx-auto px-4 py-16">
+            <div className="container mx-auto px-4 py-16 bg-primary-100/10">
                 <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
                     {/* Main Content - Latest Updates */}
                     <section>
                         <div className="flex items-center justify-between mb-8">
                             <div>
                                 <h2 className="text-3xl font-bold text-foreground mb-2">
-                                    Cập nhật mới nhất
+                                    {translations.latest_updates_title}
                                 </h2>
-                                <p className="text-muted-foreground">
-                                    Những chapter mới nhất được cập nhật
-                                </p>
                             </div>
                             <Button variant="outline" asChild>
                                 <a href="/manga?sort=latest">
-                                    Xem tất cả
+                                    {translations.view_all}
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </a>
                             </Button>

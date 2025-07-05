@@ -3,9 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Star, TrendingUp, Medal, Crown, Award } from "lucide-react";
 import { Link } from "@inertiajs/react";
+import { formatViews } from "@/lib/formatters";
 
 export function RankingsCard({ rankings = [] }) {
-    // Demo data nếu không có data từ backend
+    // Demo data chỉ dùng khi không có dữ liệu từ backend
     const defaultRankings = [
         {
             id: 1,
@@ -13,7 +14,7 @@ export function RankingsCard({ rankings = [] }) {
             slug: "one-piece",
             cover: "/api/placeholder/60/80",
             rating: 4.9,
-            total_views: 1250000,
+            views: 1250000,
             rank: 1
         },
         {
@@ -22,7 +23,7 @@ export function RankingsCard({ rankings = [] }) {
             slug: "attack-on-titan", 
             cover: "/api/placeholder/60/80",
             rating: 4.8,
-            total_views: 1100000,
+            views: 1100000,
             rank: 2
         },
         {
@@ -31,7 +32,7 @@ export function RankingsCard({ rankings = [] }) {
             slug: "naruto",
             cover: "/api/placeholder/60/80",
             rating: 4.7,
-            total_views: 980000,
+            views: 980000,
             rank: 3
         },
         {
@@ -40,7 +41,7 @@ export function RankingsCard({ rankings = [] }) {
             slug: "dragon-ball",
             cover: "/api/placeholder/60/80",
             rating: 4.6,
-            total_views: 850000,
+            views: 850000,
             rank: 4
         },
         {
@@ -49,12 +50,16 @@ export function RankingsCard({ rankings = [] }) {
             slug: "death-note",
             cover: "/api/placeholder/60/80",
             rating: 4.5,
-            total_views: 720000,
+            views: 720000,
             rank: 5
         }
     ];
 
+    // Ưu tiên dữ liệu từ backend, fallback về demo data
     const displayRankings = rankings.length > 0 ? rankings : defaultRankings;
+
+    // Debug log để kiểm tra dữ liệu
+    console.log('Rankings Data:', displayRankings.slice(0, 3));
 
     const getRankIcon = (rank) => {
         switch(rank) {
@@ -69,14 +74,7 @@ export function RankingsCard({ rankings = [] }) {
         }
     };
 
-    const formatViews = (views) => {
-        if (views >= 1000000) {
-            return `${(views / 1000000).toFixed(1)}M`;
-        } else if (views >= 1000) {
-            return `${(views / 1000).toFixed(1)}K`;
-        }
-        return views.toString();
-    };
+
 
     return (
         <Card>
@@ -125,7 +123,7 @@ export function RankingsCard({ rankings = [] }) {
                                     </span>
                                 </div>
                                 <div className="text-xs text-muted-foreground">
-                                    {formatViews(manga.total_views)} views
+                                    {formatViews(manga.views)} views
                                 </div>
                             </div>
                         </div>

@@ -41,6 +41,12 @@ class ChapterController extends Controller
             ->orderBy('chapter_number', 'asc')
             ->first();
 
+        // Get all chapters for select dropdown
+        $allChapters = Chapter::where('manga_id', $manga->id)
+            ->orderBy('chapter_number', 'asc')
+            ->select('id', 'title', 'chapter_number')
+            ->get();
+
         // Increment view count
         $chapter->increment('views');
 
@@ -49,6 +55,7 @@ class ChapterController extends Controller
             'chapter' => $chapter,
             'previousChapter' => $previousChapter,
             'nextChapter' => $nextChapter,
+            'allChapters' => $allChapters,
             'pages' => $chapter->pages()->orderBy('page_number')->get()
         ]);
     }
@@ -59,7 +66,6 @@ class ChapterController extends Controller
             'title' => 'required|string|max:255',
             'chapter_number' => 'required|numeric|min:0',
             'volume_number' => 'nullable|integer|min:1',
-            'pages_count' => 'nullable|integer|min:0',
             'published_at' => 'nullable|date'
         ]);
 
@@ -94,7 +100,6 @@ class ChapterController extends Controller
             'title' => 'required|string|max:255',
             'chapter_number' => 'required|numeric|min:0',
             'volume_number' => 'nullable|integer|min:1',
-            'pages_count' => 'nullable|integer|min:0',
             'published_at' => 'nullable|date'
         ]);
 

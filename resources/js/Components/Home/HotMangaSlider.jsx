@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
-import { Button } from "@/components/ui/button";
+import React, { useRef, useState, useEffect } from 'react';
+import { Button } from '@/Components/ui/button';
+import { MangaCard } from '../Manga/MangaCard';
 import { ChevronLeft, ChevronRight, Flame } from 'lucide-react';
-import MangaCard from '../Manga/MangaCard';
 
 export default function HotMangaSlider({ hotManga = [], title = "Manga Hot 🔥" }) {
     const scrollRef = useRef(null);
@@ -33,126 +33,46 @@ export default function HotMangaSlider({ hotManga = [], title = "Manga Hot 🔥"
         }
     };
 
-    // Demo data nếu không có data từ backend
-    const defaultHotManga = [
-        {
-            id: 1,
-            name: "Jujutsu Kaisen",
-            slug: "jujutsu-kaisen",
-            cover: "/api/placeholder/200/280",
-            rating: 4.9,
-            views: 2500000,
-            status: "ongoing",
-            total_chapters: 245,
-            genres: [
-                { name: "Action" },
-                { name: "Supernatural" },
-                { name: "School" }
-            ],
-            latest_chapter: {
-                chapter_number: 245,
-                updated_at: "2024-01-20"
-            }
-        },
-        {
-            id: 2,
-            name: "Demon Slayer",
-            slug: "demon-slayer",
-            cover: "/api/placeholder/200/280",
-            rating: 4.8,
-            views: 3200000,
-            status: "completed",
-            total_chapters: 205,
-            genres: [
-                { name: "Action" },
-                { name: "Historical" },
-                { name: "Supernatural" }
-            ],
-            latest_chapter: {
-                chapter_number: 205,
-                updated_at: "2024-01-18"
-            }
-        },
-        {
-            id: 3,
-            name: "Chainsaw Man",
-            slug: "chainsaw-man",
-            cover: "/api/placeholder/200/280",
-            rating: 4.7,
-            views: 1800000,
-            status: "ongoing",
-            total_chapters: 158,
-            genres: [
-                { name: "Action" },
-                { name: "Horror" },
-                { name: "Supernatural" }
-            ],
-            latest_chapter: {
-                chapter_number: 158,
-                updated_at: "2024-01-19"
-            }
-        },
-        {
-            id: 4,
-            name: "My Hero Academia",
-            slug: "my-hero-academia",
-            cover: "/api/placeholder/200/280",
-            rating: 4.6,
-            views: 2100000,
-            status: "ongoing",
-            total_chapters: 410,
-            genres: [
-                { name: "Action" },
-                { name: "School" },
-                { name: "Superhero" }
-            ],
-            latest_chapter: {
-                chapter_number: 410,
-                updated_at: "2024-01-21"
-            }
-        },
-        {
-            id: 5,
-            name: "Tokyo Revengers",
-            slug: "tokyo-revengers",
-            cover: "/api/placeholder/200/280",
-            rating: 4.5,
-            views: 1500000,
-            status: "completed",
-            total_chapters: 278,
-            genres: [
-                { name: "Action" },
-                { name: "Drama" },
-                { name: "Delinquents" }
-            ],
-            latest_chapter: {
-                chapter_number: 278,
-                updated_at: "2024-01-15"
-            }
-        },
-        {
-            id: 6,
-            name: "Spy x Family",
-            slug: "spy-x-family",
-            cover: "/api/placeholder/200/280",
-            rating: 4.8,
-            views: 2800000,
-            status: "ongoing",
-            total_chapters: 95,
-            genres: [
-                { name: "Comedy" },
-                { name: "Action" },
-                { name: "Family" }
-            ],
-            latest_chapter: {
-                chapter_number: 95,
-                updated_at: "2024-01-22"
-            }
+    // Check scroll buttons on mount and when hotManga changes
+    useEffect(() => {
+        if (hotManga.length > 0) {
+            setTimeout(checkScrollButtons, 100); // Small delay to ensure DOM is ready
         }
-    ];
+    }, [hotManga]);
 
-    const displayManga = hotManga.length > 0 ? hotManga : defaultHotManga;
+    // Fallback data chỉ khi thực sự cần thiết (development/testing)
+    const fallbackData = process.env.NODE_ENV === 'development' ? [
+        {
+            id: 'fallback-1',
+            name: "Loading Hot Manga...",
+            slug: "loading",
+            cover: "/api/placeholder/200/280",
+            rating: 0,
+            views: 0,
+            status: "loading",
+            total_chapters: 0,
+            genres: [{ name: "Loading" }],
+            latest_chapter: null
+        }
+    ] : [];
 
+    // Ưu tiên dữ liệu từ backend
+    const displayManga = hotManga.length > 0 ? hotManga : fallbackData;
+
+    // Debug log chỉ trong development
+    if (process.env.NODE_ENV === 'development') {
+        console.log('🔥 Hot Manga Data:', {
+            count: displayManga.length,
+            source: hotManga.length > 0 ? 'backend' : 'fallback',
+            sample: displayManga.slice(0, 2).map(m => ({ 
+                name: m.name, 
+                rating: m.rating, 
+                views: m.views 
+            }))
+        });
+    }
+
+    // Không render nếu không có dữ liệu
     if (displayManga.length === 0) {
         return null;
     }
@@ -171,7 +91,9 @@ export default function HotMangaSlider({ hotManga = [], title = "Manga Hot 🔥"
                         </div>
                         <div className="hidden sm:flex items-center gap-1 bg-gradient-to-r from-red-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                             <Flame className="h-3 w-3" />
-                            Trending
+                            <span className="text-xs font-medium">
+                                Trending
+                            </span>
                         </div>
                     </div>
                     
@@ -182,7 +104,8 @@ export default function HotMangaSlider({ hotManga = [], title = "Manga Hot 🔥"
                             size="sm"
                             onClick={() => scroll('left')}
                             disabled={!canScrollLeft}
-                            className="h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 hover:bg-red-50 dark:hover:bg-red-950"
+                            aria-label="Scroll left"
                         >
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
@@ -191,7 +114,8 @@ export default function HotMangaSlider({ hotManga = [], title = "Manga Hot 🔥"
                             size="sm"
                             onClick={() => scroll('right')}
                             disabled={!canScrollRight}
-                            className="h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 hover:bg-red-50 dark:hover:bg-red-950"
+                            aria-label="Scroll right"
                         >
                             <ChevronRight className="h-4 w-4" />
                         </Button>
@@ -214,14 +138,13 @@ export default function HotMangaSlider({ hotManga = [], title = "Manga Hot 🔥"
                                 key={manga.id}
                                 className="flex-shrink-0 w-[calc(50%-8px)] sm:w-[calc(33.333%-11px)] md:w-[calc(25%-12px)] lg:w-[calc(20%-13px)] xl:w-[calc(16.666%-14px)]"
                             >
-                                <MangaCard manga={manga} />
+                                <MangaCard 
+                                    manga={manga} 
+                                    priority={true} // Ưu tiên load ảnh cho hot manga
+                                />
                             </div>
                         ))}
                     </div>
-
-                    {/* Gradient Fade Effects */}
-                    <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none" />
                 </div>
 
                 {/* Mobile Scroll Indicator */}
@@ -233,17 +156,6 @@ export default function HotMangaSlider({ hotManga = [], title = "Manga Hot 🔥"
                     </div>
                 </div>
             </div>
-
-            {/* Custom Scrollbar Hide Styles */}
-            <style jsx>{`
-                .scrollbar-hide {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-                .scrollbar-hide::-webkit-scrollbar {
-                    display: none;
-                }
-            `}</style>
         </section>
     );
 } 

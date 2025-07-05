@@ -57,48 +57,6 @@ export default function MangaFilters({
     };
 
     const hasActiveFilters = () => {
-        return localFilters.genres?.length > 0 ||
-               localFilters.status ||
-               localFilters.author ||
-               localFilters.rating?.[0] > 0 ||
-               localFilters.year ||
-               (localFilters.sortBy && localFilters.sortBy !== 'latest');
-    };
-
-    const defaultGenres = [
-        { id: 1, name: 'Action', count: 150 },
-        { id: 2, name: 'Adventure', count: 120 },
-        { id: 3, name: 'Comedy', count: 200 },
-        { id: 4, name: 'Drama', count: 180 },
-        { id: 5, name: 'Fantasy', count: 250 },
-        { id: 6, name: 'Horror', count: 80 },
-        { id: 7, name: 'Romance', count: 300 },
-        { id: 8, name: 'Sci-Fi', count: 90 },
-        { id: 9, name: 'Slice of Life', count: 160 },
-        { id: 10, name: 'Supernatural', count: 140 }
-    ];
-
-    const defaultStatuses = [
-        { value: 'ongoing', label: 'Đang tiến hành' },
-        { value: 'completed', label: 'Hoàn thành' },
-        { value: 'hiatus', label: 'Tạm dừng' },
-        { value: 'cancelled', label: 'Đã hủy' }
-    ];
-
-    const sortOptions = [
-        { value: 'latest', label: 'Mới nhất' },
-        { value: 'popular', label: 'Phổ biến' },
-        { value: 'rating', label: 'Đánh giá cao' },
-        { value: 'alphabetical', label: 'A-Z' },
-        { value: 'oldest', label: 'Cũ nhất' },
-        { value: 'most_chapters', label: 'Nhiều chương nhất' }
-    ];
-
-    const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: 30 }, (_, i) => currentYear - i);
-
-    const genresData = genres.length > 0 ? genres : defaultGenres;
-    const statusesData = statuses.length > 0 ? statuses : defaultStatuses;
 
     return (
         <Card className={className}>
@@ -156,11 +114,11 @@ export default function MangaFilters({
                                 <RadioGroupItem value="all" id="status-all" />
                                 <Label htmlFor="status-all" className="text-sm">Tất cả</Label>
                             </div>
-                            {statusesData.map((status) => (
-                                <div key={status.value} className="flex items-center space-x-2">
-                                    <RadioGroupItem value={status.value} id={`status-${status.value}`} />
-                                    <Label htmlFor={`status-${status.value}`} className="text-sm">
-                                        {status.label}
+                            {Object.entries(statuses).map(([value, label]) => (
+                                <div key={value} className="flex items-center space-x-2">
+                                    <RadioGroupItem value={value} id={`status-${value}`} />
+                                    <Label htmlFor={`status-${value}`} className="text-sm">
+                                        {label}
                                     </Label>
                                 </div>
                             ))}

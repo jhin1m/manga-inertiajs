@@ -17,7 +17,6 @@ class Chapter extends Model
         'title',
         'chapter_number',
         'volume_number',
-        'pages_count',
         'published_at',
         'views',
     ];
@@ -25,7 +24,6 @@ class Chapter extends Model
     protected $casts = [
         'chapter_number' => 'decimal:2',
         'volume_number' => 'integer',
-        'pages_count' => 'integer',
         'published_at' => 'datetime',
         'views' => 'integer',
     ];
@@ -49,11 +47,6 @@ class Chapter extends Model
     public function scopeByVolume(Builder $query, int $volume): Builder
     {
         return $query->where('volume_number', $volume);
-    }
-
-    public function updatePagesCount(): void
-    {
-        $this->update(['pages_count' => $this->pages()->count()]);
     }
 
     public function getNextChapterAttribute()
