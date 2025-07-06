@@ -9,8 +9,8 @@ export default function MobileFilterButton({
     filters = {}, 
     onFiltersChange = () => {},
     genres = [],
-    statuses = [],
-    authors = [],
+    statuses = {},
+    translations = {},
     buttonText = "Bộ lọc",
     buttonVariant = "outline",
     buttonSize = "default",
@@ -21,8 +21,7 @@ export default function MobileFilterButton({
     const hasActiveFilters = () => {
         return filters.genres?.length > 0 ||
                filters.status ||
-               filters.author ||
-               filters.rating?.[0] > 0 ||
+               (filters.rating > 0) ||
                filters.year ||
                (filters.sortBy && filters.sortBy !== 'latest');
     };
@@ -31,8 +30,7 @@ export default function MobileFilterButton({
         let count = 0;
         if (filters.genres?.length > 0) count += filters.genres.length;
         if (filters.status) count += 1;
-        if (filters.author) count += 1;
-        if (filters.rating?.[0] > 0) count += 1;
+        if (filters.rating > 0) count += 1;
         if (filters.year) count += 1;
         if (filters.sortBy && filters.sortBy !== 'latest') count += 1;
         return count;
@@ -42,20 +40,21 @@ export default function MobileFilterButton({
         const emptyFilters = {
             genres: [],
             status: '',
-            author: '',
-            rating: [0],
+            rating: 0,
             year: '',
             sortBy: 'latest'
         };
         onFiltersChange(emptyFilters);
     };
 
+    const t = translations.filters || {};
+
     return (
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
                 <Button variant={buttonVariant} size={buttonSize} className={`relative ${className}`}>
                     <SlidersHorizontal className="h-4 w-4 mr-2" />
-                    {buttonText}
+                    {t.title || buttonText}
                     {hasActiveFilters() && (
                         <Badge 
                             variant="destructive" 
@@ -72,10 +71,10 @@ export default function MobileFilterButton({
                     <div className="flex items-center justify-between">
                         <SheetTitle className="flex items-center gap-2">
                             <Filter className="h-5 w-5" />
-                            Bộ lọc manga
+                            {t.title || 'Bộ lọc'} manga
                             {hasActiveFilters() && (
                                 <Badge variant="secondary">
-                                    {getActiveFiltersCount()} đang áp dụng
+                                    {getActiveFiltersCount()} {t.applying || 'đang áp dụng'}
                                 </Badge>
                             )}
                         </SheetTitle>
@@ -87,7 +86,7 @@ export default function MobileFilterButton({
                                 className="h-8 px-2"
                             >
                                 <X className="h-4 w-4 mr-1" />
-                                Xóa tất cả
+                                {t.clear_all || 'Xóa tất cả'}
                             </Button>
                         )}
                     </div>
@@ -100,13 +99,12 @@ export default function MobileFilterButton({
                             onFiltersChange={onFiltersChange}
                             genres={genres}
                             statuses={statuses}
-                            authors={authors}
+                            translations={translations}
                             className="border-0 shadow-none h-full"
                         />
                     </div>
                 </div>
 
-                {/* Apply Button cho mobile */}
                 <div className="p-6 border-t bg-background">
                     <div className="flex gap-2">
                         <Button 
@@ -114,14 +112,14 @@ export default function MobileFilterButton({
                             className="flex-1"
                             onClick={() => setIsOpen(false)}
                         >
-                            Đóng
+                            {t.close || 'Đóng'}
                         </Button>
                         <Button 
                             className="flex-1"
                             onClick={() => setIsOpen(false)}
                             disabled={!hasActiveFilters()}
                         >
-                            Áp dụng ({getActiveFiltersCount()})
+                            {t.apply || 'Áp dụng'} ({getActiveFiltersCount()})
                         </Button>
                     </div>
                 </div>

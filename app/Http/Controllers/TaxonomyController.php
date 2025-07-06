@@ -48,6 +48,53 @@ class TaxonomyController extends Controller
         ]);
     }
 
+    public function termsByType(TaxonomyTerm $term, Request $request)
+    {
+        $term->load('taxonomy');
+        
+        // Get the type from the route name
+        $routeName = $request->route()->getName();
+        $type = explode('.', $routeName)[0]; // genre.show -> genre
+        
+        // Validate that the term belongs to the correct taxonomy type
+        if ($term->taxonomy->type !== $type) {
+            abort(404);
+        }
+        
+        $manga = $term->mangas()
+            ->with(['taxonomyTerms.taxonomy', 'chapters'])
+            ->withCount('chapters')
+            ->orderBy('updated_at', 'desc')
+            ->paginate(20);
+
+        // Transform chapters to recent_chapters format for MangaCard compatibility
+        $manga->getCollection()->transform(function ($manga) {
+            $manga->recent_chapters = $manga->chapters->map(function ($chapter) {
+                return [
+                    'chapter_number' => $chapter->chapter_number,
+                    'title' => $chapter->title,
+                    'slug' => $chapter->slug,
+                    'updated_at' => $chapter->updated_at,
+                    'created_at' => $chapter->created_at,
+                ];
+            });
+            return $manga;
+        });
+
+        return Inertia::render('Taxonomy/TermsByType', [
+            'term' => $term,
+            'manga' => $manga,
+            'type' => $type,
+            'translations' => [
+                'title' => __('manga.taxonomy.' . $type . '_title', ['name' => $term->name]),
+                'description' => __('manga.taxonomy.' . $type . '_description', ['name' => $term->name]),
+                'found_count' => __('manga.index.found_count'),
+                'no_manga_found' => __('manga.index.no_manga_found'),
+                'no_manga_message' => __('manga.index.no_manga_message'),
+            ]
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([

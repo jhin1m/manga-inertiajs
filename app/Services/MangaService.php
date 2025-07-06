@@ -33,9 +33,9 @@ class MangaService
     public function getRelatedManga(Manga $manga, int $limit = 6): \Illuminate\Database\Eloquent\Collection
     {
         return Manga::whereHas('taxonomyTerms', function ($query) use ($manga) {
-            $query->whereIn('taxonomy_term_id', $manga->taxonomyTerms->pluck('id'));
+            $query->whereIn('manga_taxonomy_terms.taxonomy_term_id', $manga->taxonomyTerms->pluck('id'));
         })
-        ->where('id', '!=', $manga->id)
+        ->where('mangas.id', '!=', $manga->id)
         ->limit($limit)
         ->get();
     }

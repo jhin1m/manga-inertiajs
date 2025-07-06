@@ -33,4 +33,12 @@ class TaxonomyTerm extends Model
     {
         return $this->mangas();
     }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 }

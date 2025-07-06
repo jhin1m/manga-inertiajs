@@ -10,8 +10,8 @@ export default function FilterSidebar({
     filters = {}, 
     onFiltersChange = () => {},
     genres = [],
-    statuses = [],
-    authors = [],
+    statuses = {},
+    translations = {},
     className = "",
     showFilterButton = true,
     isMobile = false
@@ -21,8 +21,7 @@ export default function FilterSidebar({
     const hasActiveFilters = () => {
         return filters.genres?.length > 0 ||
                filters.status ||
-               filters.author ||
-               filters.rating?.[0] > 0 ||
+               (filters.rating > 0) ||
                filters.year ||
                (filters.sortBy && filters.sortBy !== 'latest');
     };
@@ -31,14 +30,14 @@ export default function FilterSidebar({
         let count = 0;
         if (filters.genres?.length > 0) count += filters.genres.length;
         if (filters.status) count += 1;
-        if (filters.author) count += 1;
-        if (filters.rating?.[0] > 0) count += 1;
+        if (filters.rating > 0) count += 1;
         if (filters.year) count += 1;
         if (filters.sortBy && filters.sortBy !== 'latest') count += 1;
         return count;
     };
 
-    // Mobile version với Sheet
+    const t = translations.filters || {};
+
     if (isMobile) {
         return (
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -46,7 +45,7 @@ export default function FilterSidebar({
                     {showFilterButton && (
                         <Button variant="outline" className="relative">
                             <SlidersHorizontal className="h-4 w-4 mr-2" />
-                            Bộ lọc
+                            {t.title || 'Bộ lọc'}
                             {hasActiveFilters() && (
                                 <Badge 
                                     variant="destructive" 
@@ -62,10 +61,10 @@ export default function FilterSidebar({
                     <SheetHeader className="p-6 pb-3">
                         <SheetTitle className="flex items-center gap-2">
                             <Filter className="h-5 w-5" />
-                            Bộ lọc manga
+                            {t.title || 'Bộ lọc'} manga
                             {hasActiveFilters() && (
                                 <Badge variant="secondary">
-                                    {getActiveFiltersCount()} đang áp dụng
+                                    {getActiveFiltersCount()} {t.applying || 'đang áp dụng'}
                                 </Badge>
                             )}
                         </SheetTitle>
@@ -74,14 +73,10 @@ export default function FilterSidebar({
                     <div className="px-6 pb-6">
                         <MangaFilters
                             filters={filters}
-                            onFiltersChange={(newFilters) => {
-                                onFiltersChange(newFilters);
-                                // Auto close sau khi apply filters trên mobile
-                                // setIsOpen(false);
-                            }}
+                            onFiltersChange={onFiltersChange}
                             genres={genres}
                             statuses={statuses}
-                            authors={authors}
+                            translations={translations}
                             className="border-0 shadow-none"
                         />
                     </div>
@@ -90,7 +85,6 @@ export default function FilterSidebar({
         );
     }
 
-    // Desktop version với ScrollArea
     return (
         <div className={`w-full ${className}`}>
             <ScrollArea className="h-[calc(100vh-120px)]">
@@ -99,7 +93,7 @@ export default function FilterSidebar({
                     onFiltersChange={onFiltersChange}
                     genres={genres}
                     statuses={statuses}
-                    authors={authors}
+                    translations={translations}
                 />
             </ScrollArea>
         </div>

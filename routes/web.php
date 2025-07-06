@@ -93,4 +93,10 @@ Route::prefix('taxonomies')->name('taxonomies.')->group(function () {
     });
 });
 
+// Taxonomy term routes by type (SEO-friendly URLs)
+Route::get('/genre/{term}', [TaxonomyController::class, 'termsByType'])->name('genre.show');
+Route::get('/author/{term}', [TaxonomyController::class, 'termsByType'])->name('author.show');
+Route::get('/artist/{term}', [TaxonomyController::class, 'termsByType'])->name('artist.show');
+Route::get('/tag/{term}', [TaxonomyController::class, 'termsByType'])->name('tag.show');
+
 require __DIR__.'/auth.php';

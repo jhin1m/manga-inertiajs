@@ -12,7 +12,7 @@ import {
     BreadcrumbSeparator 
 } from '@/Components/ui/breadcrumb'
 
-export default function MangaShow({ manga, chapters }) {
+export default function MangaShow({ manga, chapters, translations }) {
     return (
         <AppLayout>
             <Head title={manga.name} />
@@ -23,13 +23,13 @@ export default function MangaShow({ manga, chapters }) {
                     <BreadcrumbList>
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link href="/">Trang chủ</Link>
+                                <Link href={route('home')}>Trang chủ</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link href="/manga">Manga</Link>
+                                <Link href={route('manga.index')}>Manga</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
@@ -41,14 +41,14 @@ export default function MangaShow({ manga, chapters }) {
 
                 {/* Manga Header - Cover + Basic Info */}
                 <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-6 mb-8">
-                    <MangaHeader manga={manga} />
+                    <MangaHeader manga={manga} translations={translations} />
                 </div>
 
                 {/* Manga Info - Description + Genres */}
-                <MangaInfo manga={manga} />
+                <MangaInfo manga={manga} translations={translations} />
 
                 {/* Chapter List */}
-                <ChapterList manga={manga} chapters={chapters} />
+                <ChapterList manga={manga} chapters={chapters} translations={translations} />
             </div>
         </AppLayout>
     )

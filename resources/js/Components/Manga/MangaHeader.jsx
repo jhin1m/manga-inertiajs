@@ -3,9 +3,9 @@ import { Button } from '@/Components/ui/button'
 import { Badge } from '@/Components/ui/badge'
 import { AspectRatio } from '@/Components/ui/aspect-ratio'
 import { Card, CardContent } from '@/Components/ui/card'
-import { BookOpen, Heart, Star } from 'lucide-react'
+import { BookOpen, Heart, Star, Eye, Calendar } from 'lucide-react'
 
-export function MangaHeader({ manga }) {
+export function MangaHeader({ manga, translations }) {
     const statusColors = {
         'ongoing': 'bg-green-500',
         'completed': 'bg-blue-500', 
@@ -34,6 +34,10 @@ export function MangaHeader({ manga }) {
             }
         }
         return stars
+    }
+
+    const formatNumber = (num) => {
+        return new Intl.NumberFormat('vi-VN').format(num || 0)
     }
 
     return (
@@ -69,15 +73,31 @@ export function MangaHeader({ manga }) {
                         {renderStars(manga.rating || 0)}
                     </div>
                     <span className="text-sm text-muted-foreground">
-                        {manga.rating ? `${manga.rating}/5` : 'Chưa có đánh giá'} 
-                        {manga.total_rating > 0 && ` (${manga.total_rating} lượt)`}
+                        {manga.rating ? `${manga.rating}/5` : translations.no_rating} 
+                        {manga.total_rating > 0 && ` (${formatNumber(manga.total_rating)} ${translations.ratings_count})`}
                     </span>
                 </div>
 
-                {/* Status & Author */}
-                <div className="flex flex-wrap items-center gap-4">
+                {/* Stats */}
+                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                        <Eye className="w-4 h-4" />
+                        {formatNumber(manga.views)} {translations.views_label}
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <BookOpen className="w-4 h-4" />
+                        {formatNumber(manga.total_chapters)} {translations.chapters_label}
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {new Date(manga.updated_at).toLocaleDateString('vi-VN')}
+                    </div>
+                </div>
+
+                {/* Status & Taxonomy Info */}
+                <div className="space-y-3">
                     <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Trạng thái:</span>
+                        <span className="text-sm text-muted-foreground">{translations.status_label}:</span>
                         <Badge variant="secondary" className={`${statusColors[manga.status]} text-white`}>
                             {manga.status_label || manga.status}
                         </Badge>
@@ -85,15 +105,32 @@ export function MangaHeader({ manga }) {
                     
                     {manga.authors && manga.authors.length > 0 && (
                         <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">Tác giả:</span>
+                            <span className="text-sm text-muted-foreground">{translations.author_label}:</span>
                             <div className="flex flex-wrap gap-1">
                                 {manga.authors.map(author => (
                                     <Link 
                                         key={author.id} 
-                                        href={`/taxonomy/terms/${author.slug}`}
+                                        href={route('taxonomies.terms', author.slug)}
                                         className="text-sm text-primary hover:underline"
                                     >
                                         {author.name}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {manga.artists && manga.artists.length > 0 && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">{translations.artist_label}:</span>
+                            <div className="flex flex-wrap gap-1">
+                                {manga.artists.map(artist => (
+                                    <Link 
+                                        key={artist.id} 
+                                        href={route('taxonomies.terms', artist.slug)}
+                                        className="text-sm text-primary hover:underline"
+                                    >
+                                        {artist.name}
                                     </Link>
                                 ))}
                             </div>
@@ -103,16 +140,27 @@ export function MangaHeader({ manga }) {
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3">
-                    <Button size="lg" asChild>
-                        <Link href={manga.latest_chapter ? `/manga/${manga.slug}/chapters/${manga.latest_chapter.slug}` : '#'}>
-                            <BookOpen className="w-4 h-4 mr-2" />
-                            Đọc ngay
-                        </Link>
-                    </Button>
+                    {manga.first_chapter && (
+                        <Button size="lg" asChild>
+                            <Link href={route('manga.chapters.show', [manga.slug, manga.first_chapter.slug])}>
+                                <BookOpen className="w-4 h-4 mr-2" />
+                                {translations.read_first}
+                            </Link>
+                        </Button>
+                    )}
+                    
+                    {manga.last_chapter && (
+                        <Button variant="outline" size="lg" asChild>
+                            <Link href={route('manga.chapters.show', [manga.slug, manga.last_chapter.slug])}>
+                                <BookOpen className="w-4 h-4 mr-2" />
+                                {translations.read_last}
+                            </Link>
+                        </Button>
+                    )}
                     
                     <Button variant="outline" size="lg">
                         <Heart className="w-4 h-4 mr-2" />
-                        Yêu thích
+                        {translations.favorite}
                     </Button>
                 </div>
             </div>

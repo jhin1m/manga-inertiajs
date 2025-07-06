@@ -11,36 +11,36 @@ import { Separator } from "@/Components/ui/separator.jsx";
 import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group.jsx";
 import { X, Filter, RotateCcw } from 'lucide-react';
 
-const sortOptions = [
-    { value: 'latest', label: 'Mới nhất' },
-    { value: 'oldest', label: 'Cũ nhất' },
-    { value: 'views', label: 'Xem nhiều nhất' },
-    { value: 'rating', label: 'Đánh giá cao nhất' },
-    { value: 'name_asc', label: 'Tên A-Z' },
-    { value: 'name_desc', label: 'Tên Z-A' },
-];
-
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: currentYear - 1989 }, (_, i) => currentYear - i);
-
 
 export default function MangaFilters({ 
     filters = {}, 
     onFiltersChange = () => {},
     genres = [],
-    statuses = [],
-    authors = [],
+    statuses = {},
+    translations = {},
     className = ""
 }) {
     const [localFilters, setLocalFilters] = useState({
         genres: filters.genres || [],
         status: filters.status || '',
-        author: filters.author || '',
-        rating: filters.rating || [0],
+        rating: filters.rating ? [filters.rating] : [0],
         year: filters.year || '',
         sortBy: filters.sortBy || 'latest',
         ...filters
     });
+
+    const t = translations.filters || {};
+
+    const sortOptions = [
+        { value: 'latest', label: 'Mới nhất' },
+        { value: 'oldest', label: 'Cũ nhất' },
+        { value: 'views', label: 'Xem nhiều nhất' },
+        { value: 'rating', label: 'Đánh giá cao nhất' },
+        { value: 'name_asc', label: 'Tên A-Z' },
+        { value: 'name_desc', label: 'Tên Z-A' },
+    ];
 
     const handleFilterChange = (key, value) => {
         const newFilters = { ...localFilters, [key]: value };
@@ -48,11 +48,11 @@ export default function MangaFilters({
         onFiltersChange(newFilters);
     };
 
-    const handleGenreToggle = (genreIdentifier) => {
+    const handleGenreToggle = (genreId) => {
         const currentGenres = localFilters.genres || [];
-        const newGenres = currentGenres.includes(genreIdentifier)
-            ? currentGenres.filter(id => id !== genreIdentifier)
-            : [...currentGenres, genreIdentifier];
+        const newGenres = currentGenres.includes(genreId)
+            ? currentGenres.filter(id => id !== genreId)
+            : [...currentGenres, genreId];
         handleFilterChange('genres', newGenres);
     };
 
@@ -60,7 +60,6 @@ export default function MangaFilters({
         const emptyFilters = {
             genres: [],
             status: '',
-            author: '',
             rating: [0],
             year: '',
             sortBy: 'latest'
@@ -73,7 +72,6 @@ export default function MangaFilters({
         return (
             localFilters.genres?.length > 0 ||
             localFilters.status ||
-            localFilters.author ||
             (localFilters.rating?.[0] > 0) ||
             localFilters.year ||
             localFilters.sortBy !== 'latest'
@@ -86,7 +84,7 @@ export default function MangaFilters({
                 <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                         <Filter className="h-4 w-4" />
-                        Bộ lọc
+                        {t.title || 'Bộ lọc'}
                     </CardTitle>
                     {hasActiveFilters() && (
                         <Button
@@ -96,22 +94,21 @@ export default function MangaFilters({
                             className="h-8 px-2"
                         >
                             <RotateCcw className="h-3 w-3 mr-1" />
-                            Reset
+                            {t.reset || 'Reset'}
                         </Button>
                     )}
                 </div>
             </CardHeader>
             <CardContent className="space-y-6">
                 <ScrollArea className="h-[calc(100vh-200px)] pr-3">
-                    {/* Sort By */}
                     <div className="space-y-3">
-                        <Label className="text-sm font-medium">Sắp xếp theo</Label>
+                        <Label className="text-sm font-medium">{t.sort_by || 'Sắp xếp theo'}</Label>
                         <Select
                             value={localFilters.sortBy}
                             onValueChange={(value) => handleFilterChange('sortBy', value)}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Chọn cách sắp xếp" />
+                                <SelectValue placeholder={t.sort_placeholder || 'Chọn cách sắp xếp'} />
                             </SelectTrigger>
                             <SelectContent>
                                 {sortOptions.map((option) => (
@@ -125,16 +122,15 @@ export default function MangaFilters({
 
                     <Separator className="my-4" />
 
-                    {/* Status Filter */}
                     <div className="space-y-3">
-                        <Label className="text-sm font-medium">Trạng thái</Label>
+                        <Label className="text-sm font-medium">{t.status || 'Trạng thái'}</Label>
                         <RadioGroup
                             value={localFilters.status || 'all'}
                             onValueChange={(value) => handleFilterChange('status', value === 'all' ? '' : value)}
                         >
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="all" id="status-all" />
-                                <Label htmlFor="status-all" className="text-sm">Tất cả</Label>
+                                <Label htmlFor="status-all" className="text-sm">{t.all || 'Tất cả'}</Label>
                             </div>
                             {Object.entries(statuses).map(([value, label]) => (
                                 <div key={value} className="flex items-center space-x-2">
@@ -149,10 +145,9 @@ export default function MangaFilters({
 
                     <Separator className="my-4" />
 
-                    {/* Rating Filter */}
                     <div className="space-y-3">
                         <Label className="text-sm font-medium">
-                            Đánh giá tối thiểu: {localFilters.rating?.[0] || 0}/10
+                            {t.rating_min || 'Đánh giá tối thiểu'}: {localFilters.rating?.[0] || 0}/10
                         </Label>
                         <Slider
                             value={localFilters.rating || [0]}
@@ -171,18 +166,17 @@ export default function MangaFilters({
 
                     <Separator className="my-4" />
 
-                    {/* Year Filter */}
                     <div className="space-y-3">
-                        <Label className="text-sm font-medium">Năm phát hành</Label>
+                        <Label className="text-sm font-medium">{t.year || 'Năm phát hành'}</Label>
                         <Select
                             value={localFilters.year || 'all'}
                             onValueChange={(value) => handleFilterChange('year', value === 'all' ? '' : value)}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Chọn năm" />
+                                <SelectValue placeholder={t.year_placeholder || 'Chọn năm'} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">Tất cả</SelectItem>
+                                <SelectItem value="all">{t.all || 'Tất cả'}</SelectItem>
                                 {years.map((year) => (
                                     <SelectItem key={year} value={year.toString()}>
                                         {year}
@@ -194,10 +188,9 @@ export default function MangaFilters({
 
                     <Separator className="my-4" />
 
-                    {/* Genres Filter */}
                     <div className="space-y-3">
                         <Label className="text-sm font-medium">
-                            Thể loại 
+                            {t.genres || 'Thể loại'}
                             {localFilters.genres?.length > 0 && (
                                 <Badge variant="secondary" className="ml-2">
                                     {localFilters.genres.length}
@@ -205,20 +198,20 @@ export default function MangaFilters({
                             )}
                         </Label>
                         <div className="space-y-2 max-h-48 overflow-y-auto">
-                            {genres.map((genre, index) => (
-                                <div key={genre.id || genre.slug || index} className="flex items-center space-x-2">
+                            {genres.map((genre) => (
+                                <div key={genre.id} className="flex items-center space-x-2">
                                     <Checkbox
-                                        id={`genre-${genre.id || genre.slug || index}`}
-                                        checked={localFilters.genres?.includes(genre.id || genre.slug) || false}
-                                        onCheckedChange={() => handleGenreToggle(genre.id || genre.slug)}
+                                        id={`genre-${genre.id}`}
+                                        checked={localFilters.genres?.includes(genre.id) || false}
+                                        onCheckedChange={() => handleGenreToggle(genre.id)}
                                     />
                                     <Label 
-                                        htmlFor={`genre-${genre.id || genre.slug || index}`} 
+                                        htmlFor={`genre-${genre.id}`} 
                                         className="text-sm flex-1 flex items-center justify-between cursor-pointer"
                                     >
                                         <span>{genre.name}</span>
                                         <Badge variant="outline" className="text-xs">
-                                            {genre.count || 0}
+                                            {genre.mangas_count || 0}
                                         </Badge>
                                     </Label>
                                 </div>
@@ -226,16 +219,15 @@ export default function MangaFilters({
                         </div>
                     </div>
 
-                    {/* Selected Genres Display */}
                     {localFilters.genres?.length > 0 && (
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">Đã chọn:</Label>
+                            <Label className="text-sm font-medium">{t.selected || 'Đã chọn'}:</Label>
                             <div className="flex flex-wrap gap-1">
-                                {localFilters.genres.map((genreId, index) => {
-                                    const genre = genres.find(g => (g.id || g.slug) === genreId);
+                                {localFilters.genres.map((genreId) => {
+                                    const genre = genres.find(g => g.id === genreId);
                                     return genre ? (
                                         <Badge
-                                            key={genreId || index}
+                                            key={genreId}
                                             variant="secondary"
                                             className="text-xs cursor-pointer"
                                             onClick={() => handleGenreToggle(genreId)}

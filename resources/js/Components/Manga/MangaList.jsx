@@ -1,5 +1,7 @@
 import React from 'react';
+import { Link } from '@inertiajs/react';
 import { MangaCard } from './MangaCard';
+import { Card, CardContent } from '@/Components/ui/card';
 
 export function MangaList({ 
     mangas = [], 
@@ -34,7 +36,7 @@ export function MangaList({
     const getListVariant = () => {
         switch (variant) {
             case 'list':
-                return 'grid grid-cols-1 gap-4';
+                return 'space-y-4';
             case 'compact':
                 return `grid ${getGridColumns()} gap-3`;
             case 'featured':
@@ -44,15 +46,61 @@ export function MangaList({
         }
     };
 
+    // List item component for horizontal layout
+    const MangaListItem = ({ manga }) => (
+        <Link href={route('manga.show', manga.slug)}>
+            <Card className="group hover:shadow-md transition-all duration-300 cursor-pointer">
+                <CardContent className="p-4">
+                    <div className="flex gap-4">
+                        <div className="w-16 h-20 bg-muted rounded overflow-hidden flex-shrink-0">
+                            <img 
+                                src={manga.cover || "/api/placeholder/80/100"} 
+                                alt={manga.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">
+                                {manga.name}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+                                {manga.description || 'Chưa có mô tả'}
+                            </p>
+                            <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
+                                <span className="px-2 py-1 bg-secondary rounded text-xs">
+                                    {manga.status_label}
+                                </span>
+                                <span>★ {manga.rating?.toFixed(1) || 'N/A'}</span>
+                                <span>👁 {manga.views?.toLocaleString() || 0}</span>
+                                <span>{manga.chapters_count || 0} chương</span>
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                                {manga.taxonomy_terms?.filter(term => term.taxonomy && term.taxonomy.type === 'genre').slice(0, 3).map((genre, index) => (
+                                    <span key={index} className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">
+                                        {genre.name}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </Link>
+    );
+
     return (
         <div className={`${getListVariant()} ${className}`}>
             {mangas.map((manga) => (
-                <MangaCard
-                    key={manga.id}
-                    manga={manga}
-                    variant={variant}
-                    className={variant === 'featured' ? 'h-full' : ''}
-                />
+                variant === 'list' ? (
+                    <MangaListItem key={manga.id} manga={manga} />
+                ) : (
+                    <MangaCard
+                        key={manga.id}
+                        manga={manga}
+                        variant={variant}
+                        className={variant === 'featured' ? 'h-full' : ''}
+                    />
+                )
             ))}
         </div>
     );
