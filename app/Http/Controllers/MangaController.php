@@ -79,7 +79,7 @@ class MangaController extends Controller
         // Load chapters with pagination
         $chapters = $manga->chapters()
             ->orderBy('chapter_number', 'desc')
-            ->paginate(50);
+            ->paginate(150);
 
         // Increment view count
         $manga->increment('views');
@@ -112,7 +112,7 @@ class MangaController extends Controller
             'slug' => 'required|string|unique:mangas,slug',
             'rating' => 'nullable|numeric|min:0|max:10',
             'total_rating' => 'nullable|integer|min:0',
-            'genre_ids' => 'nullable|array',
+        'genre_ids' => 'nullable|array',
             'genre_ids.*' => 'exists:taxonomy_terms,id'
         ]);
 
@@ -166,7 +166,7 @@ class MangaController extends Controller
         return Manga::with([
             'taxonomyTerms.taxonomy',
             'chapters' => function ($query) {
-                $query->orderBy('updated_at', 'desc')
+                $query->orderBy('chapter_number', 'desc')
                       ->limit(3);
             }
         ])
@@ -219,6 +219,7 @@ class MangaController extends Controller
                 'latest_chapter' => $manga->chapters->first() ? [
                     'chapter_number' => $manga->chapters->first()->chapter_number,
                     'title' => $manga->chapters->first()->title,
+                    'slug' => $manga->chapters->first()->slug,
                     'updated_at' => $manga->chapters->first()->updated_at->format('Y-m-d')
                 ] : null
             ];

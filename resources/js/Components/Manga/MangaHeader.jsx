@@ -104,7 +104,7 @@ export function MangaHeader({ manga }) {
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3">
                     <Button size="lg" asChild>
-                        <Link href={manga.latest_chapter ? `/chapters/${manga.latest_chapter.id}` : '#'}>
+                        <Link href={manga.latest_chapter ? `/manga/${manga.slug}/chapters/${manga.latest_chapter.slug}` : '#'}>
                             <BookOpen className="w-4 h-4 mr-2" />
                             Đọc ngay
                         </Link>

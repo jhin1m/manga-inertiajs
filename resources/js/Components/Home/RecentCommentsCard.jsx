@@ -119,7 +119,7 @@ export function RecentCommentsCard({ comments = [] }) {
                                 {truncateContent(comment.content)}
                             </p>
                             <Link
-                                href={`/manga/${comment.manga.slug}/chapter/${comment.chapter.chapter_number}`}
+                                href={`/manga/${comment.manga.slug}/chapters/${comment.chapter.slug || 'chapter-' + comment.chapter.chapter_number}`}
                                 className="text-xs text-primary hover:underline"
                             >
                                 {comment.manga.name} - Chapter {comment.chapter.chapter_number}

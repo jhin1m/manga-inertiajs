@@ -24,22 +24,6 @@ Route::get('/search', function () {
     ]);
 })->name('search');
 
-// Browse manga route để test Sidebar
-Route::get('/browse', function () {
-    return Inertia::render('MangaBrowse', [
-        'mangas' => [],
-        'genres' => [],
-        'statuses' => [],
-        'authors' => [],
-        'totalCount' => 0,
-        'currentFilters' => []
-    ]);
-})->name('browse');
-
-
-
-
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

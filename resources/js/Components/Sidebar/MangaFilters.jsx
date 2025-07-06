@@ -48,11 +48,11 @@ export default function MangaFilters({
         onFiltersChange(newFilters);
     };
 
-    const handleGenreToggle = (genreId) => {
+    const handleGenreToggle = (genreIdentifier) => {
         const currentGenres = localFilters.genres || [];
-        const newGenres = currentGenres.includes(genreId)
-            ? currentGenres.filter(id => id !== genreId)
-            : [...currentGenres, genreId];
+        const newGenres = currentGenres.includes(genreIdentifier)
+            ? currentGenres.filter(id => id !== genreIdentifier)
+            : [...currentGenres, genreIdentifier];
         handleFilterChange('genres', newGenres);
     };
 
@@ -205,15 +205,15 @@ export default function MangaFilters({
                             )}
                         </Label>
                         <div className="space-y-2 max-h-48 overflow-y-auto">
-                            {genres.map((genre) => (
-                                <div key={genre.id} className="flex items-center space-x-2">
+                            {genres.map((genre, index) => (
+                                <div key={genre.id || genre.slug || index} className="flex items-center space-x-2">
                                     <Checkbox
-                                        id={`genre-${genre.id}`}
-                                        checked={localFilters.genres?.includes(genre.id) || false}
-                                        onCheckedChange={() => handleGenreToggle(genre.id)}
+                                        id={`genre-${genre.id || genre.slug || index}`}
+                                        checked={localFilters.genres?.includes(genre.id || genre.slug) || false}
+                                        onCheckedChange={() => handleGenreToggle(genre.id || genre.slug)}
                                     />
                                     <Label 
-                                        htmlFor={`genre-${genre.id}`} 
+                                        htmlFor={`genre-${genre.id || genre.slug || index}`} 
                                         className="text-sm flex-1 flex items-center justify-between cursor-pointer"
                                     >
                                         <span>{genre.name}</span>
@@ -231,11 +231,11 @@ export default function MangaFilters({
                         <div className="space-y-2">
                             <Label className="text-sm font-medium">Đã chọn:</Label>
                             <div className="flex flex-wrap gap-1">
-                                {localFilters.genres.map((genreId) => {
-                                    const genre = genres.find(g => g.id === genreId);
+                                {localFilters.genres.map((genreId, index) => {
+                                    const genre = genres.find(g => (g.id || g.slug) === genreId);
                                     return genre ? (
                                         <Badge
-                                            key={genreId}
+                                            key={genreId || index}
                                             variant="secondary"
                                             className="text-xs cursor-pointer"
                                             onClick={() => handleGenreToggle(genreId)}

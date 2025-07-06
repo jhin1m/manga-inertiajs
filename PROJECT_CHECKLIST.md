@@ -65,10 +65,10 @@
 - [ ] MangaSearch với Command component + suggestions
 
 ### Chapter Components với Shadcn/UI (0/4)
-- [ ] ChapterList với Table/Card layout + Pagination
-- [ ] ChapterCard với Card, Progress, Badge components
-- [ ] ChapterReader với custom controls + shadcn/ui
-- [ ] PageNavigation với Button, Slider components
+- [x] ChapterList với Table/Card layout + Pagination
+- [x] ChapterCard với Card, Progress, Badge components
+- [x] ChapterReader với custom controls + shadcn/ui
+- [x] PageNavigation với Button, Slider components
 
 ### Common Components từ Shadcn/UI (0/5)
 - [ ] LoadingSpinner với Skeleton components
@@ -79,10 +79,10 @@
 
 ### Pages với Shadcn/UI (1/6)
 - [x] Home với Card, Badge, Button layouts (Basic version completed)
-- [ ] Home Advanced Layout (Hot Slider + Sidebar + Rankings)
-- [ ] MangaIndex với Table, Pagination, Filters
-- [ ] MangaShow với Tabs, Badge, Button components
-- [ ] ChapterShow với custom reader + shadcn/ui controls
+- [x] Home Advanced Layout (Hot Slider + Sidebar + Rankings)
+- [x] MangaIndex với Table, Pagination, Filters
+- [x] MangaShow với Tabs, Badge, Button components
+- [x] ChapterShow với custom reader + shadcn/ui controls
 - [ ] Search với Command, Card components
 - [ ] 404 Error với shadcn/ui styling
 
@@ -100,11 +100,11 @@
 ## ⚡ Phase 3: Core Features (6/20 tasks)
 
 ### Manga Listing & Filtering (0/6)
-- [ ] Homepage với featured manga
-- [ ] Browse page với all manga
-- [ ] Search functionality
-- [ ] Filter system
-- [ ] Sort options
+- [x] Homepage với featured manga
+- [x] Browse page với all manga
+- [x] Search functionality
+- [x] Filter system
+- [x] Sort options
 - [ ] Pagination
 
 ### Manga Detail Page (5/5)
@@ -228,8 +228,7 @@
 # Setup shadcn/ui và tạo layout system
 
 # Test current setup
-php artisan serve
-pnpm run dev
+composer run dev
 
 # Kiểm tra data
 php artisan tinker

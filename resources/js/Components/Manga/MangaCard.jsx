@@ -33,8 +33,6 @@ export function MangaCard({
 
     const statusConfig = statusVariants[status] || { variant: 'outline' };
 
-
-
     // Sử dụng recent_chapters nếu có, nếu không thì dùng latest_chapter
     const chaptersToShow = recent_chapters.length > 0 ? recent_chapters : 
         (latest_chapter ? [latest_chapter] : []);
@@ -43,7 +41,7 @@ export function MangaCard({
         <Card className={`group hover:shadow-lg transition-all duration-300 ${className}`}>
             {/* Cover Image */}
             <div className="relative overflow-hidden rounded-t-xl">
-                <Link href={`/manga/${slug}`}>
+                <Link href={route('manga.show', slug)}>
                     <div className="aspect-[3/4] bg-gray-100">
                         {cover ? (
                             <img
@@ -71,7 +69,7 @@ export function MangaCard({
 
             <CardContent className="p-3 sm:p-4">
                 {/* Title */}
-                <Link href={`/manga/${slug}`}>
+                <Link href={route('manga.show', slug)}>
                     <h3 className="font-semibold text-sm sm:text-base line-clamp-2 mb-3 group-hover:text-primary transition-colors">
                         {name}
                     </h3>
@@ -84,7 +82,7 @@ export function MangaCard({
                             <div key={index} className="flex items-center justify-between text-xs">
                                 {/* Chapter link - left side */}
                                 <Link 
-                                    href={`/manga/${slug}/chapter/${chapter.slug || chapter.chapter_number}`}
+                                    href={chapter.slug ? route('manga.chapters.show', [slug, chapter.slug]) : route('manga.show', slug)}
                                     className="text-primary hover:underline flex-1 truncate"
                                 >
                                     {chapter.title || `Chapter ${chapter.chapter_number}`}

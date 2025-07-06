@@ -63,7 +63,6 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
     const navigationItems = [
         { name: 'Trang chủ', href: '/', icon: Home, current: route().current('home') },
         { name: 'Thư viện', href: '/manga', icon: Library, current: route().current('manga.*') },
-        { name: 'Duyệt manga', href: '/browse', icon: Filter, current: route().current('browse') },
         { name: 'Tìm kiếm', href: '/search', icon: Search, current: route().current('search') },
     ];
 

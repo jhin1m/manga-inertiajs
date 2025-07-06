@@ -1,84 +1,23 @@
 import { Head } from '@inertiajs/react';
 import { AppLayout } from '@/Layouts/AppLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card.jsx";
 import { Button } from "@/Components/ui/button.jsx";
-import { Badge } from "@/Components/ui/badge.jsx";
 import { MangaList } from '@/Components/Manga';
 import { HotMangaSlider, RankingsCard, RecommendedCard } from '@/Components/Home';
-import { 
-    BookOpen, 
-    TrendingUp, 
-    Star, 
-    Users, 
-    Clock,
-    ArrowRight,
-    Search,
-    Heart
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export default function Home({
-    canLogin,
-    canRegister,
-    featuredManga = [],
     hotManga = [],
     latestUpdates = [],
     rankings = [],
-    recentComments = [],
     recommended = [],
     translations
 }) {
-    // Demo data fallback nếu không có data từ backend
-    const defaultManga = [
-        {
-            id: 1,
-            name: "One Piece",
-            slug: "one-piece",
-            cover: "/api/placeholder/200/280",
-            status: "ongoing",
-            recent_chapters: [
-                {
-                    chapter_number: 1098,
-                    title: "Adventure Continues",
-                    slug: "1098",
-                    updated_at: "2024-01-15"
-                }
-            ]
-        },
-        {
-            id: 2,
-            name: "Naruto",
-            slug: "naruto",
-            cover: "/api/placeholder/200/280",
-            status: "completed",
-            recent_chapters: [
-                {
-                    chapter_number: 700,
-                    title: "The End",
-                    slug: "700",
-                    updated_at: "2023-12-01"
-                }
-            ]
-        }
-    ];
-
-    const displayLatestUpdates = latestUpdates.length > 0 ? latestUpdates : defaultManga;
-    
-    // Debug log để kiểm tra dữ liệu
-    console.log('Latest Updates Data:', displayLatestUpdates.slice(0, 2));
-
-    const stats = [
-        { label: "Manga", value: "10,000+", icon: BookOpen },
-        { label: "Chapters", value: "500K+", icon: Clock },
-        { label: "Users", value: "1M+", icon: Users },
-        { label: "Rating", value: "4.8/5", icon: Star }
-    ];
-
     return (
         <AppLayout>
             <Head title="Trang chủ - MangaReader" />
 
             {/* Hot Manga Slider */}
-            <HotMangaSlider hotManga={hotManga} />
+            <HotMangaSlider hotManga={hotManga} translations={translations} />
 
             {/* Main Content Grid (2fr + 1fr layout) */}
             <div className="container mx-auto px-4 py-16 bg-primary-100/10">
@@ -100,7 +39,7 @@ export default function Home({
                         </div>
 
                         <MangaList 
-                            mangas={displayLatestUpdates}
+                            mangas={latestUpdates}
                             variant="grid"
                             className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
                         />
@@ -109,7 +48,6 @@ export default function Home({
                     {/* Sidebar */}
                     <aside className="space-y-6">
                         <RankingsCard rankings={rankings} />
-                        {/* <RecentCommentsCard comments={recentComments} /> */}
                         <RecommendedCard recommended={recommended} />
                     </aside>
                 </div>

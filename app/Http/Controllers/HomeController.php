@@ -25,6 +25,8 @@ class HomeController extends Controller
             'translations' => [
                 'latest_updates_title' => __('page.home.latest_updates_title'),
                 'view_all' => __('page.home.view_all'),
+                'hot_manga_title' => __('page.home.hot_manga_title'),
+                'scroll_hint' => __('page.home.scroll_hint'),
             ]
         ]);
     }

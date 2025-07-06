@@ -44,7 +44,7 @@ class ChapterController extends Controller
         // Get all chapters for select dropdown
         $allChapters = Chapter::where('manga_id', $manga->id)
             ->orderBy('chapter_number', 'asc')
-            ->select('id', 'title', 'chapter_number')
+            ->select('id', 'title', 'chapter_number', 'slug')
             ->get();
 
         // Increment view count
@@ -64,6 +64,7 @@ class ChapterController extends Controller
     {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255',
             'chapter_number' => 'required|numeric|min:0',
             'volume_number' => 'nullable|integer|min:1',
             'published_at' => 'nullable|date'
@@ -78,6 +79,19 @@ class ChapterController extends Controller
             return back()->withErrors([
                 'chapter_number' => 'Số chương này đã tồn tại cho manga này.'
             ]);
+        }
+
+        // Check if slug already exists for this manga (if provided)
+        if (!empty($validatedData['slug'])) {
+            $existingSlug = Chapter::where('manga_id', $manga->id)
+                ->where('slug', $validatedData['slug'])
+                ->first();
+
+            if ($existingSlug) {
+                return back()->withErrors([
+                    'slug' => 'Slug này đã tồn tại cho manga này.'
+                ]);
+            }
         }
 
         $validatedData['manga_id'] = $manga->id;
@@ -98,6 +112,7 @@ class ChapterController extends Controller
 
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255',
             'chapter_number' => 'required|numeric|min:0',
             'volume_number' => 'nullable|integer|min:1',
             'published_at' => 'nullable|date'
@@ -113,6 +128,20 @@ class ChapterController extends Controller
             return back()->withErrors([
                 'chapter_number' => 'Số chương này đã tồn tại cho manga này.'
             ]);
+        }
+
+        // Check if slug already exists for this manga (if provided, excluding current chapter)
+        if (!empty($validatedData['slug'])) {
+            $existingSlug = Chapter::where('manga_id', $manga->id)
+                ->where('slug', $validatedData['slug'])
+                ->where('id', '!=', $chapter->id)
+                ->first();
+
+            if ($existingSlug) {
+                return back()->withErrors([
+                    'slug' => 'Slug này đã tồn tại cho manga này.'
+                ]);
+            }
         }
 
         $chapter->update($validatedData);

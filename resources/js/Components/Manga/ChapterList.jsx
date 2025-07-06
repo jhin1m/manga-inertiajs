@@ -87,7 +87,7 @@ export function ChapterList({ manga, chapters }) {
                                 </TableCell>
                                 <TableCell>
                                     <Link 
-                                        href={`/manga/${manga.slug}/chapters/${chapter.id}`}
+                                        href={`/manga/${manga.slug}/chapters/${chapter.slug}`}
                                         className="hover:text-primary hover:underline font-medium"
                                     >
                                         {chapter.title || `Chương ${chapter.chapter_number}`}
@@ -101,7 +101,7 @@ export function ChapterList({ manga, chapters }) {
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <Button size="sm" asChild>
-                                        <Link href={`/manga/${manga.slug}/chapters/${chapter.id}`}>
+                                        <Link href={`/manga/${manga.slug}/chapters/${chapter.slug}`}>
                                             Đọc
                                         </Link>
                                     </Button>
@@ -126,7 +126,7 @@ export function ChapterList({ manga, chapters }) {
                                         </span>
                                     </div>
                                     <Link 
-                                        href={`/manga/${manga.slug}/chapters/${chapter.id}`}
+                                        href={`/manga/${manga.slug}/chapters/${chapter.slug}`}
                                         className="block font-medium hover:text-primary hover:underline line-clamp-2"
                                     >
                                         {chapter.title || `Chương ${chapter.chapter_number}`}
@@ -137,7 +137,7 @@ export function ChapterList({ manga, chapters }) {
                                     </div>
                                 </div>
                                 <Button size="sm" asChild>
-                                    <Link href={`/manga/${manga.slug}/chapters/${chapter.id}`}>
+                                    <Link href={`/manga/${manga.slug}/chapters/${chapter.slug}`}>
                                         <BookOpen className="w-4 h-4" />
                                     </Link>
                                 </Button>

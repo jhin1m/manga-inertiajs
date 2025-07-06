@@ -1,5 +1,5 @@
-export { MangaCard } from './MangaCard';
-export { MangaList } from './MangaList';
-export { MangaHeader } from './MangaHeader';
-export { MangaInfo } from './MangaInfo';
-export { ChapterList } from './ChapterList'; 
+export { MangaCard } from './MangaCard.jsx';
+export { MangaList } from './MangaList.jsx';
+export { MangaHeader } from './MangaHeader.jsx';
+export { MangaInfo } from './MangaInfo.jsx';
+export { ChapterList } from './ChapterList.jsx'; 
