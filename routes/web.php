@@ -43,7 +43,7 @@ Route::prefix('manga')->name('manga.')->group(function () {
     });
 
     // Chapter routes nested under manga
-    Route::prefix('{manga}/chapters')->name('chapters.')->group(function () {
+    Route::prefix('{manga}/chapters')->name('chapters.')->scopeBindings()->group(function () {
         Route::get('/', [ChapterController::class, 'index'])->name('index');
         Route::get('/{chapter}', [ChapterController::class, 'show'])->name('show');
         
