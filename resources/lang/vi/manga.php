@@ -19,7 +19,7 @@ return [
     'ratings_count' => 'lượt',
     'read_now' => 'Đọc ngay',
     'read_first' => 'Đọc từ đầu',
-    'read_last' => 'Đọc chương mới nhất',
+    'read_last' => 'Đọc chương mới',
     'favorite' => 'Yêu thích',
     'expand_more' => 'Xem thêm',
     'collapse' => 'Thu gọn',

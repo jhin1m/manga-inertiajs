@@ -72,60 +72,6 @@ export function MangaInfo({ manga, translations }) {
                 </div>
             )}
 
-            {/* Authors */}
-            {manga.authors && manga.authors.length > 0 && (
-                <div>
-                    <h3 className="text-lg font-semibold mb-3">{translations.author_label || 'Tác giả'}</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {manga.authors.map(author => (
-                            <Link 
-                                key={author.id} 
-                                href={route('author.show', author.slug)}
-                                className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border border-input bg-background hover:bg-secondary hover:text-secondary-foreground"
-                            >
-                                {author.name}
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Artists */}
-            {manga.artists && manga.artists.length > 0 && (
-                <div>
-                    <h3 className="text-lg font-semibold mb-3">{translations.artist_label || 'Họa sĩ'}</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {manga.artists.map(artist => (
-                            <Link 
-                                key={artist.id} 
-                                href={route('artist.show', artist.slug)}
-                                className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border border-input bg-background hover:bg-secondary hover:text-secondary-foreground"
-                            >
-                                {artist.name}
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Tags */}
-            {manga.tags && manga.tags.length > 0 && (
-                <div>
-                    <h3 className="text-lg font-semibold mb-3">{translations.tag_label || 'Tags'}</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {manga.tags.map(tag => (
-                            <Link 
-                                key={tag.id} 
-                                href={route('tag.show', tag.slug)}
-                                className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border border-input bg-background hover:bg-secondary hover:text-secondary-foreground"
-                            >
-                                {tag.name}
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            )}
-
             <Separator />
         </div>
     )

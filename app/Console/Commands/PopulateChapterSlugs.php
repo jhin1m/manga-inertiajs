@@ -47,7 +47,7 @@ class PopulateChapterSlugs extends Command
         $bar->start();
         
         foreach ($chapters as $chapter) {
-            $slug = Chapter::generateSlug($chapter->chapter_number, $chapter->manga_id);
+            $slug = Chapter::generateSlug(floatval($chapter->chapter_number), $chapter->manga_id);
             
             // Update without triggering model events to avoid infinite loop
             Chapter::withoutEvents(function () use ($chapter, $slug) {

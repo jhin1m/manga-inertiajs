@@ -10,6 +10,11 @@ import {
     CommandList,
     CommandSeparator,
 } from "@/Components/ui/command.jsx";
+import { 
+    DialogTitle,
+    DialogDescription,
+} from "@/Components/ui/dialog.jsx";
+import { VisuallyHidden } from "@/Components/ui/visually-hidden.jsx";
 import { Badge } from "@/Components/ui/badge.jsx";
 import { 
     Search, 
@@ -80,6 +85,13 @@ export default function SearchDialog({ open, setOpen }) {
 
     return (
         <CommandDialog open={open} onOpenChange={setOpen}>
+            <VisuallyHidden>
+                <DialogTitle>Tìm kiếm manga</DialogTitle>
+                <DialogDescription>
+                    Tìm kiếm manga, tác giả, thể loại và nhiều hơn nữa
+                </DialogDescription>
+            </VisuallyHidden>
+            
             <Command className="rounded-lg border shadow-md">
                 <CommandInput
                     placeholder="Tìm kiếm manga, tác giả, thể loại..."

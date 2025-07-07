@@ -39,7 +39,7 @@ import {
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import SearchDialog from '@/Components/Common/SearchDialog';
 import Footer from '@/Components/Layout/Footer';
-import Breadcrumb from '@/Components/Layout/Breadcrumb';
+import { Breadcrumb } from '@/Components/Layout/Breadcrumb';
 
 export function AppLayout({ children, header, breadcrumbItems = [], hideHeader = false }) {
     const { auth } = usePage().props;

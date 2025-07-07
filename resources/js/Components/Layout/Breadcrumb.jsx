@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { 
     Breadcrumb as ShadcnBreadcrumb,
     BreadcrumbEllipsis,
@@ -16,16 +16,54 @@ import {
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu.jsx";
 import { Button } from "@/Components/ui/button.jsx";
-import { Sheet, SheetContent, SheetTrigger } from "@/Components/ui/sheet.jsx";
+import { 
+    Sheet, 
+    SheetContent, 
+    SheetTrigger,
+    SheetTitle,
+    SheetDescription,
+} from "@/Components/ui/sheet.jsx";
+import { VisuallyHidden } from "@/Components/ui/visually-hidden.jsx";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { ChevronDown, Home } from 'lucide-react';
 
-export default function Breadcrumb({ items = [], className = "" }) {
+export function Breadcrumb({ items = [], className = "" }) {
     const isMobile = useIsMobile();
+    const { props } = usePage();
+    
+    // Get current language from Laravel
+    const currentLocale = props.locale || 'vi';
+    
+    // Translation helper
+    const t = (key, replacements = {}) => {
+        const translations = {
+            vi: {
+                home: 'Trang chủ',
+                more: 'Xem thêm',
+                navigation: 'Đường dẫn',
+                close: 'Đóng'
+            },
+            en: {
+                home: 'Home',
+                more: 'More',
+                navigation: 'Navigation',
+                close: 'Close'
+            }
+        };
+        
+        let text = translations[currentLocale]?.[key] || translations['vi'][key] || key;
+        
+        // Replace placeholders
+        Object.entries(replacements).forEach(([placeholder, value]) => {
+            text = text.replace(`:${placeholder}`, value);
+        });
+        
+        return text;
+    };
     
     // Luôn có Home làm item đầu tiên
     const allItems = [
-        { label: 'Trang chủ', href: '/', icon: Home },
+        { label: t('home'), href: route('home'), icon: Home },
         ...items
     ];
 
@@ -110,14 +148,21 @@ export default function Breadcrumb({ items = [], className = "" }) {
                                             variant="ghost"
                                             size="sm"
                                             className="h-auto p-0 text-muted-foreground hover:text-foreground"
+                                            aria-label={t('more')}
                                         >
                                             <BreadcrumbEllipsis className="h-4 w-4" />
-                                            <span className="sr-only">Xem thêm</span>
+                                            <span className="sr-only">{t('more')}</span>
                                         </Button>
                                     </SheetTrigger>
                                     <SheetContent side="bottom" className="h-[300px]">
+                                        <VisuallyHidden>
+                                            <SheetTitle>{t('navigation')}</SheetTitle>
+                                            <SheetDescription>
+                                                Danh sách đường dẫn điều hướng
+                                            </SheetDescription>
+                                        </VisuallyHidden>
                                         <div className="py-4">
-                                            <h3 className="font-semibold mb-4">Đường dẫn</h3>
+                                            <h3 className="font-semibold mb-4">{t('navigation')}</h3>
                                             <div className="space-y-2">
                                                 {hiddenItems.map((item, index) => (
                                                     <Link
@@ -176,10 +221,11 @@ export default function Breadcrumb({ items = [], className = "" }) {
                                         variant="ghost"
                                         size="sm"
                                         className="h-auto p-0 text-muted-foreground hover:text-foreground"
+                                        aria-label={t('more')}
                                     >
                                         <BreadcrumbEllipsis className="h-4 w-4" />
                                         <ChevronDown className="ml-1 h-3 w-3" />
-                                        <span className="sr-only">Xem thêm</span>
+                                        <span className="sr-only">{t('more')}</span>
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="start" className="w-48">
@@ -212,41 +258,149 @@ export default function Breadcrumb({ items = [], className = "" }) {
     );
 }
 
-// Helper component để tạo breadcrumb items dễ dàng hơn
+// Helper component để tạo breadcrumb items dễ dàng hơn với Ziggy
 export function BreadcrumbBuilder() {
     const items = [];
+    const { props } = usePage();
+    const currentLocale = props.locale || 'vi';
+    
+    // Translation helper
+    const t = (key, replacements = {}) => {
+        const translations = {
+            vi: {
+                manga_list: 'Danh sách manga',
+                chapter: 'Chương',
+                chapter_list: 'Danh sách chương',
+                search: 'Tìm kiếm',
+                search_results: 'Kết quả tìm kiếm',
+                genre: 'Thể loại',
+                author: 'Tác giả',
+                artist: 'Họa sĩ',
+                tag: 'Tag',
+                chapter_prefix: 'Chương :number',
+                volume_prefix: 'Tập :number',
+            },
+            en: {
+                manga_list: 'Manga List',
+                chapter: 'Chapter',
+                chapter_list: 'Chapter List',
+                search: 'Search',
+                search_results: 'Search Results',
+                genre: 'Genre',
+                author: 'Author',
+                artist: 'Artist',
+                tag: 'Tag',
+                chapter_prefix: 'Chapter :number',
+                volume_prefix: 'Volume :number',
+            }
+        };
+        
+        let text = translations[currentLocale]?.[key] || translations['vi'][key] || key;
+        
+        // Replace placeholders
+        Object.entries(replacements).forEach(([placeholder, value]) => {
+            text = text.replace(`:${placeholder}`, value);
+        });
+        
+        return text;
+    };
     
     const builder = {
         add: (label, href, icon = null) => {
             items.push({ label, href, icon });
             return builder;
         },
+        
         addManga: (manga) => {
             items.push({ 
-                label: manga.title, 
-                href: `/manga/${manga.slug}`,
+                label: manga.name || manga.title, 
+                href: route('manga.show', manga.slug),
                 icon: null 
             });
             return builder;
         },
-        addChapter: (chapter) => {
+        
+        addChapter: (chapter, manga) => {
+            const chapterNumber = chapter.chapter_number || chapter.number;
+            const chapterSlug = chapter.slug || chapterNumber;
+            const mangaSlug = manga?.slug || chapter.manga_slug;
+            
             items.push({ 
-                label: `Chapter ${chapter.number}`, 
-                href: `/manga/${chapter.manga_slug}/chapter/${chapter.number}`,
+                label: t('chapter_prefix', { number: chapterNumber }), 
+                href: route('manga.chapters.show', [mangaSlug, chapterSlug]),
                 icon: null 
             });
             return builder;
         },
+        
         addGenre: (genre) => {
             items.push({ 
                 label: genre.name, 
-                href: `/genres/${genre.slug}`,
+                href: route('genre.show', genre.slug),
                 icon: null 
             });
             return builder;
         },
+        
+        addAuthor: (author) => {
+            items.push({ 
+                label: author.name, 
+                href: route('author.show', author.slug),
+                icon: null 
+            });
+            return builder;
+        },
+        
+        addArtist: (artist) => {
+            items.push({ 
+                label: artist.name, 
+                href: route('artist.show', artist.slug),
+                icon: null 
+            });
+            return builder;
+        },
+        
+        addTag: (tag) => {
+            items.push({ 
+                label: tag.name, 
+                href: route('tag.show', tag.slug),
+                icon: null 
+            });
+            return builder;
+        },
+        
+        addMangaList: () => {
+            items.push({
+                label: t('manga_list'),
+                href: route('manga.index'),
+                icon: null
+            });
+            return builder;
+        },
+        
+        addChapterList: (manga) => {
+            items.push({
+                label: t('chapter_list'),
+                href: route('manga.chapters.index', manga.slug),
+                icon: null
+            });
+            return builder;
+        },
+        
+        addSearch: (query = '') => {
+            items.push({
+                label: query ? t('search_results') : t('search'),
+                href: route('search', query ? { q: query } : {}),
+                icon: null
+            });
+            return builder;
+        },
+        
         build: () => items
     };
     
     return builder;
-} 
+}
+
+// Default export for backward compatibility
+export default Breadcrumb;

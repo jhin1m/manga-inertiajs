@@ -2,8 +2,8 @@ import { Link } from '@inertiajs/react'
 import { Button } from '@/Components/ui/button'
 import { Badge } from '@/Components/ui/badge'
 import { AspectRatio } from '@/Components/ui/aspect-ratio'
-import { Card, CardContent } from '@/Components/ui/card'
 import { BookOpen, Heart, Star, Eye, Calendar } from 'lucide-react'
+import { formatViews, formatRating } from '@/lib/formatters'
 
 export function MangaHeader({ manga, translations }) {
     const statusColors = {
@@ -20,30 +20,20 @@ export function MangaHeader({ manga, translations }) {
         
         for (let i = 0; i < 5; i++) {
             if (i < fullStars) {
-                stars.push(
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                )
+                stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)
             } else if (i === fullStars && hasHalfStar) {
-                stars.push(
-                    <Star key={i} className="w-4 h-4 fill-yellow-400/50 text-yellow-400" />
-                )
+                stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400/50 text-yellow-400" />)
             } else {
-                stars.push(
-                    <Star key={i} className="w-4 h-4 text-gray-300" />
-                )
+                stars.push(<Star key={i} className="w-4 h-4 text-gray-300" />)
             }
         }
         return stars
     }
 
-    const formatNumber = (num) => {
-        return new Intl.NumberFormat('vi-VN').format(num || 0)
-    }
-
     return (
         <>
             {/* Cover Image */}
-            <div className="w-full lg:w-[200px]">
+            <div className="w-[140px] sm:w-[160px] lg:w-[200px] flex-shrink-0">
                 <AspectRatio ratio={2/3} className="bg-muted rounded-lg overflow-hidden">
                     <img 
                         src={manga.cover || '/api/placeholder/200/300'} 
@@ -54,10 +44,10 @@ export function MangaHeader({ manga, translations }) {
             </div>
 
             {/* Info Section */}
-            <div className="space-y-4">
+            <div className="space-y-4 flex-1 min-w-0">
                 {/* Title */}
                 <div>
-                    <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-2">
                         {manga.name}
                     </h1>
                     {manga.alternative_names && Array.isArray(manga.alternative_names) && manga.alternative_names.length > 0 && (
@@ -73,8 +63,8 @@ export function MangaHeader({ manga, translations }) {
                         {renderStars(manga.rating || 0)}
                     </div>
                     <span className="text-sm text-muted-foreground">
-                        {manga.rating ? `${manga.rating}/5` : translations.no_rating} 
-                        {manga.total_rating > 0 && ` (${formatNumber(manga.total_rating)} ${translations.ratings_count})`}
+                        {manga.rating ? `${formatRating(manga.rating)}/5` : translations.no_rating} 
+                        {manga.total_rating > 0 && ` (${formatViews(manga.total_rating)} ${translations.ratings_count})`}
                     </span>
                 </div>
 
@@ -82,11 +72,11 @@ export function MangaHeader({ manga, translations }) {
                 <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                         <Eye className="w-4 h-4" />
-                        {formatNumber(manga.views)} {translations.views_label}
+                        {formatViews(manga.views)} {translations.views_label}
                     </div>
                     <div className="flex items-center gap-1">
                         <BookOpen className="w-4 h-4" />
-                        {formatNumber(manga.total_chapters)} {translations.chapters_label}
+                        {formatViews(manga.total_chapters)} {translations.chapters_label}
                     </div>
                     <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
@@ -110,7 +100,7 @@ export function MangaHeader({ manga, translations }) {
                                 {manga.authors.map(author => (
                                     <Link 
                                         key={author.id} 
-                                        href={route('taxonomies.terms', author.slug)}
+                                        href={route('author.show', author.slug)}
                                         className="text-sm text-primary hover:underline"
                                     >
                                         {author.name}
@@ -127,10 +117,27 @@ export function MangaHeader({ manga, translations }) {
                                 {manga.artists.map(artist => (
                                     <Link 
                                         key={artist.id} 
-                                        href={route('taxonomies.terms', artist.slug)}
+                                        href={route('artist.show', artist.slug)}
                                         className="text-sm text-primary hover:underline"
                                     >
                                         {artist.name}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {manga.tags && manga.tags.length > 0 && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">{translations.tag_label || 'Tags'}:</span>
+                            <div className="flex flex-wrap gap-1">
+                                {manga.tags.map(tag => (
+                                    <Link 
+                                        key={tag.id} 
+                                        href={route('tag.show', tag.slug)}
+                                        className="text-sm text-primary hover:underline"
+                                    >
+                                        {tag.name}
                                     </Link>
                                 ))}
                             </div>

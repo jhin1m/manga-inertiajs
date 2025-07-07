@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from "@/Components/ui/button.jsx";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/Components/ui/sheet.jsx";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/Components/ui/sheet.jsx";
 import { Badge } from "@/Components/ui/badge.jsx";
 import { Filter, SlidersHorizontal, X } from 'lucide-react';
 import MangaFilters from './MangaFilters';
@@ -69,15 +69,20 @@ export default function MobileFilterButton({
             <SheetContent side="left" className="w-[320px] sm:w-[400px] p-0 flex flex-col">
                 <SheetHeader className="p-6 pb-3 border-b">
                     <div className="flex items-center justify-between">
-                        <SheetTitle className="flex items-center gap-2">
-                            <Filter className="h-5 w-5" />
-                            {t.title || 'Bộ lọc'} manga
-                            {hasActiveFilters() && (
-                                <Badge variant="secondary">
-                                    {getActiveFiltersCount()} {t.applying || 'đang áp dụng'}
-                                </Badge>
-                            )}
-                        </SheetTitle>
+                        <div>
+                            <SheetTitle className="flex items-center gap-2">
+                                <Filter className="h-5 w-5" />
+                                {t.title || 'Bộ lọc'} manga
+                                {hasActiveFilters() && (
+                                    <Badge variant="secondary">
+                                        {getActiveFiltersCount()} {t.applying || 'đang áp dụng'}
+                                    </Badge>
+                                )}
+                            </SheetTitle>
+                            <SheetDescription>
+                                Lọc manga theo thể loại, trạng thái, đánh giá và các tiêu chí khác
+                            </SheetDescription>
+                        </div>
                         {hasActiveFilters() && (
                             <Button
                                 variant="ghost"
