@@ -24,7 +24,6 @@ class MangaController extends Controller
             'genres' => $request->genres ?: [],
             'status' => $request->status,
             'rating' => $request->rating ? (float) $request->rating : 0,
-            'year' => $request->year,
             'sortBy' => $request->get('sortBy', 'latest'),
         ];
 

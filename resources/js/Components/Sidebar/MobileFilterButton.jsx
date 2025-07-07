@@ -22,7 +22,6 @@ export default function MobileFilterButton({
         return filters.genres?.length > 0 ||
                filters.status ||
                (filters.rating > 0) ||
-               filters.year ||
                (filters.sortBy && filters.sortBy !== 'latest');
     };
 
@@ -31,7 +30,6 @@ export default function MobileFilterButton({
         if (filters.genres?.length > 0) count += filters.genres.length;
         if (filters.status) count += 1;
         if (filters.rating > 0) count += 1;
-        if (filters.year) count += 1;
         if (filters.sortBy && filters.sortBy !== 'latest') count += 1;
         return count;
     };
@@ -41,7 +39,6 @@ export default function MobileFilterButton({
             genres: [],
             status: '',
             rating: 0,
-            year: '',
             sortBy: 'latest'
         };
         onFiltersChange(emptyFilters);

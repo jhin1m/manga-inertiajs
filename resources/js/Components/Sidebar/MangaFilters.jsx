@@ -95,13 +95,18 @@ export default function MangaFilters({
         return [ref, inView];
     };
 
-    // Tự tạo debounce hook
+    // Tự tạo debounce hook với stable reference
     const useDebounce = (value, delay) => {
         const [debouncedValue, setDebouncedValue] = useState(value);
+        const valueRef = useRef(value);
+        
+        useEffect(() => {
+            valueRef.current = value;
+        }, [value]);
         
         useEffect(() => {
             const handler = setTimeout(() => {
-                setDebouncedValue(value);
+                setDebouncedValue(valueRef.current);
             }, delay);
             
             return () => {
@@ -121,8 +126,27 @@ export default function MangaFilters({
         return showAllGenres ? genres : genres.slice(0, 20);
     }, [genres, genresInView, showAllGenres]);
 
-    // Debounce filter changes
+    // Debounce filter changes với ref để tránh stale closure
     const debouncedFilters = useDebounce(localFilters, 300);
+    
+    // Flag để check first mount
+    const isFirstMount = useRef(true);
+    
+    // Sync localFilters với props filters khi cần thiết
+    useEffect(() => {
+        const propsFilters = {
+            genres: filters.genres || [],
+            status: filters.status || '',
+            rating: filters.rating ? [filters.rating] : [0],
+            sortBy: filters.sortBy || 'latest',
+            ...filters
+        };
+        
+        // Chỉ sync khi filters từ props thay đổi và khác với localFilters
+        if (JSON.stringify(propsFilters) !== JSON.stringify(localFilters)) {
+            setLocalFilters(propsFilters);
+        }
+    }, [filters]); // Chỉ phụ thuộc vào filters props
 
     const sortOptions = [
         { value: 'latest', label: 'Mới nhất' },
@@ -134,23 +158,34 @@ export default function MangaFilters({
     ];
 
     const handleFilterChange = useCallback((key, value) => {
-        const newFilters = { ...localFilters, [key]: value };
-        setLocalFilters(newFilters);
+        setLocalFilters(prev => ({ ...prev, [key]: value }));
         // onFiltersChange sẽ được gọi qua debounced effect
-    }, [localFilters]);
+    }, []); // Loại bỏ localFilters dependency
 
-    // Effect để gọi onFiltersChange với debounce
+    // Effect để gọi onFiltersChange với debounce - FIX MOUNT REQUEST
     useEffect(() => {
-        onFiltersChange(debouncedFilters);
-    }, [debouncedFilters, onFiltersChange]);
+        // Bỏ qua lần đầu mount
+        if (isFirstMount.current) {
+            isFirstMount.current = false;
+            return;
+        }
+        
+        // Chỉ gọi khi có thay đổi thực sự
+        const filtersChanged = JSON.stringify(debouncedFilters) !== JSON.stringify(filters);
+        if (filtersChanged) {
+            onFiltersChange(debouncedFilters);
+        }
+    }, [debouncedFilters]); // Loại bỏ onFiltersChange khỏi dependencies
 
     const handleGenreToggle = useCallback((genreId) => {
-        const currentGenres = localFilters.genres || [];
-        const newGenres = currentGenres.includes(genreId)
-            ? currentGenres.filter(id => id !== genreId)
-            : [...currentGenres, genreId];
-        handleFilterChange('genres', newGenres);
-    }, [localFilters.genres, handleFilterChange]);
+        setLocalFilters(prev => {
+            const currentGenres = prev.genres || [];
+            const newGenres = currentGenres.includes(genreId)
+                ? currentGenres.filter(id => id !== genreId)
+                : [...currentGenres, genreId];
+            return { ...prev, genres: newGenres };
+        });
+    }, []); // Loại bỏ tất cả dependencies
 
     const clearFilters = useCallback(() => {
         const emptyFilters = {

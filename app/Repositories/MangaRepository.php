@@ -273,10 +273,6 @@ class MangaRepository implements MangaRepositoryInterface
             $query->where('rating', '>=', $filters['rating']);
         }
 
-        // Filter by year
-        if (!empty($filters['year'])) {
-            $query->whereYear('created_at', $filters['year']);
-        }
 
         // Filter by status
         if (!empty($filters['status'])) {

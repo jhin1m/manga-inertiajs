@@ -92,12 +92,6 @@ class MangaService
             
             'statuses' => Manga::getStatuses(),
             
-            'years' => Manga::selectRaw('DISTINCT publication_year')
-                ->whereNotNull('publication_year')
-                ->orderBy('publication_year', 'desc')
-                ->pluck('publication_year')
-                ->filter()
-                ->values()
         ];
     }
 } 
