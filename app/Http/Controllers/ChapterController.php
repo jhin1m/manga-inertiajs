@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ChapterRequest;
 use App\Models\Chapter;
 use App\Models\Manga;
+use App\Services\ChapterService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ChapterController extends Controller
 {
+    public function __construct(
+        private ChapterService $chapterService
+    ) {}
     public function index(Manga $manga)
     {
-        $chapters = $manga->chapters()
-            ->orderBy('chapter_number', 'desc')
-            ->paginate(20);
+        $chapters = $this->chapterService->getChaptersByManga($manga, 20);
 
         return Inertia::render('Chapter/Index', [
             'manga' => $manga,
@@ -28,126 +31,60 @@ class ChapterController extends Controller
             abort(404);
         }
 
-        $chapter->load('pages');
-
-        // Get adjacent chapters for navigation
-        $previousChapter = Chapter::where('manga_id', $manga->id)
-            ->where('chapter_number', '<', $chapter->chapter_number)
-            ->orderBy('chapter_number', 'desc')
-            ->first();
-
-        $nextChapter = Chapter::where('manga_id', $manga->id)
-            ->where('chapter_number', '>', $chapter->chapter_number)
-            ->orderBy('chapter_number', 'asc')
-            ->first();
-
-        // Get all chapters for select dropdown
-        $allChapters = Chapter::where('manga_id', $manga->id)
-            ->orderBy('chapter_number', 'asc')
-            ->select('id', 'title', 'chapter_number', 'slug')
-            ->get();
+        $chapter = $this->chapterService->getChapterDetail($chapter);
+        $adjacentChapters = $this->chapterService->getAdjacentChapters($chapter);
 
         // Increment view count
-        $chapter->increment('views');
+        $this->chapterService->incrementViewCount($chapter);
 
         return Inertia::render('Chapter/Show', [
             'manga' => $manga,
             'chapter' => $chapter,
-            'previousChapter' => $previousChapter,
-            'nextChapter' => $nextChapter,
-            'allChapters' => $allChapters,
-            'pages' => $chapter->pages()->orderBy('page_number')->get()
+            'previousChapter' => $adjacentChapters['previous'],
+            'nextChapter' => $adjacentChapters['next'],
+            // Defer allChapters to improve page load performance for manga with many chapters
+            'allChapters' => Inertia::defer(function () use ($manga) {
+                return $this->chapterService->getAllChaptersByManga($manga);
+            }),
+            'pages' => $chapter->pages,
+            'translations' => [
+                'home' => __('chapter.home'),
+                'chapter_list' => __('chapter.chapter_list'),
+                'previous_chapter' => __('chapter.previous_chapter'),
+                'next_chapter' => __('chapter.next_chapter'),
+                'select_chapter' => __('chapter.select_chapter'),
+                'views' => __('chapter.views'),
+                'chapter_short' => __('chapter.chapter_short'),
+                'chapter_prefix' => __('chapter.chapter_prefix'),
+            ]
         ]);
     }
 
-    public function store(Request $request, Manga $manga)
+    public function store(ChapterRequest $request, Manga $manga)
     {
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255',
-            'chapter_number' => 'required|numeric|min:0',
-            'volume_number' => 'nullable|integer|min:1',
-            'published_at' => 'nullable|date'
-        ]);
-
-        // Check if chapter number already exists for this manga
-        $existingChapter = Chapter::where('manga_id', $manga->id)
-            ->where('chapter_number', $validatedData['chapter_number'])
-            ->first();
-
-        if ($existingChapter) {
-            return back()->withErrors([
-                'chapter_number' => 'Số chương này đã tồn tại cho manga này.'
-            ]);
+        try {
+            $chapter = $this->chapterService->createChapter($manga, $request->validated());
+            return redirect()->route('manga.chapters.show', [$manga, $chapter])
+                ->with('success', 'Chương đã được tạo thành công!');
+        } catch (\InvalidArgumentException $e) {
+            return back()->withErrors(['chapter_number' => $e->getMessage()]);
         }
-
-        // Check if slug already exists for this manga (if provided)
-        if (!empty($validatedData['slug'])) {
-            $existingSlug = Chapter::where('manga_id', $manga->id)
-                ->where('slug', $validatedData['slug'])
-                ->first();
-
-            if ($existingSlug) {
-                return back()->withErrors([
-                    'slug' => 'Slug này đã tồn tại cho manga này.'
-                ]);
-            }
-        }
-
-        $validatedData['manga_id'] = $manga->id;
-        $validatedData['published_at'] = $validatedData['published_at'] ?? now();
-
-        $chapter = Chapter::create($validatedData);
-
-        return redirect()->route('manga.chapters.show', [$manga, $chapter])
-            ->with('success', 'Chương đã được tạo thành công!');
     }
 
-    public function update(Request $request, Manga $manga, Chapter $chapter)
+    public function update(ChapterRequest $request, Manga $manga, Chapter $chapter)
     {
         // Ensure chapter belongs to manga
         if ($chapter->manga_id !== $manga->id) {
             abort(404);
         }
 
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255',
-            'chapter_number' => 'required|numeric|min:0',
-            'volume_number' => 'nullable|integer|min:1',
-            'published_at' => 'nullable|date'
-        ]);
-
-        // Check if chapter number already exists for this manga (excluding current chapter)
-        $existingChapter = Chapter::where('manga_id', $manga->id)
-            ->where('chapter_number', $validatedData['chapter_number'])
-            ->where('id', '!=', $chapter->id)
-            ->first();
-
-        if ($existingChapter) {
-            return back()->withErrors([
-                'chapter_number' => 'Số chương này đã tồn tại cho manga này.'
-            ]);
+        try {
+            $chapter = $this->chapterService->updateChapter($chapter, $request->validated());
+            return redirect()->route('manga.chapters.show', [$manga, $chapter])
+                ->with('success', 'Chương đã được cập nhật thành công!');
+        } catch (\InvalidArgumentException $e) {
+            return back()->withErrors(['chapter_number' => $e->getMessage()]);
         }
-
-        // Check if slug already exists for this manga (if provided, excluding current chapter)
-        if (!empty($validatedData['slug'])) {
-            $existingSlug = Chapter::where('manga_id', $manga->id)
-                ->where('slug', $validatedData['slug'])
-                ->where('id', '!=', $chapter->id)
-                ->first();
-
-            if ($existingSlug) {
-                return back()->withErrors([
-                    'slug' => 'Slug này đã tồn tại cho manga này.'
-                ]);
-            }
-        }
-
-        $chapter->update($validatedData);
-
-        return redirect()->route('manga.chapters.show', [$manga, $chapter])
-            ->with('success', 'Chương đã được cập nhật thành công!');
     }
 
     public function destroy(Manga $manga, Chapter $chapter)
@@ -157,7 +94,7 @@ class ChapterController extends Controller
             abort(404);
         }
 
-        $chapter->delete();
+        $this->chapterService->deleteChapter($chapter);
 
         return redirect()->route('manga.chapters.index', $manga)
             ->with('success', 'Chương đã được xóa thành công!');

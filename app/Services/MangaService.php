@@ -2,122 +2,66 @@
 
 namespace App\Services;
 
+use App\Contracts\MangaRepositoryInterface;
 use App\Models\Manga;
 use App\Models\TaxonomyTerm;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class MangaService
 {
+    public function __construct(
+        private MangaRepositoryInterface $mangaRepository
+    ) {}
+
     public function getMangaList(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
-        $query = Manga::with(['taxonomyTerms.taxonomy', 'chapters'])
-            ->withCount('chapters');
-
-        $query = $this->applyFilters($query, $filters);
-        $query = $this->applySorting($query, $filters);
-
-        return $query->paginate($perPage)->withQueryString();
+        return $this->mangaRepository->getMangaWithFilters($filters, $perPage);
     }
 
     public function getMangaDetail(Manga $manga): Manga
     {
-        return $manga->load([
-            'taxonomyTerms.taxonomy',
-            'chapters' => function ($query) {
-                $query->orderBy('chapter_number', 'desc');
-            }
-        ]);
+        return $this->mangaRepository->getMangaDetail($manga);
     }
 
-    public function getRelatedManga(Manga $manga, int $limit = 6): \Illuminate\Database\Eloquent\Collection
+    public function getRelatedManga(Manga $manga, int $limit = 6): Collection
     {
-        return Manga::whereHas('taxonomyTerms', function ($query) use ($manga) {
-            $query->whereIn('manga_taxonomy_terms.taxonomy_term_id', $manga->taxonomyTerms->pluck('id'));
-        })
-        ->where('mangas.id', '!=', $manga->id)
-        ->limit($limit)
-        ->get();
+        return $this->mangaRepository->getRelatedManga($manga, $limit);
     }
 
-    public function getFeaturedManga(int $limit = 10): \Illuminate\Database\Eloquent\Collection
+    public function getFeaturedManga(int $limit = 10): Collection
     {
-        return Manga::with(['taxonomyTerms', 'chapters'])
-            ->withCount('chapters')
-            ->orderBy('views', 'desc')
-            ->orderBy('rating', 'desc')
-            ->limit($limit)
-            ->get();
+        return $this->mangaRepository->getFeaturedManga($limit);
     }
 
-    public function getLatestManga(int $limit = 10): \Illuminate\Database\Eloquent\Collection
+    public function getLatestManga(int $limit = 10): Collection
     {
-        return Manga::with(['taxonomyTerms', 'chapters'])
-            ->withCount('chapters')
-            ->orderBy('created_at', 'desc')
-            ->limit($limit)
-            ->get();
+        return $this->mangaRepository->getFeaturedManga($limit);
     }
 
-    public function getPopularManga(int $limit = 10): \Illuminate\Database\Eloquent\Collection
+    public function getPopularManga(int $limit = 10): Collection
     {
-        return Manga::with(['taxonomyTerms', 'chapters'])
-            ->withCount('chapters')
-            ->orderBy('views', 'desc')
-            ->limit($limit)
-            ->get();
+        return $this->mangaRepository->getPopularManga($limit);
     }
 
     public function createManga(array $data): Manga
     {
-        $genreIds = $data['genre_ids'] ?? [];
-        $authorIds = $data['author_ids'] ?? [];
-        $tagIds = $data['tag_ids'] ?? [];
-        
-        unset($data['genre_ids'], $data['author_ids'], $data['tag_ids']);
-
-        $manga = Manga::create($data);
-
-        // Attach taxonomy terms
-        $taxonomyTermIds = array_merge($genreIds, $authorIds, $tagIds);
-        if (!empty($taxonomyTermIds)) {
-            $manga->taxonomyTerms()->attach($taxonomyTermIds);
-        }
-
-        return $manga->load(['taxonomyTerms.taxonomy']);
+        return $this->mangaRepository->createManga($data);
     }
 
     public function updateManga(Manga $manga, array $data): Manga
     {
-        $genreIds = $data['genre_ids'] ?? [];
-        $authorIds = $data['author_ids'] ?? [];
-        $tagIds = $data['tag_ids'] ?? [];
-        
-        unset($data['genre_ids'], $data['author_ids'], $data['tag_ids']);
-
-        $manga->update($data);
-
-        // Sync taxonomy terms
-        $taxonomyTermIds = array_merge($genreIds, $authorIds, $tagIds);
-        $manga->taxonomyTerms()->sync($taxonomyTermIds);
-
-        return $manga->load(['taxonomyTerms.taxonomy']);
+        return $this->mangaRepository->updateManga($manga, $data);
     }
 
     public function deleteManga(Manga $manga): bool
     {
-        // Detach all taxonomy terms
-        $manga->taxonomyTerms()->detach();
-        
-        // Delete all chapters and their pages (cascade should handle this)
-        $manga->chapters()->delete();
-
-        return $manga->delete();
+        return $this->mangaRepository->deleteManga($manga);
     }
 
     public function incrementViewCount(Manga $manga): void
     {
-        $manga->increment('views');
+        $this->mangaRepository->incrementViewCount($manga);
     }
 
     public function addRating(Manga $manga, float $rating): void
@@ -125,111 +69,14 @@ class MangaService
         $manga->updateRating($rating);
     }
 
-    public function getTopRatedManga(int $limit = 10): \Illuminate\Database\Eloquent\Collection
+    public function getTopRatedManga(int $limit = 10): Collection
     {
-        return Manga::with(['taxonomyTerms', 'chapters'])
-            ->withCount('chapters')
-            ->topRated()
-            ->limit($limit)
-            ->get();
+        return $this->mangaRepository->getTopRatedManga($limit);
     }
 
     public function searchManga(string $query, int $perPage = 20): LengthAwarePaginator
     {
-        return Manga::with(['taxonomyTerms.taxonomy', 'chapters'])
-            ->withCount('chapters')
-            ->where(function ($q) use ($query) {
-                $q->where('title', 'like', "%{$query}%")
-                  ->orWhere('description', 'like', "%{$query}%")
-                  ->orWhere('author', 'like', "%{$query}%")
-                  ->orWhere('artist', 'like', "%{$query}%");
-            })
-            ->orWhereHas('taxonomyTerms', function ($q) use ($query) {
-                $q->where('name', 'like', "%{$query}%");
-            })
-            ->orderBy('views', 'desc')
-            ->paginate($perPage);
-    }
-
-    private function applyFilters(Builder $query, array $filters): Builder
-    {
-        // Search filter
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('author', 'like', "%{$search}%")
-                  ->orWhere('artist', 'like', "%{$search}%");
-            });
-        }
-
-        // Genre filter
-        if (!empty($filters['genre'])) {
-            $query->whereHas('taxonomyTerms', function ($q) use ($filters) {
-                $q->where('slug', $filters['genre'])
-                  ->whereHas('taxonomy', function ($taxonomy) {
-                      $taxonomy->where('type', 'genre');
-                  });
-            });
-        }
-
-        // Author filter
-        if (!empty($filters['author'])) {
-            $query->whereHas('taxonomyTerms', function ($q) use ($filters) {
-                $q->where('slug', $filters['author'])
-                  ->whereHas('taxonomy', function ($taxonomy) {
-                      $taxonomy->where('type', 'author');
-                  });
-            });
-        }
-
-        // Status filter
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-
-        // Rating filter
-        if (!empty($filters['min_rating'])) {
-            $query->where('rating', '>=', $filters['min_rating']);
-        }
-
-        // Year filter
-        if (!empty($filters['year'])) {
-            $query->where('publication_year', $filters['year']);
-        }
-
-        return $query;
-    }
-
-    private function applySorting(Builder $query, array $filters): Builder
-    {
-        $sortBy = $filters['sort'] ?? 'updated_at';
-        $sortOrder = $filters['order'] ?? 'desc';
-
-        switch ($sortBy) {
-            case 'popular':
-                $query->orderBy('views', 'desc');
-                break;
-            case 'rating':
-            case 'top_rated':
-                $query->orderBy('rating', 'desc')
-                      ->orderBy('total_rating', 'desc');
-                break;
-            case 'title':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'latest':
-                $query->orderBy('created_at', 'desc');
-                break;
-            case 'chapters':
-                $query->orderBy('chapters_count', 'desc');
-                break;
-            default:
-                $query->orderBy($sortBy, $sortOrder);
-        }
-
-        return $query;
+        return $this->mangaRepository->searchManga($query, $perPage);
     }
 
     public function getFilterOptions(): array

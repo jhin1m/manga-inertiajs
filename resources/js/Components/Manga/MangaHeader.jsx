@@ -31,22 +31,24 @@ export function MangaHeader({ manga, translations }) {
     }
 
     return (
-        <>
+        <div className="flex flex-col sm:flex-row gap-6">
             {/* Cover Image */}
-            <div className="w-[140px] sm:w-[160px] lg:w-[200px] flex-shrink-0">
-                <AspectRatio ratio={2/3} className="bg-muted rounded-lg overflow-hidden">
-                    <img 
-                        src={manga.cover || '/api/placeholder/200/300'} 
-                        alt={manga.name}
-                        className="object-cover w-full h-full"
-                    />
-                </AspectRatio>
+            <div className="w-full sm:w-[160px] lg:w-[200px] flex-shrink-0 flex justify-center sm:block">
+                <div className="w-[140px] sm:w-full">
+                    <AspectRatio ratio={2/3} className="bg-muted rounded-lg overflow-hidden">
+                        <img 
+                            src={manga.cover || '/api/placeholder/200/300'} 
+                            alt={manga.name}
+                            className="object-cover w-full h-full"
+                        />
+                    </AspectRatio>
+                </div>
             </div>
 
             {/* Info Section */}
-            <div className="space-y-4 flex-1 min-w-0">
+            <div className="space-y-4 flex-1">
                 {/* Title */}
-                <div>
+                <div className="text-center sm:text-left">
                     <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-2">
                         {manga.name}
                     </h1>
@@ -146,7 +148,7 @@ export function MangaHeader({ manga, translations }) {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     {manga.first_chapter && (
                         <Button size="lg" asChild>
                             <Link href={route('manga.chapters.show', [manga.slug, manga.first_chapter.slug])}>
@@ -171,6 +173,6 @@ export function MangaHeader({ manga, translations }) {
                     </Button>
                 </div>
             </div>
-        </>
+        </div>
     )
-} 
+}

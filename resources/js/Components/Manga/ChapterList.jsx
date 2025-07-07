@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react'
 import { Button } from '@/Components/ui/button'
 import { Card, CardContent } from '@/Components/ui/card'
+import { Skeleton } from '@/Components/ui/skeleton'
 import { 
     Table, 
     TableBody, 
@@ -17,7 +18,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/Components/ui/pagination'
-import { BookOpen, Calendar, Hash } from 'lucide-react'
+import { BookOpen, Calendar, Hash, Loader2 } from 'lucide-react'
 import { formatDistanceToNow } from '@/lib/formatters'
 
 export function ChapterList({ manga, chapters, translations = {} }) {
@@ -26,13 +27,76 @@ export function ChapterList({ manga, chapters, translations = {} }) {
     // Helper function to get chapter URL
     const getChapterUrl = (chapter) => route('manga.chapters.show', [manga.slug, chapter.slug])
 
+    // Loading state for deferred props
+    if (chapters === undefined) {
+        return (
+            <div>
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-semibold flex items-center gap-2">
+                        <BookOpen className="w-5 h-5" />
+                        {t.title || 'Danh sách chương'} ({manga.total_chapters || 0})
+                    </h2>
+                </div>
+
+                {/* Loading Skeleton - Desktop */}
+                <div className="hidden md:block">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[100px]">{t.chapter_column || 'Chương'}</TableHead>
+                                <TableHead>{t.title_column || 'Tiêu đề'}</TableHead>
+                                <TableHead className="w-[140px]">{t.updated_column || 'Ngày cập nhật'}</TableHead>
+                                <TableHead className="w-[100px] text-right">{t.read_column || 'Đọc'}</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {Array.from({ length: 10 }).map((_, index) => (
+                                <TableRow key={index}>
+                                    <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                                    <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                                    <TableCell className="text-right"><Skeleton className="h-8 w-16 ml-auto" /></TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+
+                {/* Loading Skeleton - Mobile */}
+                <div className="md:hidden space-y-3">
+                    {Array.from({ length: 10 }).map((_, index) => (
+                        <Card key={index}>
+                            <CardContent className="p-4">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="flex-1 space-y-2">
+                                        <Skeleton className="h-4 w-16" />
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-3 w-20" />
+                                    </div>
+                                    <Skeleton className="h-8 w-12" />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+
+                {/* Loading indicator */}
+                <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                    <span className="text-muted-foreground">Đang tải danh sách chương...</span>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div>
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
                     <BookOpen className="w-5 h-5" />
-                    {t.title || 'Danh sách chương'} ({manga.total_chapters || chapters.total})
+                    {t.title || 'Danh sách chương'} ({manga.total_chapters || chapters?.total || 0})
                 </h2>
             </div>
 
@@ -48,7 +112,7 @@ export function ChapterList({ manga, chapters, translations = {} }) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {chapters.data.map(chapter => (
+                        {chapters?.data?.map(chapter => (
                             <TableRow key={chapter.id} className="hover:bg-muted/50">
                                 <TableCell className="font-medium">
                                     <div className="flex items-center gap-2">
@@ -85,7 +149,7 @@ export function ChapterList({ manga, chapters, translations = {} }) {
 
             {/* Mobile Card View */}
             <div className="md:hidden space-y-3">
-                {chapters.data.map(chapter => (
+                {chapters?.data?.map(chapter => (
                     <Card key={chapter.id} className="hover:shadow-md transition-shadow">
                         <CardContent className="p-4">
                             <div className="flex items-start justify-between gap-3">
@@ -118,8 +182,17 @@ export function ChapterList({ manga, chapters, translations = {} }) {
                 ))}
             </div>
 
+            {/* No chapters message */}
+            {chapters?.data?.length === 0 && (
+                <div className="text-center py-12">
+                    <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium mb-2">Chưa có chương nào</h3>
+                    <p className="text-muted-foreground">Manga này chưa có chương nào được phát hành.</p>
+                </div>
+            )}
+
             {/* Pagination */}
-            {chapters.links && chapters.links.length > 3 && (
+            {chapters?.links && chapters.links.length > 3 && (
                 <Pagination className="mt-6">
                     <PaginationContent>
                         {chapters.prev_page_url && (

@@ -2,95 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MangaRequest;
 use App\Models\Manga;
 use App\Models\TaxonomyTerm;
+use App\Services\MangaService;
+use App\Services\ChapterService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class MangaController extends Controller
 {
+    public function __construct(
+        private MangaService $mangaService,
+        private ChapterService $chapterService
+    ) {}
     public function index(Request $request)
     {
-        $query = Manga::with([
-            'taxonomyTerms', 
-            'chapters' => function ($query) {
-                $query->orderBy('chapter_number', 'desc')->limit(3);
-            }
-        ])
-        ->withCount('chapters');
+        $filters = [
+            'search' => $request->search,
+            'genres' => $request->genres ?: [],
+            'status' => $request->status,
+            'rating' => $request->rating ? (float) $request->rating : 0,
+            'year' => $request->year,
+            'sortBy' => $request->get('sortBy', 'latest'),
+        ];
 
-        // Search functionality
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('alternative_names', 'like', '%' . $request->search . '%');
-        }
-
-        // Filter by genres (multiple)
-        if ($request->filled('genres')) {
-            $genres = is_array($request->genres) ? $request->genres : [$request->genres];
-            $query->whereHas('taxonomyTerms', function ($q) use ($genres) {
-                $q->whereIn('taxonomy_terms.id', $genres)
-                  ->whereHas('taxonomy', function ($taxonomy) {
-                      $taxonomy->where('type', 'genre');
-                  });
-            });
-        }
-
-        // Filter by rating
-        if ($request->filled('rating') && $request->rating > 0) {
-            $query->where('rating', '>=', $request->rating);
-        }
-
-        // Filter by year
-        if ($request->filled('year')) {
-            $query->whereYear('created_at', $request->year);
-        }
-
-        // Filter by status
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Sort options
-        $sortBy = $request->get('sortBy', 'latest');
-        
-        switch ($sortBy) {
-            case 'views':
-                $query->orderBy('views', 'desc');
-                break;
-            case 'rating':
-                $query->orderBy('rating', 'desc')->orderBy('total_rating', 'desc');
-                break;
-            case 'name_asc':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'name_desc':
-                $query->orderBy('name', 'desc');
-                break;
-            case 'oldest':
-                $query->orderBy('created_at', 'asc');
-                break;
-            case 'latest':
-            default:
-                $query->orderBy('updated_at', 'desc');
-                break;
-        }
-
-        $manga = $query->paginate(20)->withQueryString();
-        
-        // Transform chapters to recent_chapters format for MangaCard compatibility
-        $manga->getCollection()->transform(function ($manga) {
-            $manga->recent_chapters = $manga->chapters->map(function ($chapter) {
-                return [
-                    'chapter_number' => $chapter->chapter_number,
-                    'title' => $chapter->title,
-                    'slug' => $chapter->slug,
-                    'updated_at' => $chapter->updated_at,
-                    'created_at' => $chapter->created_at,
-                ];
-            });
-            return $manga;
-        });
+        $manga = $this->mangaService->getMangaList($filters, 20);
 
         // Get filter options
         $genres = TaxonomyTerm::whereHas('taxonomy', function ($q) {
@@ -99,14 +37,7 @@ class MangaController extends Controller
 
         return Inertia::render('Manga/Index', [
             'manga' => $manga,
-            'filters' => [
-                'search' => $request->search,
-                'genres' => $request->genres ?: [],
-                'status' => $request->status,
-                'rating' => $request->rating ? (float) $request->rating : 0,
-                'year' => $request->year,
-                'sortBy' => $sortBy,
-            ],
+            'filters' => $filters,
             'genres' => $genres,
             'statuses' => Manga::getStatuses(),
             'translations' => [
@@ -124,17 +55,10 @@ class MangaController extends Controller
 
     public function show(Manga $manga, Request $request)
     {
-        $manga->load([
-            'taxonomyTerms.taxonomy',
-        ]);
-
-        // Load chapters with pagination
-        $chapters = $manga->chapters()
-            ->orderBy('chapter_number', 'desc')
-            ->paginate(150);
+        $manga = $this->mangaService->getMangaDetail($manga);
 
         // Increment view count
-        $manga->increment('views');
+        $this->mangaService->incrementViewCount($manga);
 
         // Get first and last chapters for navigation
         $firstChapter = $manga->chapters()->orderBy('chapter_number', 'asc')->first();
@@ -166,7 +90,11 @@ class MangaController extends Controller
                 'first_chapter' => $firstChapter,
                 'last_chapter' => $lastChapter,
             ]),
-            'chapters' => $chapters,
+            // Use deferred props for chapters to improve initial page load performance
+            
+            'chapters' => Inertia::defer(function () use ($manga) {
+                return $this->chapterService->getChaptersByManga($manga, 20);
+            }),
             'translations' => [
                 'chapter_list' => __('manga.chapter_list'),
                 'status_label' => __('manga.status_label'),
@@ -189,53 +117,17 @@ class MangaController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(MangaRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'alternative_names' => 'nullable|array',
-            'description' => 'nullable|string',
-            'status' => 'required|in:ongoing,completed,hiatus,cancelled',
-            'cover' => 'nullable|string',
-            'slug' => 'required|string|unique:mangas,slug',
-            'rating' => 'nullable|numeric|min:0|max:10',
-            'total_rating' => 'nullable|integer|min:0',
-        'genre_ids' => 'nullable|array',
-            'genre_ids.*' => 'exists:taxonomy_terms,id'
-        ]);
-
-        $manga = Manga::create($validatedData);
-
-        // Attach genres if provided
-        if (isset($validatedData['genre_ids'])) {
-            $manga->taxonomyTerms()->attach($validatedData['genre_ids']);
-        }
+        $manga = $this->mangaService->createManga($request->validated());
 
         return redirect()->route('manga.show', $manga)
             ->with('success', 'Manga đã được tạo thành công!');
     }
 
-    public function update(Request $request, Manga $manga)
+    public function update(MangaRequest $request, Manga $manga)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'alternative_names' => 'nullable|array',
-            'description' => 'nullable|string',
-            'status' => 'required|in:ongoing,completed,hiatus,cancelled',
-            'cover' => 'nullable|string',
-            'slug' => 'required|string|unique:mangas,slug,' . $manga->id,
-            'rating' => 'nullable|numeric|min:0|max:10',
-            'total_rating' => 'nullable|integer|min:0',
-            'genre_ids' => 'nullable|array',
-            'genre_ids.*' => 'exists:taxonomy_terms,id'
-        ]);
-
-        $manga->update($validatedData);
-
-        // Sync genres
-        if (isset($validatedData['genre_ids'])) {
-            $manga->taxonomyTerms()->sync($validatedData['genre_ids']);
-        }
+        $manga = $this->mangaService->updateManga($manga, $request->validated());
 
         return redirect()->route('manga.show', $manga)
             ->with('success', 'Manga đã được cập nhật thành công!');
@@ -243,117 +135,83 @@ class MangaController extends Controller
 
     public function destroy(Manga $manga)
     {
-        $manga->delete();
+        $this->mangaService->deleteManga($manga);
 
         return redirect()->route('manga.index')
             ->with('success', 'Manga đã được xóa thành công!');
     }
 
-    public function getLatestUpdates($limit = 12)
+    public function search(Request $request)
     {
-        return Manga::with([
-            'taxonomyTerms.taxonomy',
-            'chapters' => function ($query) {
-                $query->orderBy('chapter_number', 'desc')
-                      ->limit(3);
-            }
-        ])
-        ->whereHas('chapters')
-        ->orderBy('updated_at', 'desc')
-        ->limit($limit)
-        ->get()
-        ->map(function ($manga) {
-            return [
-                'id' => $manga->id,
-                'name' => $manga->name,
-                'slug' => $manga->slug,
-                'cover' => $manga->cover,
-                'status' => $manga->status,
-                'recent_chapters' => $manga->chapters->map(function ($chapter) {
-                    return [
-                        'chapter_number' => $chapter->chapter_number,
-                        'title' => $chapter->title,
-                        'slug' => $chapter->slug,
-                        'updated_at' => $chapter->updated_at,
-                        'created_at' => $chapter->created_at,
-                    ];
-                })
-            ];
+        $query = $request->get('q', '');
+        $filters = [
+            'search' => $query,
+            'genres' => $request->get('genres', []),
+            'status' => $request->get('status'),
+            'rating' => $request->get('rating') ? (float) $request->get('rating') : 0,
+            'sortBy' => $request->get('sortBy', 'latest'),
+        ];
+
+        $manga = $this->mangaService->getMangaList($filters, 20);
+
+        // Cache genres for 1 hour since they don't change frequently
+        $genres = Cache::remember('search_genres', 3600, function () {
+            return TaxonomyTerm::whereHas('taxonomy', function ($q) {
+                $q->where('type', 'genre');
+            })
+            ->withCount('mangas')
+            ->having('mangas_count', '>', 0) // Only genres with manga
+            ->orderBy('mangas_count', 'desc')
+            ->limit(20) // Limit to top 20 genres
+            ->get(['id', 'name', 'slug']);
         });
-    }
 
-    /**
-     * Lấy danh sách Hot Manga dựa trên views và rating
-     */
-    public function getHotManga($limit = 10)
-    {
-        return Manga::with([
-            'chapters' => function ($query) {
-                $query->orderBy('chapter_number', 'desc')
-                      ->limit(1); // Lấy chapter mới nhất
-            }
-        ])
-        ->where('views', '>', 1000) // Chỉ lấy manga có views > 1000
-        ->orderByRaw('(views * 0.7) + (rating * total_rating * 0.3) DESC') // Công thức tính hot score
-        ->limit($limit)
-        ->get()
-        ->map(function ($manga) {
-            return [
-                'id' => $manga->id,
-                'name' => $manga->name,
-                'slug' => $manga->slug,
-                'cover' => $manga->cover ?: '/api/placeholder/200/280',
-                'status' => $manga->status,
-                'latest_chapter' => $manga->chapters->first() ? [
-                    'chapter_number' => $manga->chapters->first()->chapter_number,
-                    'title' => $manga->chapters->first()->title,
-                    'slug' => $manga->chapters->first()->slug,
-                    'updated_at' => $manga->chapters->first()->updated_at->format('Y-m-d')
-                ] : null
-            ];
+        // Cache popular manga for 30 minutes
+        $popularManga = Cache::remember('search_popular_manga', 1800, function () {
+            return Manga::where('status', 'published')
+                ->orderBy('views', 'desc')
+                ->limit(10)
+                ->get(['id', 'name', 'slug']);
         });
+
+        return Inertia::render('Search/Index', [
+            'manga' => $manga,
+            'query' => $query,
+            'filters' => $filters,
+            'genres' => $genres,
+            'statuses' => Manga::getStatuses(),
+            'popularManga' => $popularManga,
+            'translations' => [
+                'title' => __('search.title'),
+                'placeholder' => __('search.placeholder'),
+                'button' => __('search.button'),
+                'results' => __('search.results'),
+                'no_results' => __('search.no_results'),
+                'no_results_message' => __('search.no_results_message'),
+                'found_count' => __('search.found_count'),
+                'search_for' => __('search.search_for'),
+                'clear' => __('search.clear'),
+                'advanced' => __('search.advanced'),
+                'categories' => __('search.categories'),
+                'all_categories' => __('search.all_categories'),
+                'status' => __('search.status'),
+                'all_statuses' => __('search.all_statuses'),
+                'sort_by' => __('search.sort_by'),
+                'sort_latest' => __('search.sort_latest'),
+                'sort_popular' => __('search.sort_popular'),
+                'sort_rating' => __('search.sort_rating'),
+                'sort_alphabetical' => __('search.sort_alphabetical'),
+                'min_rating' => __('search.min_rating'),
+                'popular_manga' => __('search.popular_manga'),
+                'popular_genres' => __('search.popular_genres'),
+                'search_tips' => __('search.search_tips'),
+                'tip_title' => __('search.tip_title'),
+                'tip_author' => __('search.tip_author'),
+                'tip_genre' => __('search.tip_genre'),
+                'tip_hotkey' => __('search.tip_hotkey'),
+                'back_to_home' => __('search.back_to_home'),
+            ],
+        ]);
     }
 
-    /**
-     * Lấy danh sách Rankings theo rating cao nhất
-     */
-    public function getRankings($limit = 10)
-    {
-        return Manga::select('id', 'name', 'slug', 'cover', 'rating', 'views')
-            ->orderBy('rating', 'desc')
-            ->orderBy('total_rating', 'desc')
-            ->limit($limit)
-            ->get()
-            ->map(function ($manga, $index) {
-                return [
-                    'rank' => $index + 1,
-                    'id' => $manga->id,
-                    'name' => $manga->name,
-                    'slug' => $manga->slug,
-                    'cover' => $manga->cover ?: '/api/placeholder/100/140',
-                    'rating' => $manga->rating,
-                    'views' => $manga->views
-                ];
-            });
-    }
-
-    /**
-     * Lấy danh sách Recommended manga
-     */
-    public function getRecommended($limit = 6)
-    {
-        return Manga::where('rating', '>=', 4.0)
-            ->orderBy('rating', 'desc')
-            ->limit($limit)
-            ->get()
-            ->map(function ($manga) {
-                return [
-                    'id' => $manga->id,
-                    'name' => $manga->name,
-                    'slug' => $manga->slug,
-                    'cover' => $manga->cover ?: '/api/placeholder/150/200',
-                    'rating' => $manga->rating
-                ];
-            });
-    }
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Button } from "@/Components/ui/button.jsx";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/Components/ui/sheet.jsx";
 import { ScrollArea } from "@/Components/ui/scroll-area.jsx";
@@ -18,23 +18,21 @@ export default function FilterSidebar({
 }) {
     const [isOpen, setIsOpen] = useState(false);
 
-    const hasActiveFilters = () => {
+    const hasActiveFilters = useMemo(() => {
         return filters.genres?.length > 0 ||
                filters.status ||
                (filters.rating > 0) ||
-               filters.year ||
                (filters.sortBy && filters.sortBy !== 'latest');
-    };
+    }, [filters]);
 
-    const getActiveFiltersCount = () => {
+    const activeFiltersCount = useMemo(() => {
         let count = 0;
         if (filters.genres?.length > 0) count += filters.genres.length;
         if (filters.status) count += 1;
         if (filters.rating > 0) count += 1;
-        if (filters.year) count += 1;
         if (filters.sortBy && filters.sortBy !== 'latest') count += 1;
         return count;
-    };
+    }, [filters]);
 
     const t = translations.filters || {};
 
@@ -46,12 +44,12 @@ export default function FilterSidebar({
                         <Button variant="outline" className="relative">
                             <SlidersHorizontal className="h-4 w-4 mr-2" />
                             {t.title || 'Bộ lọc'}
-                            {hasActiveFilters() && (
+                            {hasActiveFilters && (
                                 <Badge 
                                     variant="destructive" 
                                     className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
                                 >
-                                    {getActiveFiltersCount()}
+                                    {activeFiltersCount}
                                 </Badge>
                             )}
                         </Button>
@@ -62,9 +60,9 @@ export default function FilterSidebar({
                         <SheetTitle className="flex items-center gap-2">
                             <Filter className="h-5 w-5" />
                             {t.title || 'Bộ lọc'} manga
-                            {hasActiveFilters() && (
+                            {hasActiveFilters && (
                                 <Badge variant="secondary">
-                                    {getActiveFiltersCount()} {t.applying || 'đang áp dụng'}
+                                    {activeFiltersCount} {t.applying || 'đang áp dụng'}
                                 </Badge>
                             )}
                         </SheetTitle>

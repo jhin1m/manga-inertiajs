@@ -17,12 +17,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Search route
-Route::get('/search', function () {
-    $query = request()->get('q', '');
-    return Inertia::render('Search', [
-        'query' => $query
-    ]);
-})->name('search');
+Route::get('/search', [MangaController::class, 'search'])->name('search');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

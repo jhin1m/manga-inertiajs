@@ -2,98 +2,60 @@
 
 namespace App\Services;
 
+use App\Contracts\ChapterRepositoryInterface;
 use App\Models\Chapter;
 use App\Models\Manga;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ChapterService
 {
+    public function __construct(
+        private ChapterRepositoryInterface $chapterRepository
+    ) {}
     public function getChaptersByManga(Manga $manga, int $perPage = 20): LengthAwarePaginator
     {
-        return $manga->chapters()
-            ->orderBy('chapter_number', 'desc')
-            ->paginate($perPage);
+        return $this->chapterRepository->getChaptersByManga($manga, $perPage);
     }
 
     public function getChapterDetail(Chapter $chapter): Chapter
     {
-        return $chapter->load(['manga', 'pages' => function ($query) {
-            $query->orderBy('page_number');
-        }]);
+        return $this->chapterRepository->getChapterDetail($chapter);
     }
 
     public function getAdjacentChapters(Chapter $chapter): array
     {
-        $previousChapter = Chapter::where('manga_id', $chapter->manga_id)
-            ->where('chapter_number', '<', $chapter->chapter_number)
-            ->orderBy('chapter_number', 'desc')
-            ->first();
+        return $this->chapterRepository->getAdjacentChapters($chapter);
+    }
 
-        $nextChapter = Chapter::where('manga_id', $chapter->manga_id)
-            ->where('chapter_number', '>', $chapter->chapter_number)
-            ->orderBy('chapter_number', 'asc')
-            ->first();
-
-        return [
-            'previous' => $previousChapter,
-            'next' => $nextChapter
-        ];
+    public function getAllChaptersByManga(Manga $manga): Collection
+    {
+        return $this->chapterRepository->getAllChaptersByManga($manga);
     }
 
     public function createChapter(Manga $manga, array $data): Chapter
     {
-        // Check if chapter number already exists
-        $existingChapter = Chapter::where('manga_id', $manga->id)
-            ->where('chapter_number', $data['chapter_number'])
-            ->first();
-
-        if ($existingChapter) {
-            throw new \InvalidArgumentException('Số chương này đã tồn tại cho manga này.');
-        }
-
-        $data['manga_id'] = $manga->id;
-        $data['published_at'] = $data['published_at'] ?? now();
-
-        return Chapter::create($data);
+        return $this->chapterRepository->createChapter($manga, $data);
     }
 
     public function updateChapter(Chapter $chapter, array $data): Chapter
     {
-        // Check if chapter number already exists (excluding current chapter)
-        if (isset($data['chapter_number'])) {
-            $existingChapter = Chapter::where('manga_id', $chapter->manga_id)
-                ->where('chapter_number', $data['chapter_number'])
-                ->where('id', '!=', $chapter->id)
-                ->first();
-
-            if ($existingChapter) {
-                throw new \InvalidArgumentException('Số chương này đã tồn tại cho manga này.');
-            }
-        }
-
-        $chapter->update($data);
-        return $chapter;
+        return $this->chapterRepository->updateChapter($chapter, $data);
     }
 
     public function deleteChapter(Chapter $chapter): bool
     {
-        // Delete all pages associated with this chapter
-        $chapter->pages()->delete();
-        
-        return $chapter->delete();
+        return $this->chapterRepository->deleteChapter($chapter);
     }
 
     public function incrementViewCount(Chapter $chapter): void
     {
-        $chapter->increment('views');
+        $this->chapterRepository->incrementViewCount($chapter);
     }
 
-    public function getLatestChapters(int $limit = 20): \Illuminate\Database\Eloquent\Collection
+    public function getLatestChapters(int $limit = 20): Collection
     {
-        return Chapter::with(['manga'])
-            ->orderBy('published_at', 'desc')
-            ->limit($limit)
-            ->get();
+        return $this->chapterRepository->getLatestChapters($limit);
     }
 
     // TODO: Implement this

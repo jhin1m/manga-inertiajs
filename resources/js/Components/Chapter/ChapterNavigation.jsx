@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react'
 import { Button } from '@/Components/ui/button'
-import { ChevronLeft, ChevronRight, Home, List } from 'lucide-react'
+import { Skeleton } from '@/Components/ui/skeleton'
+import { ChevronLeft, ChevronRight, Home, List, Loader2 } from 'lucide-react'
 
 export function ChapterNavigation({ 
     manga, 
@@ -8,14 +9,47 @@ export function ChapterNavigation({
     previousChapter, 
     nextChapter, 
     isNavVisible,
-    allChapters = [],
+    allChapters,
     className = ""
 }) {
     const handleChapterSelect = (e) => {
         const chapterSlug = e.target.value
-        if (chapterSlug && chapterSlug !== chapter.slug) {
+        if (chapterSlug && chapterSlug !== chapter.slug && allChapters) {
             window.location.href = route('manga.chapters.show', [manga.slug, chapterSlug])
         }
+    }
+
+    // Component for chapter select that handles loading state
+    const ChapterSelectDropdown = ({ mobile = false }) => {
+        if (allChapters === undefined) {
+            return (
+                <div className="flex items-center gap-1">
+                    <Skeleton className={mobile ? "h-7 w-[100px]" : "h-9 w-[200px]"} />
+                    <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                </div>
+            )
+        }
+
+        return (
+            <select 
+                value={chapter.slug} 
+                onChange={handleChapterSelect}
+                name="chapter"
+                className={mobile 
+                    ? "w-[100px] px-2 py-1 text-xs border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    : "w-[200px] px-3 py-2 mx-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                }
+            >
+                {allChapters?.map((chap) => (
+                    <option key={chap.id} value={chap.slug}>
+                        {mobile 
+                            ? `Ch.${chap.chapter_number}`
+                            : `Chương ${chap.chapter_number}: ${chap.title}`
+                        }
+                    </option>
+                ))}
+            </select>
+        )
     }
 
     return (
@@ -54,18 +88,7 @@ export function ChapterNavigation({
                         )}
                     </Button>
                     
-                    <select 
-                        value={chapter.slug} 
-                        onChange={handleChapterSelect}
-                        name="chapter"
-                        className="w-[200px] px-3 py-2 mx-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    >
-                        {allChapters.map((chap) => (
-                            <option key={chap.id} value={chap.slug}>
-                                Chương {chap.chapter_number}: {chap.title}
-                            </option>
-                        ))}
-                    </select>
+                    <ChapterSelectDropdown mobile={false} />
                     
                     <Button 
                         variant="ghost" 
@@ -114,18 +137,7 @@ export function ChapterNavigation({
                         )}
                     </Button>
                     
-                    <select 
-                        value={chapter.slug} 
-                        onChange={handleChapterSelect}
-                        name="chapter"
-                        className="w-[100px] px-2 py-1 text-xs border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    >
-                        {allChapters.map((chap) => (
-                            <option key={chap.id} value={chap.slug}>
-                                Ch.{chap.chapter_number}
-                            </option>
-                        ))}
-                    </select>
+                    <ChapterSelectDropdown mobile={true} />
                     
                     <Button 
                         variant="ghost" 

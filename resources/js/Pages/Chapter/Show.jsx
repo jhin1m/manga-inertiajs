@@ -2,31 +2,55 @@ import { Head, Link } from '@inertiajs/react'
 import { AppLayout } from '@/Layouts/AppLayout'
 import { Button } from '@/Components/ui/button'
 import { Card } from '@/Components/ui/card'
-import { 
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/Components/ui/select'
+import { Skeleton } from '@/Components/ui/skeleton'
 import { BreadcrumbBuilder } from '@/Components/Layout/Breadcrumb'
-import { ChevronLeft, ChevronRight, List, Eye, Home } from 'lucide-react'
+import { ChevronLeft, ChevronRight, List, Eye, Home, Loader2 } from 'lucide-react'
 import { ChapterReader, ChapterNavigation } from '@/Components/Chapter'
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation'
 import { useAutoHideNavigation } from '@/hooks/useAutoHideNavigation'
 
-export default function ChapterShow({ manga, chapter, previousChapter, nextChapter, allChapters, pages }) {
+export default function ChapterShow({ manga, chapter, previousChapter, nextChapter, allChapters, pages, translations = {} }) {
     const isNavVisible = useAutoHideNavigation(100)
     useKeyboardNavigation(previousChapter, nextChapter, manga.slug)
 
-    const handleChapterSelect = (chapterId) => {
-        if (chapterId && chapterId !== chapter.id.toString()) {
+    const handleChapterSelect = (e) => {
+        const chapterId = e.target.value;
+        if (chapterId && chapterId !== chapter.id.toString() && allChapters) {
             const selectedChapter = allChapters.find(c => c.id.toString() === chapterId);
             if (selectedChapter) {
                 const chapterSlug = selectedChapter.slug || selectedChapter.chapter_number;
                 window.location.href = route('manga.chapters.show', [manga.slug, chapterSlug]);
             }
         }
+    }
+
+    // Component for chapter select - handles both loading and loaded states
+    const ChapterSelect = ({ className = "", mobile = false }) => {
+        if (allChapters === undefined) {
+            return (
+                <div className={`flex items-center gap-2 ${className}`}>
+                    <Skeleton className="h-10 flex-1" />
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                </div>
+            );
+        }
+
+        return (
+            <select 
+                value={chapter.id.toString()} 
+                onChange={handleChapterSelect}
+                className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+            >
+                {allChapters?.map((chap) => (
+                    <option key={chap.id} value={chap.id.toString()}>
+                        {mobile 
+                            ? `${translations.chapter_short || 'Ch.'} ${chap.chapter_number}: ${chap.title}`
+                            : `${translations.chapter_prefix || 'Chương'} ${chap.chapter_number}: ${chap.title}`
+                        }
+                    </option>
+                ))}
+            </select>
+        );
     }
 
     // Sử dụng BreadcrumbBuilder để tạo breadcrumb
@@ -61,7 +85,7 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                             </div>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Eye className="h-4 w-4" />
-                                {chapter.views.toLocaleString()} lượt xem
+                                {chapter.views.toLocaleString()} {translations.views || 'lượt xem'}
                             </div>
                         </div>
                     </div>
@@ -84,14 +108,14 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                     <Button variant="outline" asChild>
                                         <Link href={route('home')}>
                                             <Home className="h-4 w-4 mr-2" />
-                                            Trang chủ
+                                            {translations.home || 'Trang chủ'}
                                         </Link>
                                     </Button>
                                     
                                     <Button variant="outline" asChild>
                                         <Link href={route('manga.show', manga.slug)}>
                                             <List className="h-4 w-4 mr-2" />
-                                            Danh sách chương
+                                            {translations.chapter_list || 'Danh sách chương'}
                                         </Link>
                                     </Button>
                                     
@@ -103,28 +127,17 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                         {previousChapter ? (
                                             <Link href={route('manga.chapters.show', [manga.slug, previousChapter.slug || previousChapter.chapter_number])}>
                                                 <ChevronLeft className="h-4 w-4 mr-2" />
-                                                Chương trước
+                                                {translations.previous_chapter || 'Chương trước'}
                                             </Link>
                                         ) : (
                                             <>
                                                 <ChevronLeft className="h-4 w-4 mr-2" />
-                                                Chương trước
+                                                {translations.previous_chapter || 'Chương trước'}
                                             </>
                                         )}
                                     </Button>
                                     
-                                    <Select value={chapter.id.toString()} onValueChange={handleChapterSelect}>
-                                        <SelectTrigger className="w-[250px]">
-                                            <SelectValue placeholder="Chọn chương" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {allChapters.map((chap) => (
-                                                <SelectItem key={chap.id} value={chap.id.toString()}>
-                                                    Chương {chap.chapter_number}: {chap.title}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <ChapterSelect className="w-[250px]" />
                                     
                                     <Button 
                                         disabled={!nextChapter}
@@ -132,12 +145,12 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                     >
                                         {nextChapter ? (
                                             <Link href={route('manga.chapters.show', [manga.slug, nextChapter.slug || nextChapter.chapter_number])}>
-                                                Chương tiếp
+                                                {translations.next_chapter || 'Chương tiếp'}
                                                 <ChevronRight className="h-4 w-4 ml-2" />
                                             </Link>
                                         ) : (
                                             <>
-                                                Chương tiếp
+                                                {translations.next_chapter || 'Chương tiếp'}
                                                 <ChevronRight className="h-4 w-4 ml-2" />
                                             </>
                                         )}
@@ -151,31 +164,19 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                         <Button variant="outline" size="sm" asChild>
                                             <Link href={route('home')}>
                                                 <Home className="h-4 w-4 mr-2" />
-                                                Trang chủ
+                                                {translations.home || 'Trang chủ'}
                                             </Link>
                                         </Button>
                                         
                                         <Button variant="outline" size="sm" asChild>
                                             <Link href={route('manga.show', manga.slug)}>
                                                 <List className="h-4 w-4 mr-2" />
-                                                Danh sách
+                                                {translations.chapter_list || 'Danh sách'}
                                             </Link>
                                         </Button>
                                     </div>
-                                    
                                     {/* Chapter Select */}
-                                    <Select value={chapter.id.toString()} onValueChange={handleChapterSelect}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Chọn chương" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {allChapters.map((chap) => (
-                                                <SelectItem key={chap.id} value={chap.id.toString()}>
-                                                    Ch. {chap.chapter_number}: {chap.title}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <ChapterSelect mobile={true} />
                                     
                                     {/* Navigation Buttons */}
                                     <div className="flex items-center justify-center gap-2">
@@ -189,12 +190,12 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                             {previousChapter ? (
                                                 <Link href={route('manga.chapters.show', [manga.slug, previousChapter.slug || previousChapter.chapter_number])}>
                                                     <ChevronLeft className="h-4 w-4 mr-2" />
-                                                    Trước
+                                                    {translations.previous_chapter || 'Trước'}
                                                 </Link>
                                             ) : (
                                                 <>
                                                     <ChevronLeft className="h-4 w-4 mr-2" />
-                                                    Trước
+                                                    {translations.previous_chapter || 'Trước'}
                                                 </>
                                             )}
                                         </Button>
@@ -207,12 +208,12 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                         >
                                             {nextChapter ? (
                                                 <Link href={route('manga.chapters.show', [manga.slug, nextChapter.slug || nextChapter.chapter_number])}>
-                                                    Tiếp
+                                                    {translations.next_chapter || 'Tiếp'}
                                                     <ChevronRight className="h-4 w-4 ml-2" />
                                                 </Link>
                                             ) : (
                                                 <>
-                                                    Tiếp
+                                                    {translations.next_chapter || 'Tiếp'}
                                                     <ChevronRight className="h-4 w-4 ml-2" />
                                                 </>
                                             )}
