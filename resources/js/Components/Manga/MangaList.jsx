@@ -3,6 +3,7 @@ import { Link } from '@inertiajs/react';
 import { MangaCard } from './MangaCard';
 import { Card, CardContent } from '@/Components/ui/card';
 import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx';
+import { formatRelativeTime } from '@/lib/formatters';
 
 export function MangaList({ 
     mangas = [], 
@@ -37,7 +38,7 @@ export function MangaList({
     const getListVariant = () => {
         switch (variant) {
             case 'list':
-                return 'space-y-4';
+                return 'grid grid-cols-1 md:grid-cols-2 gap-3';
             case 'compact':
                 return `grid ${getGridColumns()} gap-3`;
             case 'featured':
@@ -48,12 +49,17 @@ export function MangaList({
     };
 
     // List item component for horizontal layout
-    const MangaListItem = ({ manga }) => (
-        <Link href={route('manga.show', manga.slug)}>
-            <Card className="group hover:shadow-md transition-all duration-300 cursor-pointer">
-                <CardContent className="p-4">
-                    <div className="flex gap-4">
-                        <div className="w-16 h-20 bg-muted rounded overflow-hidden flex-shrink-0">
+    const MangaListItem = ({ manga }) => {
+        // Get chapters to display (use recent_chapters if available, otherwise latest_chapter)
+        const chaptersToShow = manga.recent_chapters?.length > 0 ? manga.recent_chapters : 
+            (manga.latest_chapter ? [manga.latest_chapter] : []);
+
+        return (
+            <Card className="group hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden">
+                <div className="flex">
+                    {/* Cover Image - Full bleed */}
+                    <div className="w-26 h-40 bg-muted flex-shrink-0 overflow-hidden">
+                        <Link href={route('manga.show', manga.slug)}>
                             {isValidCover(manga.cover) ? (
                                 <img 
                                     src={manga.cover} 
@@ -63,35 +69,44 @@ export function MangaList({
                             ) : (
                                 getContextualDefaultCover('list')
                             )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">
+                        </Link>
+                    </div>
+                    
+                    {/* Content */}
+                    <CardContent className="p-3 flex-1 min-w-0">
+                        <Link href={route('manga.show', manga.slug)}>
+                            <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-1">
                                 {manga.name}
                             </h3>
-                            <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
-                                {manga.description || 'Chưa có mô tả'}
-                            </p>
-                            <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
-                                <span className="px-2 py-1 bg-secondary rounded text-xs">
-                                    {manga.status_label}
-                                </span>
-                                <span>★ {manga.rating?.toFixed(1) || 'N/A'}</span>
-                                <span>👁 {manga.views?.toLocaleString() || 0}</span>
-                                <span>{manga.chapters_count || 0} chương</span>
-                            </div>
-                            <div className="flex flex-wrap gap-1">
-                                {manga.taxonomy_terms?.filter(term => term.taxonomy && term.taxonomy.type === 'genre').slice(0, 3).map((genre, index) => (
-                                    <span key={index} className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">
-                                        {genre.name}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </CardContent>
+                        </Link>
+                        
+<div className="space-y-1">
+    {chaptersToShow.slice(0, 3).map((chapter, index) => (
+        <div key={index} className="flex items-center justify-between text-xs pt-0.5">
+            <Link 
+                href={chapter.slug ? route('manga.chapters.show', [manga.slug, chapter.slug]) : route('manga.show', manga.slug)}
+                className="flex items-center justify-between w-full text-primary truncate border border-primary/20 px-2 py-0.5 rounded-xl hover:border-primary/40 hover:bg-secondary"
+            >
+                <span className="flex-1 truncate">
+                    {chapter.title || `Chapter ${chapter.chapter_number || chapter.number}`}
+                </span>
+                <span className = "text-muted-foreground ml-2 flex-shrink-0">
+                    {formatRelativeTime(chapter.updated_at || chapter.created_at)}
+                </span>
+            </Link>
+        </div>
+    ))}
+    {chaptersToShow.length === 0 && (
+        <div className="text-xs text-muted-foreground">
+            Chưa có chapter
+        </div>
+    )}
+</div>
+                    </CardContent>
+                </div>
             </Card>
-        </Link>
-    );
+        );
+    };
 
     return (
         <div className={`${getListVariant()} ${className}`}>
