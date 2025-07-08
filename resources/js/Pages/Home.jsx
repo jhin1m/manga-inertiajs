@@ -1,4 +1,3 @@
-import { Head } from '@inertiajs/react';
 import { AppLayout } from '@/Layouts/AppLayout';
 import { Button } from "@/Components/ui/button.jsx";
 import { MangaList } from '@/Components/Manga';
@@ -17,7 +16,6 @@ export default function Home({
     return (
         <AppLayout>
             <SeoHead seo={seo} />
-            <Head title="Trang chủ - MangaReader" />
 
             {/* Hot Manga Slider */}
             <HotMangaSlider hotManga={hotManga} translations={translations} />

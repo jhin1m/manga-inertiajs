@@ -5,19 +5,19 @@ import { Star, Heart, Sparkles } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx';
 
-export function RecommendedCard({ recommended = [] }) {
+export function RecommendedCard({ recommended = [], translations = {} }) {
     if (!recommended || recommended.length === 0) {
         return (
             <Card>
                 <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2 text-lg">
                         <Sparkles className="h-5 w-5 text-primary" />
-                        Đề xuất cho bạn
+                        {translations.title || 'Đề xuất cho bạn'}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center py-8">
                     <div className="text-muted-foreground">
-                        Chưa có đề xuất nào
+                        {translations.no_data || 'Chưa có đề xuất nào'}
                     </div>
                 </CardContent>
             </Card>
@@ -40,14 +40,14 @@ export function RecommendedCard({ recommended = [] }) {
             <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                     <Sparkles className="h-5 w-5 text-primary" />
-                    Đề xuất cho bạn
+                    {translations.title || 'Đề xuất cho bạn'}
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
                 {recommended.map((manga) => (
                     <Link
                         key={manga.id}
-                        href={`/manga/${manga.slug}`}
+                        href={route('manga.show', manga.slug)}
                         className="flex gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors group"
                     >
                         {/* Cover Image */}
@@ -86,7 +86,7 @@ export function RecommendedCard({ recommended = [] }) {
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                     {getReasonIcon(manga.reason)}
                                     <span className="line-clamp-1">
-                                        {manga.reason || `Đánh giá ${manga.rating}/5`}
+                                        {manga.reason || (translations.rating_reason || 'Đánh giá :rating/5').replace(':rating', manga.rating)}
                                     </span>
                                 </div>
                             )}
@@ -96,10 +96,10 @@ export function RecommendedCard({ recommended = [] }) {
 
                 {/* View All Button */}
                 <Link
-                    href="/manga?sort=recommended"
+                    href={route('manga.index', { sort: 'recommended' })}
                     className="block w-full text-center text-sm text-primary hover:underline pt-3 border-t"
                 >
-                    Xem thêm đề xuất →
+                    {translations.view_all || 'Xem thêm đề xuất →'}
                 </Link>
             </CardContent>
         </Card>

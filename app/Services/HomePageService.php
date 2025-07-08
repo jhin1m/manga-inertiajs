@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\MangaRepositoryInterface;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Collection;
 
 class HomePageService
 {
@@ -23,6 +24,7 @@ class HomePageService
             'recentComments' => [],
             'recommended' => $this->getCachedRecommended(),
             'translations' => [
+                // Page specific translations
                 'latest_updates_title' => __('page.home.latest_updates_title'),
                 'view_all' => __('page.home.view_all'),
                 'hot_manga_title' => __('page.home.hot_manga_title'),
@@ -31,28 +33,28 @@ class HomePageService
         ];
     }
 
-    private function getCachedHotManga(): \Illuminate\Support\Collection
+    private function getCachedHotManga(): Collection
     {
         return Cache::remember('homepage.hot_manga', config('homepage.cache.hot_manga_ttl'), function () {
             return $this->mangaRepository->getHotManga(config('homepage.limits.hot_manga'));
         });
     }
 
-    private function getCachedLatestUpdates(): \Illuminate\Support\Collection
+    private function getCachedLatestUpdates(): Collection
     {
         return Cache::remember('homepage.latest_updates', config('homepage.cache.latest_updates_ttl'), function () {
             return $this->mangaRepository->getLatestUpdates(config('homepage.limits.latest_updates'));
         });
     }
 
-    private function getCachedRankings(): \Illuminate\Support\Collection
+    private function getCachedRankings(): Collection
     {
         return Cache::remember('homepage.rankings', config('homepage.cache.rankings_ttl'), function () {
             return $this->mangaRepository->getRankings(config('homepage.limits.rankings'));
         });
     }
 
-    private function getCachedRecommended(): \Illuminate\Support\Collection
+    private function getCachedRecommended(): Collection
     {
         return Cache::remember('homepage.recommended', config('homepage.cache.recommended_ttl'), function () {
             return $this->mangaRepository->getRecommended(config('homepage.limits.recommended'));

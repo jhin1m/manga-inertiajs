@@ -31,6 +31,10 @@ return [
         'found_count' => 'Found :count manga',
         'no_manga_found' => 'No manga found',
         'no_manga_message' => 'Try changing the filters to find more manga',
+        'empty_message' => 'No manga to display',
+        'no_manga_title' => 'No manga yet',
+        'no_chapters' => 'No chapters yet',
+        'loading' => 'Loading...',
         'chapters_count' => ':count chapters',
         'views_count' => ':count views',
         'sort_by' => [
@@ -82,5 +86,21 @@ return [
         'artist_description' => 'Manga list by artist :name',
         'tag_title' => 'Tag: :name',
         'tag_description' => 'Manga list with tag :name',
+    ],
+    
+    // Rankings Card
+    'rankings' => [
+        'title' => 'Manga Rankings',
+        'no_data' => 'No ranking data available',
+        'view_all' => 'View all rankings →',
+        'views' => 'views',
+    ],
+    
+    // Recommended Card
+    'recommended' => [
+        'title' => 'Recommended for you',
+        'no_data' => 'No recommendations available',
+        'view_all' => 'View more recommendations →',
+        'rating_reason' => 'Rating :rating/5',
     ],
 ];

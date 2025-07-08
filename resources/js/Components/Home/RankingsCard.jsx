@@ -6,19 +6,19 @@ import { Link } from "@inertiajs/react";
 import { formatViews } from "@/lib/formatters";
 import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx';
 
-export function RankingsCard({ rankings = [] }) {
+export function RankingsCard({ rankings = [], translations = {} }) {
     if (!rankings || rankings.length === 0) {
         return (
             <Card>
                 <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2 text-lg">
                         <TrendingUp className="h-5 w-5 text-primary" />
-                        Xếp hạng Manga
+                        {translations.title || 'Xếp hạng Manga'}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center py-8">
                     <div className="text-muted-foreground">
-                        Chưa có dữ liệu xếp hạng
+                        {translations.no_data || 'Chưa có dữ liệu xếp hạng'}
                     </div>
                 </CardContent>
             </Card>
@@ -45,14 +45,14 @@ export function RankingsCard({ rankings = [] }) {
             <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                     <TrendingUp className="h-5 w-5 text-primary" />
-                    Xếp hạng Manga
+                    {translations.title || 'Xếp hạng Manga'}
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
                 {rankings.map((manga) => (
                     <Link
                         key={manga.id}
-                        href={`/manga/${manga.slug}`}
+                        href={route('manga.show', manga.slug)}
                         className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors group"
                     >
                         {/* Rank Icon */}
@@ -90,7 +90,7 @@ export function RankingsCard({ rankings = [] }) {
                                     </span>
                                 </div>
                                 <div className="text-xs text-muted-foreground">
-                                    {formatViews(manga.views)} lượt xem
+                                    {formatViews(manga.views)} {translations.views || 'lượt xem'}
                                 </div>
                             </div>
                         </div>
@@ -99,10 +99,10 @@ export function RankingsCard({ rankings = [] }) {
 
                 {/* View All Button */}
                 <Link
-                    href="/manga?sort=popular"
+                    href={route('manga.index', { sort: 'popular' })}
                     className="block w-full text-center text-sm text-primary hover:underline pt-2 border-t"
                 >
-                    Xem tất cả xếp hạng →
+                    {translations.view_all || 'Xem tất cả xếp hạng →'}
                 </Link>
             </CardContent>
         </Card>

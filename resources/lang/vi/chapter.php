@@ -10,4 +10,5 @@ return [
     'chapter_short' => 'Ch.',
     'chapter_prefix' => 'Chương',
     'loading_chapters' => 'Đang tải danh sách chương...',
+    'no_chapters' => 'Chưa có chapter',
 ];

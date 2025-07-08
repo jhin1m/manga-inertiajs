@@ -16,6 +16,7 @@ return [
     'tag' => 'Tag',
     'more' => 'More',
     'navigation' => 'Navigation',
+    'close' => 'Close',
     'chapter_prefix' => 'Chapter :number',
     'volume_prefix' => 'Volume :number',
 ]; 

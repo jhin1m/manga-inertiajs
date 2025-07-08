@@ -30,6 +30,10 @@ return [
         'found_count' => 'Tìm thấy :count manga',
         'no_manga_found' => 'Không tìm thấy manga',
         'no_manga_message' => 'Thử thay đổi bộ lọc để tìm thêm manga',
+        'empty_message' => 'Không có manga nào để hiển thị',
+        'no_manga_title' => 'Chưa có manga',
+        'no_chapters' => 'Chưa có chapter',
+        'loading' => 'Đang tải...',
         'chapters_count' => ':count chương',
         'views_count' => ':count lượt xem',
         'sort_by' => [
@@ -81,5 +85,21 @@ return [
         'artist_description' => 'Danh sách manga của họa sĩ :name',
         'tag_title' => 'Tag: :name',
         'tag_description' => 'Danh sách manga có tag :name',
+    ],
+    
+    // Rankings Card
+    'rankings' => [
+        'title' => 'Xếp hạng Manga',
+        'no_data' => 'Chưa có dữ liệu xếp hạng',
+        'view_all' => 'Xem tất cả xếp hạng →',
+        'views' => 'lượt xem',
+    ],
+    
+    // Recommended Card
+    'recommended' => [
+        'title' => 'Đề xuất cho bạn',
+        'no_data' => 'Chưa có đề xuất nào',
+        'view_all' => 'Xem thêm đề xuất →',
+        'rating_reason' => 'Đánh giá :rating/5',
     ],
 ];

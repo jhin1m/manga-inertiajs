@@ -23,27 +23,25 @@ import {
 } from "@/Components/ui/navigation-menu.jsx";
 import { Badge } from "@/Components/ui/badge.jsx";
 import { 
-    BookOpen, 
     Home, 
     Search, 
     Library, 
     Settings, 
-    User, 
     LogOut, 
     Menu,
     Heart,
     History,
-    Star,
-    Filter
+    Star
 } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import SearchDialog from '@/Components/Common/SearchDialog';
 import Footer from '@/Components/Layout/Footer';
 import { Breadcrumb } from '@/Components/Layout/Breadcrumb';
 
-export function AppLayout({ children, header, breadcrumbItems = [], hideHeader = false }) {
-    const { auth } = usePage().props;
+export function AppLayout({ children, header, breadcrumbItems = [], hideHeader = false, translations = {} }) {
+    const { auth, appName, layoutTranslations = {} } = usePage().props;
     const user = auth?.user;
+    
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
 
@@ -61,15 +59,15 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
     }, []);
 
     const navigationItems = [
-        { name: 'Trang chủ', href: '/', icon: Home, current: route().current('home') },
-        { name: 'Thư viện', href: '/manga', icon: Library, current: route().current('manga.*') },
-        { name: 'Tìm kiếm', href: '/search', icon: Search, current: route().current('search') },
+        { name: layoutTranslations.home || 'Trang chủ', href: route('home'), icon: Home, current: route().current('home') },
+        { name: layoutTranslations.library || 'Thư viện', href: route('manga.index'), icon: Library, current: route().current('manga.*') },
+        { name: layoutTranslations.search || 'Tìm kiếm', href: route('search'), icon: Search, current: route().current('search') },
     ];
 
     const userMenuItems = user ? [
-        { name: 'Yêu thích', href: '/favorites', icon: Heart },
-        { name: 'Lịch sử', href: '/history', icon: History },
-        { name: 'Đánh giá', href: '/ratings', icon: Star },
+        { name: layoutTranslations.favorites || 'Yêu thích', href: route('favorites'), icon: Heart },
+        { name: layoutTranslations.history || 'Lịch sử', href: route('history'), icon: History },
+        { name: layoutTranslations.ratings || 'Đánh giá', href: route('ratings'), icon: Star },
     ] : [];
 
     return (
@@ -80,9 +78,9 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                     <div className="container mx-auto flex h-16 items-center justify-between px-4">
                         {/* Logo */}
                         <div className="flex items-center space-x-4">
-                            <Link href="/" className="flex items-center space-x-2">
+                            <Link href={route('home')} className="flex items-center space-x-2">
                                 <ApplicationLogo className="h-8 w-8 text-primary" />
-                                <span className="font-bold text-xl text-primary">MangaReader</span>
+                                <span className="font-bold text-xl text-primary">{appName || 'MangaReader'}</span>
                             </Link>
                         </div>
 
@@ -115,7 +113,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                 onClick={() => setSearchOpen(true)}
                             >
                                 <Search className="mr-2 h-4 w-4" />
-                                <span className="flex-1 text-left">Tìm kiếm manga...</span>
+                                <span className="flex-1 text-left">{layoutTranslations.search_placeholder || 'Tìm kiếm manga...'}</span>
                                 <kbd className="pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 hidden sm:flex">
                                     <span className="text-xs">⌘</span>K
                                 </kbd>
@@ -132,7 +130,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                 onClick={() => setSearchOpen(true)}
                             >
                                 <Search className="h-5 w-5" />
-                                <span className="sr-only">Search</span>
+                                <span className="sr-only">{layoutTranslations.search || 'Tìm kiếm'}</span>
                             </Button>
 
                             {user ? (
@@ -169,7 +167,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                             <DropdownMenuItem asChild>
                                                 <Link href={route('profile.edit')} className="flex items-center">
                                                     <Settings className="mr-2 h-4 w-4" />
-                                                    <span>Cài đặt</span>
+                                                    <span>{layoutTranslations.settings || 'Cài đặt'}</span>
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
@@ -180,7 +178,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                                     className="flex items-center w-full"
                                                 >
                                                     <LogOut className="mr-2 h-4 w-4" />
-                                                    <span>Đăng xuất</span>
+                                                    <span>{layoutTranslations.logout || 'Đăng xuất'}</span>
                                                 </Link>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
@@ -189,10 +187,10 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                             ) : (
                                 <div className="hidden md:flex items-center space-x-2">
                                     <Button variant="ghost" asChild>
-                                        <Link href={route('login')}>Đăng nhập</Link>
+                                        <Link href={route('login')}>{layoutTranslations.login || 'Đăng nhập'}</Link>
                                     </Button>
                                     <Button asChild>
-                                        <Link href={route('register')}>Đăng ký</Link>
+                                        <Link href={route('register')}>{layoutTranslations.register || 'Đăng ký'}</Link>
                                     </Button>
                                 </div>
                             )}
@@ -206,7 +204,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                         size="icon"
                                     >
                                         <Menu className="h-5 w-5" />
-                                        <span className="sr-only">Toggle menu</span>
+                                        <span className="sr-only">{layoutTranslations.toggle_menu || 'Mở/đóng menu'}</span>
                                     </Button>
                                 </SheetTrigger>
                                 <SheetContent side="right" className="w-[300px] sm:w-[400px]">
@@ -214,7 +212,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                         {/* Mobile Logo */}
                                         <div className="flex items-center space-x-2 pb-4">
                                             <ApplicationLogo className="h-6 w-6 text-primary" />
-                                            <span className="font-bold text-lg text-primary">MangaReader</span>
+                                            <span className="font-bold text-lg text-primary">{appName || 'MangaReader'}</span>
                                         </div>
                                         
                                         <Separator />
@@ -277,7 +275,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                                     <Button variant="ghost" className="w-full justify-start" asChild>
                                                         <Link href={route('profile.edit')}>
                                                             <Settings className="mr-2 h-4 w-4" />
-                                                            Cài đặt
+                                                            {layoutTranslations.settings || 'Cài đặt'}
                                                         </Link>
                                                     </Button>
                                                     <Button variant="ghost" className="w-full justify-start" asChild>
@@ -287,17 +285,17 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                                             as="button"
                                                         >
                                                             <LogOut className="mr-2 h-4 w-4" />
-                                                            Đăng xuất
+                                                            {layoutTranslations.logout || 'Đăng xuất'}
                                                         </Link>
                                                     </Button>
                                                 </div>
                                             ) : (
                                                 <div className="space-y-2">
                                                     <Button className="w-full" asChild>
-                                                        <Link href={route('login')}>Đăng nhập</Link>
+                                                        <Link href={route('login')}>{layoutTranslations.login || 'Đăng nhập'}</Link>
                                                     </Button>
                                                     <Button variant="outline" className="w-full" asChild>
-                                                        <Link href={route('register')}>Đăng ký</Link>
+                                                        <Link href={route('register')}>{layoutTranslations.register || 'Đăng ký'}</Link>
                                                     </Button>
                                                 </div>
                                             )}
@@ -323,7 +321,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
             {breadcrumbItems.length > 0 && (
                 <div className="border-b bg-muted/20">
                     <div className="container mx-auto px-4 py-3">
-                        <Breadcrumb items={breadcrumbItems} />
+                        <Breadcrumb items={breadcrumbItems} translations={translations} />
                     </div>
                 </div>
             )}

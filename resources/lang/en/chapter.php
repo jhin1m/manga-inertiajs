@@ -10,4 +10,5 @@ return [
     'chapter_short' => 'Ch.',
     'chapter_prefix' => 'Chapter',
     'loading_chapters' => 'Loading chapters...',
+    'no_chapters' => 'No chapters yet',
 ];

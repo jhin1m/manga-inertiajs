@@ -10,18 +10,17 @@ export function MangaCard({
     manga, 
     variant = 'default', 
     className = '', 
-    priority = false 
+    priority = false,
+    translations = {}
 }) {
     const {
-        id,
         name,
         slug,
         cover,
         status,
         status_label,
         recent_chapters = [],
-        latest_chapter,
-        created_at
+        latest_chapter
     } = manga;
 
     const statusVariants = {
@@ -99,7 +98,7 @@ export function MangaCard({
                 {/* No chapters message */}
                 {chaptersToShow.length === 0 && (
                     <div className="text-xs text-muted-foreground text-center py-2">
-                        {status === 'loading' ? 'Đang tải...' : 'Chưa có chapter nào'}
+                        {status === 'loading' ? (translations.loading || 'Đang tải...') : (translations.no_chapters || 'Chưa có chapter nào')}
                     </div>
                 )}
             </CardContent>

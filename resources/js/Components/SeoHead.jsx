@@ -35,7 +35,6 @@ export default function SeoHead({ seo, canonical = null }) {
             <meta name="author" content={seo.site_name} />
             <meta name="viewport" content="width=device-width, initial-scale=1" />
             <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-            <meta name="language" content="Vietnamese" />
             <meta name="revisit-after" content="1 days" />
 
             {/* Structured Data (JSON-LD) */}

@@ -105,6 +105,7 @@ export function TermsByType({
                         variant={viewMode}
                         columns={viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6' : 'auto'}
                         showEmpty={false}
+                        translations={translations}
                     />
 
                     {(!manga?.data || manga.data.length === 0) && (

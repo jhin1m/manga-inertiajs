@@ -16,6 +16,7 @@ return [
     'tag' => 'Tag',
     'more' => 'Xem thêm',
     'navigation' => 'Đường dẫn',
+    'close' => 'Đóng',
     'chapter_prefix' => 'Chương :number',
     'volume_prefix' => 'Tập :number',
 ]; 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { 
     Breadcrumb as ShadcnBreadcrumb,
     BreadcrumbEllipsis,
@@ -27,43 +27,12 @@ import { VisuallyHidden } from "@/Components/ui/visually-hidden.jsx";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { ChevronDown, Home } from 'lucide-react';
 
-export function Breadcrumb({ items = [], className = "" }) {
+export function Breadcrumb({ items = [], className = "", translations = {} }) {
     const isMobile = useIsMobile();
-    const { props } = usePage();
-    
-    // Get current language from Laravel
-    const currentLocale = props.locale || 'vi';
-    
-    // Translation helper
-    const t = (key, replacements = {}) => {
-        const translations = {
-            vi: {
-                home: 'Trang chủ',
-                more: 'Xem thêm',
-                navigation: 'Đường dẫn',
-                close: 'Đóng'
-            },
-            en: {
-                home: 'Home',
-                more: 'More',
-                navigation: 'Navigation',
-                close: 'Close'
-            }
-        };
-        
-        let text = translations[currentLocale]?.[key] || translations['vi'][key] || key;
-        
-        // Replace placeholders
-        Object.entries(replacements).forEach(([placeholder, value]) => {
-            text = text.replace(`:${placeholder}`, value);
-        });
-        
-        return text;
-    };
     
     // Luôn có Home làm item đầu tiên
     const allItems = [
-        { label: t('home'), href: route('home'), icon: Home },
+        { label: translations.home || 'Trang chủ', href: route('home'), icon: Home },
         ...items
     ];
 
@@ -148,21 +117,21 @@ export function Breadcrumb({ items = [], className = "" }) {
                                             variant="ghost"
                                             size="sm"
                                             className="h-auto p-0 text-muted-foreground hover:text-foreground"
-                                            aria-label={t('more')}
+                                            aria-label={translations.more || 'Xem thêm'}
                                         >
                                             <BreadcrumbEllipsis className="h-4 w-4" />
-                                            <span className="sr-only">{t('more')}</span>
+                                            <span className="sr-only">{translations.more || 'Xem thêm'}</span>
                                         </Button>
                                     </SheetTrigger>
                                     <SheetContent side="bottom" className="h-[300px]">
                                         <VisuallyHidden>
-                                            <SheetTitle>{t('navigation')}</SheetTitle>
+                                            <SheetTitle>{translations.navigation || 'Đường dẫn'}</SheetTitle>
                                             <SheetDescription>
                                                 Danh sách đường dẫn điều hướng
                                             </SheetDescription>
                                         </VisuallyHidden>
                                         <div className="py-4">
-                                            <h3 className="font-semibold mb-4">{t('navigation')}</h3>
+                                            <h3 className="font-semibold mb-4">{translations.navigation || 'Đường dẫn'}</h3>
                                             <div className="space-y-2">
                                                 {hiddenItems.map((item, index) => (
                                                     <Link
@@ -221,11 +190,11 @@ export function Breadcrumb({ items = [], className = "" }) {
                                         variant="ghost"
                                         size="sm"
                                         className="h-auto p-0 text-muted-foreground hover:text-foreground"
-                                        aria-label={t('more')}
+                                        aria-label={translations.more || 'Xem thêm'}
                                     >
                                         <BreadcrumbEllipsis className="h-4 w-4" />
                                         <ChevronDown className="ml-1 h-3 w-3" />
-                                        <span className="sr-only">{t('more')}</span>
+                                        <span className="sr-only">{translations.more || 'Xem thêm'}</span>
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="start" className="w-48">
@@ -259,51 +228,8 @@ export function Breadcrumb({ items = [], className = "" }) {
 }
 
 // Helper component để tạo breadcrumb items dễ dàng hơn với Ziggy
-export function BreadcrumbBuilder() {
+export function BreadcrumbBuilder(translations = {}) {
     const items = [];
-    const { props } = usePage();
-    const currentLocale = props.locale || 'vi';
-    
-    // Translation helper
-    const t = (key, replacements = {}) => {
-        const translations = {
-            vi: {
-                manga_list: 'Danh sách manga',
-                chapter: 'Chương',
-                chapter_list: 'Danh sách chương',
-                search: 'Tìm kiếm',
-                search_results: 'Kết quả tìm kiếm',
-                genre: 'Thể loại',
-                author: 'Tác giả',
-                artist: 'Họa sĩ',
-                tag: 'Tag',
-                chapter_prefix: 'Chương :number',
-                volume_prefix: 'Tập :number',
-            },
-            en: {
-                manga_list: 'Manga List',
-                chapter: 'Chapter',
-                chapter_list: 'Chapter List',
-                search: 'Search',
-                search_results: 'Search Results',
-                genre: 'Genre',
-                author: 'Author',
-                artist: 'Artist',
-                tag: 'Tag',
-                chapter_prefix: 'Chapter :number',
-                volume_prefix: 'Volume :number',
-            }
-        };
-        
-        let text = translations[currentLocale]?.[key] || translations['vi'][key] || key;
-        
-        // Replace placeholders
-        Object.entries(replacements).forEach(([placeholder, value]) => {
-            text = text.replace(`:${placeholder}`, value);
-        });
-        
-        return text;
-    };
     
     const builder = {
         add: (label, href, icon = null) => {
@@ -326,7 +252,7 @@ export function BreadcrumbBuilder() {
             const mangaSlug = manga?.slug || chapter.manga_slug;
             
             items.push({ 
-                label: t('chapter_prefix', { number: chapterNumber }), 
+                label: (translations.chapter_prefix || 'Chương :number').replace(':number', chapterNumber), 
                 href: route('manga.chapters.show', [mangaSlug, chapterSlug]),
                 icon: null 
             });
@@ -371,7 +297,7 @@ export function BreadcrumbBuilder() {
         
         addMangaList: () => {
             items.push({
-                label: t('manga_list'),
+                label: translations.manga_list || 'Danh sách manga',
                 href: route('manga.index'),
                 icon: null
             });
@@ -380,7 +306,7 @@ export function BreadcrumbBuilder() {
         
         addChapterList: (manga) => {
             items.push({
-                label: t('chapter_list'),
+                label: translations.chapter_list || 'Danh sách chương',
                 href: route('manga.chapters.index', manga.slug),
                 icon: null
             });
@@ -389,7 +315,7 @@ export function BreadcrumbBuilder() {
         
         addSearch: (query = '') => {
             items.push({
-                label: query ? t('search_results') : t('search'),
+                label: query ? (translations.search_results || 'Kết quả tìm kiếm') : (translations.search || 'Tìm kiếm'),
                 href: route('search', query ? { q: query } : {}),
                 icon: null
             });
