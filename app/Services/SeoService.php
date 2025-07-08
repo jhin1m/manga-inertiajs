@@ -54,9 +54,14 @@ class SeoService
             ->implode(', ');
 
         $title = str_replace('{manga_name}', $manga->name, $template['title']);
+        $cleanDescription = strip_tags($manga->description ?? '');
+        $limitedDescription = mb_strlen($cleanDescription) > 160 
+            ? mb_substr($cleanDescription, 0, 160) . '...' 
+            : $cleanDescription;
+        
         $description = str_replace(
             '{manga_description}',
-            Str::limit(strip_tags($manga->description), 160),
+            $limitedDescription,
             $template['description']
         );
         $keywords = str_replace(['{manga_name}', '{manga_genres}'], [$manga->name, $genres], $template['keywords']);
@@ -176,7 +181,7 @@ class SeoService
             '@context' => 'https://schema.org',
             '@type' => 'Book',
             'name' => $manga->name,
-            'description' => strip_tags($manga->description),
+            'description' => strip_tags($manga->description ?? ''),
             'url' => route('manga.show', $manga->slug),
             'image' => $manga->cover_image ? url($manga->cover_image) : null,
             'genre' => $genres,
