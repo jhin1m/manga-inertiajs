@@ -3,6 +3,7 @@ import { AppLayout } from '@/Layouts/AppLayout';
 import { Button } from "@/Components/ui/button.jsx";
 import { MangaList } from '@/Components/Manga';
 import { HotMangaSlider, RankingsCard, RecommendedCard } from '@/Components/Home';
+import SeoHead from '@/Components/SeoHead';
 import { ArrowRight } from 'lucide-react';
 
 export default function Home({
@@ -10,10 +11,12 @@ export default function Home({
     latestUpdates = [],
     rankings = [],
     recommended = [],
+    seo,
     translations
 }) {
     return (
         <AppLayout>
+            <SeoHead seo={seo} />
             <Head title="Trang chủ - MangaReader" />
 
             {/* Hot Manga Slider */}

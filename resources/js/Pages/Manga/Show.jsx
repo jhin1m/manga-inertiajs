@@ -4,9 +4,10 @@ import { MangaHeader } from '@/Components/Manga/MangaHeader'
 import { MangaInfo } from '@/Components/Manga/MangaInfo'
 import { ChapterList } from '@/Components/Manga/ChapterList'
 import { BreadcrumbBuilder } from '@/Components/Layout/Breadcrumb'
+import SeoHead from '@/Components/SeoHead'
 import { BookOpen } from 'lucide-react'
 
-export default function MangaShow({ manga, chapters, translations }) {
+export default function MangaShow({ manga, chapters, seo, translations }) {
     // Sử dụng BreadcrumbBuilder để tạo breadcrumb
     const breadcrumbItems = new BreadcrumbBuilder()
         .addMangaList()
@@ -15,6 +16,7 @@ export default function MangaShow({ manga, chapters, translations }) {
 
     return (
         <AppLayout breadcrumbItems={breadcrumbItems}>
+            <SeoHead seo={seo} />
             <Head title={manga.name} />
             
             <div className="container mx-auto px-4 py-6">

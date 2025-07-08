@@ -13,7 +13,7 @@ class ChapterService
     public function __construct(
         private ChapterRepositoryInterface $chapterRepository
     ) {}
-    public function getChaptersByManga(Manga $manga, int $perPage = 20): LengthAwarePaginator
+    public function getChaptersByManga(Manga $manga, ?int $perPage = null): LengthAwarePaginator
     {
         return $this->chapterRepository->getChaptersByManga($manga, $perPage);
     }
@@ -51,11 +51,6 @@ class ChapterService
     public function incrementViewCount(Chapter $chapter): void
     {
         $this->chapterRepository->incrementViewCount($chapter);
-    }
-
-    public function getLatestChapters(int $limit = 20): Collection
-    {
-        return $this->chapterRepository->getLatestChapters($limit);
     }
 
     // TODO: Implement this

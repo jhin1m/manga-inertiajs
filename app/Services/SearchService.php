@@ -10,8 +10,10 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class SearchService
 {
-    public function searchAll(string $query, int $perPage = 20): array
+    public function searchAll(string $query, int $perPage = null): array
     {
+        $perPage = $perPage ?? config('search.pagination.per_page');
+        
         return [
             'manga' => $this->searchManga($query, $perPage),
             'chapters' => $this->searchChapters($query, $perPage),
@@ -19,8 +21,10 @@ class SearchService
         ];
     }
 
-    public function searchManga(string $query, int $perPage = 20): LengthAwarePaginator
+    public function searchManga(string $query, int $perPage = null): LengthAwarePaginator
     {
+        $perPage = $perPage ?? config('search.pagination.per_page');
+        
         return Manga::with(['taxonomyTerms.taxonomy', 'chapters'])
             ->withCount('chapters')
             ->where(function ($q) use ($query) {
@@ -45,8 +49,10 @@ class SearchService
             ->paginate($perPage);
     }
 
-    public function searchChapters(string $query, int $perPage = 20): LengthAwarePaginator
+    public function searchChapters(string $query, int $perPage = null): LengthAwarePaginator
     {
+        $perPage = $perPage ?? config('search.pagination.per_page');
+        
         return Chapter::with(['manga'])
             ->where('title', 'like', "%{$query}%")
             ->orWhereHas('manga', function ($q) use ($query) {
@@ -62,8 +68,10 @@ class SearchService
             ->paginate($perPage);
     }
 
-    public function searchTaxonomyTerms(string $query, int $perPage = 20): LengthAwarePaginator
+    public function searchTaxonomyTerms(string $query, int $perPage = null): LengthAwarePaginator
     {
+        $perPage = $perPage ?? config('search.pagination.per_page');
+        
         return TaxonomyTerm::with(['taxonomy'])
             ->withCount('manga')
             ->where('name', 'like', "%{$query}%")
@@ -77,8 +85,10 @@ class SearchService
             ->paginate($perPage);
     }
 
-    public function advancedMangaSearch(array $criteria, int $perPage = 20): LengthAwarePaginator
+    public function advancedMangaSearch(array $criteria, int $perPage = null): LengthAwarePaginator
     {
+        $perPage = $perPage ?? config('search.pagination.per_page');
+        
         $query = Manga::with(['taxonomyTerms.taxonomy', 'chapters'])
             ->withCount('chapters');
 
@@ -168,8 +178,10 @@ class SearchService
         return $query->paginate($perPage)->withQueryString();
     }
 
-    public function getSearchSuggestions(string $query, int $limit = 10): array
+    public function getSearchSuggestions(string $query, int $limit = null): array
     {
+        $limit = $limit ?? config('search.pagination.suggestions_limit');
+        
         $mangaTitles = Manga::where('title', 'like', "%{$query}%")
             ->limit($limit)
             ->pluck('title')
@@ -198,8 +210,10 @@ class SearchService
         ];
     }
 
-    public function getPopularSearches(int $limit = 10): array
+    public function getPopularSearches(int $limit = null): array
     {
+        $limit = $limit ?? config('search.pagination.popular_limit');
+        
         // This would typically be stored in a separate table tracking search queries
         // For now, return popular manga titles and genres
         return [
@@ -246,11 +260,11 @@ class SearchService
                 ->values(),
 
             'rating_ranges' => [
-                ['min' => 9, 'max' => 10, 'label' => '9.0 - 10.0'],
-                ['min' => 8, 'max' => 8.9, 'label' => '8.0 - 8.9'],
-                ['min' => 7, 'max' => 7.9, 'label' => '7.0 - 7.9'],
-                ['min' => 6, 'max' => 6.9, 'label' => '6.0 - 6.9'],
-                ['min' => 0, 'max' => 5.9, 'label' => 'Dưới 6.0']
+                ['min' => config('search.rating_filters.excellent.min'), 'max' => config('search.rating_filters.excellent.max'), 'label' => config('search.rating_filters.excellent.min') . ' - ' . config('search.rating_filters.excellent.max')],
+                ['min' => config('search.rating_filters.very_good.min'), 'max' => config('search.rating_filters.very_good.max'), 'label' => config('search.rating_filters.very_good.min') . ' - ' . config('search.rating_filters.very_good.max')],
+                ['min' => config('search.rating_filters.good.min'), 'max' => config('search.rating_filters.good.max'), 'label' => config('search.rating_filters.good.min') . ' - ' . config('search.rating_filters.good.max')],
+                ['min' => config('search.rating_filters.average.min'), 'max' => config('search.rating_filters.average.max'), 'label' => config('search.rating_filters.average.min') . ' - ' . config('search.rating_filters.average.max')],
+                ['min' => config('search.rating_filters.poor.min'), 'max' => config('search.rating_filters.poor.max'), 'label' => 'Dưới ' . config('search.rating_filters.below_average.min')]
             ]
         ];
     }

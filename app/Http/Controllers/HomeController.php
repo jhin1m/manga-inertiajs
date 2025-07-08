@@ -3,16 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Services\HomePageService;
+use App\Services\SeoService;
 use Inertia\Inertia;
 
 class HomeController extends Controller
 {
     public function __construct(
-        private HomePageService $homePageService
+        private HomePageService $homePageService,
+        private SeoService $seoService
     ) {}
 
     public function index()
     {
-        return Inertia::render('Home', $this->homePageService->getHomePageData());
+        $data = $this->homePageService->getHomePageData();
+        $data['seo'] = $this->seoService->forHome();
+        
+        return Inertia::render('Home', $data);
     }
 }

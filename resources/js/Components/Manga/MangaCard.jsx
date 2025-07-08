@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { BookOpen } from 'lucide-react';
 import { formatRelativeTime } from '@/lib/formatters';
+import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx';
 
 export function MangaCard({ 
     manga, 
@@ -43,7 +44,7 @@ export function MangaCard({
             <div className="relative overflow-hidden rounded-t-xl">
                 <Link href={route('manga.show', slug)}>
                     <div className="aspect-[3/4] bg-gray-100">
-                        {cover ? (
+                        {isValidCover(cover) ? (
                             <img
                                 src={cover}
                                 alt={name}
@@ -52,9 +53,7 @@ export function MangaCard({
                                 decoding={priority ? "sync" : "async"}
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                                <BookOpen className="w-12 h-12 text-gray-400" />
-                            </div>
+                            getContextualDefaultCover('card')
                         )}
                     </div>
                 </Link>

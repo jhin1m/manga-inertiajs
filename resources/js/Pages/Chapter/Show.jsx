@@ -4,12 +4,13 @@ import { Button } from '@/Components/ui/button'
 import { Card } from '@/Components/ui/card'
 import { Skeleton } from '@/Components/ui/skeleton'
 import { BreadcrumbBuilder } from '@/Components/Layout/Breadcrumb'
+import SeoHead from '@/Components/SeoHead'
 import { ChevronLeft, ChevronRight, List, Eye, Home, Loader2 } from 'lucide-react'
 import { ChapterReader, ChapterNavigation } from '@/Components/Chapter'
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation'
 import { useAutoHideNavigation } from '@/hooks/useAutoHideNavigation'
 
-export default function ChapterShow({ manga, chapter, previousChapter, nextChapter, allChapters, pages, translations = {} }) {
+export default function ChapterShow({ manga, chapter, previousChapter, nextChapter, allChapters, pages, seo, translations = {} }) {
     const isNavVisible = useAutoHideNavigation(100)
     useKeyboardNavigation(previousChapter, nextChapter, manga.slug)
 
@@ -62,6 +63,7 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
 
     return (
         <AppLayout hideHeader={true} breadcrumbItems={breadcrumbItems}>
+            <SeoHead seo={seo} />
             <Head title={`${manga.name} - ${chapter.title}`} />
             
             {/* Sticky Navigation */}

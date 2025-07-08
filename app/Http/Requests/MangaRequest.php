@@ -24,13 +24,13 @@ class MangaRequest extends FormRequest
         $mangaId = $this->route('manga')?->id;
 
         return [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:' . config('upload.validation.manga_name_max'),
             'alternative_names' => 'nullable|array',
             'description' => 'nullable|string',
             'status' => 'required|in:ongoing,completed,hiatus,cancelled',
-            'cover' => 'nullable|string|max:500',
+            'cover' => 'nullable|string|max:' . config('upload.validation.manga_cover_max'),
             'slug' => 'required|string|unique:mangas,slug,' . $mangaId,
-            'rating' => 'nullable|numeric|min:0|max:10',
+            'rating' => 'nullable|numeric|min:' . config('upload.validation.rating_min') . '|max:' . config('upload.validation.rating_max'),
             'total_rating' => 'nullable|integer|min:0',
             'views' => 'nullable|integer|min:0',
             'genre_ids' => 'nullable|array',

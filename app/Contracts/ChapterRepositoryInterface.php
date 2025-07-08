@@ -9,15 +9,13 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 interface ChapterRepositoryInterface
 {
-    public function getChaptersByManga(Manga $manga, int $perPage = 20): LengthAwarePaginator;
+    public function getChaptersByManga(Manga $manga, ?int $perPage = null): LengthAwarePaginator;
     
     public function getChapterDetail(Chapter $chapter): Chapter;
     
     public function getAdjacentChapters(Chapter $chapter): array;
     
     public function getAllChaptersByManga(Manga $manga): Collection;
-    
-    public function getLatestChapters(int $limit = 20): Collection;
     
     public function createChapter(Manga $manga, array $data): Chapter;
     

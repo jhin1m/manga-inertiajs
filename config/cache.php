@@ -105,4 +105,20 @@ return [
 
     'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache_'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Application Cache TTL Values
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define cache TTL values for different parts of your
+    | application. These values can be overridden in the .env file.
+    |
+    */
+
+    'ttl' => [
+        'search_genres' => env('CACHE_SEARCH_GENRES_TTL', 3600),
+        'popular_manga' => env('CACHE_POPULAR_MANGA_TTL', 1800),
+        'sitemap' => env('CACHE_SITEMAP_TTL', 3600),
+    ],
+
 ];

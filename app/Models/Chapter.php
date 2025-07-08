@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use App\Services\SeoService;
 
 class Chapter extends Model
 {
@@ -22,6 +23,17 @@ class Chapter extends Model
         'published_at',
         'views',
     ];
+
+    /**
+     * Default pagination size for chapters
+     */
+    protected $perPage;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->perPage = config('manga.pagination.chapters_per_page', 150);
+    }
 
     protected $casts = [
         'chapter_number' => 'decimal:2',
@@ -106,5 +118,22 @@ class Chapter extends Model
                     ->where('chapter_number', '<', $this->chapter_number)
                     ->orderBy('chapter_number', 'desc')
                     ->first();
+    }
+
+    /**
+     * Get SEO data for this chapter
+     */
+    public function getSeoData(): array
+    {
+        $seoService = app(SeoService::class);
+        return $seoService->forChapter($this);
+    }
+
+    /**
+     * Increment view count
+     */
+    public function incrementViews(): void
+    {
+        $this->increment('views');
     }
 }

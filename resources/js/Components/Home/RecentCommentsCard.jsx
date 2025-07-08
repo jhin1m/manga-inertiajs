@@ -5,75 +5,23 @@ import { Link } from "@inertiajs/react";
 import { formatRelativeTime } from "@/lib/formatters";
 
 export function RecentCommentsCard({ comments = [] }) {
-    // Demo data nếu không có data từ backend
-    const defaultComments = [
-        {
-            id: 1,
-            user: {
-                name: "Manga Fan",
-                avatar: "/api/placeholder/32/32"
-            },
-            manga: {
-                name: "One Piece",
-                slug: "one-piece"
-            },
-            chapter: {
-                chapter_number: 1098
-            },
-            content: "Chapter này hay quá! Luffy đã mạnh hơn rất nhiều so với trước...",
-            created_at: "2024-01-15T10:30:00Z"
-        },
-        {
-            id: 2,
-            user: {
-                name: "Otaku King",
-                avatar: "/api/placeholder/32/32"
-            },
-            manga: {
-                name: "Attack on Titan",
-                slug: "attack-on-titan"
-            },
-            chapter: {
-                chapter_number: 139
-            },
-            content: "Kết thúc perfect! Không thể tốt hơn được nữa rồi",
-            created_at: "2024-01-15T09:15:00Z"
-        },
-        {
-            id: 3,
-            user: {
-                name: "Reader Pro",
-                avatar: "/api/placeholder/32/32"
-            },
-            manga: {
-                name: "Naruto",
-                slug: "naruto"
-            },
-            chapter: {
-                chapter_number: 700
-            },
-            content: "Sasuke vs Naruto battle cuối cùng quá epic!",
-            created_at: "2024-01-15T08:45:00Z"
-        },
-        {
-            id: 4,
-            user: {
-                name: "Manga Lover",
-                avatar: "/api/placeholder/32/32"
-            },
-            manga: {
-                name: "Dragon Ball",
-                slug: "dragon-ball"
-            },
-            chapter: {
-                chapter_number: 42
-            },
-            content: "Goku lúc nhỏ dễ thương quá đi mất",
-            created_at: "2024-01-15T07:20:00Z"
-        }
-    ];
-
-    const displayComments = comments.length > 0 ? comments : defaultComments;
+    if (!comments || comments.length === 0) {
+        return (
+            <Card>
+                <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                        <MessageCircle className="h-5 w-5 text-primary" />
+                        Bình luận gần đây
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center py-8">
+                    <div className="text-muted-foreground">
+                        Chưa có bình luận nào
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
 
 
 
@@ -91,7 +39,7 @@ export function RecentCommentsCard({ comments = [] }) {
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                {displayComments.map((comment) => (
+                {comments.map((comment) => (
                     <div key={comment.id} className="space-y-2">
                         {/* User Info */}
                         <div className="flex items-center gap-2">

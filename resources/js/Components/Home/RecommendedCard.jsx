@@ -3,50 +3,25 @@ import { Badge } from "@/Components/ui/badge.jsx";
 import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar.jsx";
 import { Star, Heart, Sparkles } from "lucide-react";
 import { Link } from "@inertiajs/react";
+import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx';
 
 export function RecommendedCard({ recommended = [] }) {
-    // Demo data chỉ dùng khi không có dữ liệu từ backend
-    const defaultRecommended = [
-        {
-            id: 1,
-            name: "Jujutsu Kaisen",
-            slug: "jujutsu-kaisen",
-            cover: "/api/placeholder/80/100",
-            rating: 4.8,
-            reason: "Dựa trên lịch sử đọc của bạn"
-        },
-        {
-            id: 2,
-            name: "Demon Slayer",
-            slug: "demon-slayer",
-            cover: "/api/placeholder/80/100",
-            rating: 4.7,
-            reason: "Manga trending"
-        },
-        {
-            id: 3,
-            name: "My Hero Academia",
-            slug: "my-hero-academia",
-            cover: "/api/placeholder/80/100",
-            rating: 4.6,
-            reason: "Tương tự manga đã đọc"
-        },
-        {
-            id: 4,
-            name: "Tokyo Ghoul",
-            slug: "tokyo-ghoul",
-            cover: "/api/placeholder/80/100",
-            rating: 4.5,
-            reason: "Đánh giá cao"
-        }
-    ];
-
-    // Ưu tiên dữ liệu từ backend, fallback về demo data
-    const displayRecommended = recommended.length > 0 ? recommended : defaultRecommended;
-
-    // Debug log chỉ trong development
-    if (process.env.NODE_ENV === 'development') {
-        console.log('Recommended Data:', displayRecommended.slice(0, 3));
+    if (!recommended || recommended.length === 0) {
+        return (
+            <Card>
+                <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        Đề xuất cho bạn
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center py-8">
+                    <div className="text-muted-foreground">
+                        Chưa có đề xuất nào
+                    </div>
+                </CardContent>
+            </Card>
+        );
     }
 
     const getReasonIcon = (reason) => {
@@ -69,7 +44,7 @@ export function RecommendedCard({ recommended = [] }) {
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                {displayRecommended.map((manga) => (
+                {recommended.map((manga) => (
                     <Link
                         key={manga.id}
                         href={`/manga/${manga.slug}`}
@@ -78,14 +53,17 @@ export function RecommendedCard({ recommended = [] }) {
                         {/* Cover Image */}
                         <div className="relative flex-shrink-0">
                             <Avatar className="h-16 w-12 rounded-md">
-                                <AvatarImage 
-                                    src={manga.cover} 
-                                    alt={manga.name}
-                                    className="object-cover"
-                                />
-                                <AvatarFallback className="rounded-md text-xs">
-                                    {manga.name.substring(0, 2).toUpperCase()}
-                                </AvatarFallback>
+                                {isValidCover(manga.cover) ? (
+                                    <AvatarImage 
+                                        src={manga.cover} 
+                                        alt={manga.name}
+                                        className="object-cover"
+                                    />
+                                ) : (
+                                    <AvatarFallback className="rounded-md text-xs">
+                                        {getContextualDefaultCover('comment')}
+                                    </AvatarFallback>
+                                )}
                             </Avatar>
                         </div>
 

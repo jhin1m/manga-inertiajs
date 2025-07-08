@@ -33,29 +33,29 @@ class HomePageService
 
     private function getCachedHotManga(): \Illuminate\Support\Collection
     {
-        return Cache::remember('homepage.hot_manga', 3600, function () {
-            return $this->mangaRepository->getHotManga(10);
+        return Cache::remember('homepage.hot_manga', config('homepage.cache.hot_manga_ttl'), function () {
+            return $this->mangaRepository->getHotManga(config('homepage.limits.hot_manga'));
         });
     }
 
     private function getCachedLatestUpdates(): \Illuminate\Support\Collection
     {
-        return Cache::remember('homepage.latest_updates', 1800, function () {
-            return $this->mangaRepository->getLatestUpdates(12);
+        return Cache::remember('homepage.latest_updates', config('homepage.cache.latest_updates_ttl'), function () {
+            return $this->mangaRepository->getLatestUpdates(config('homepage.limits.latest_updates'));
         });
     }
 
     private function getCachedRankings(): \Illuminate\Support\Collection
     {
-        return Cache::remember('homepage.rankings', 7200, function () {
-            return $this->mangaRepository->getRankings(10);
+        return Cache::remember('homepage.rankings', config('homepage.cache.rankings_ttl'), function () {
+            return $this->mangaRepository->getRankings(config('homepage.limits.rankings'));
         });
     }
 
     private function getCachedRecommended(): \Illuminate\Support\Collection
     {
-        return Cache::remember('homepage.recommended', 3600, function () {
-            return $this->mangaRepository->getRecommended(6);
+        return Cache::remember('homepage.recommended', config('homepage.cache.recommended_ttl'), function () {
+            return $this->mangaRepository->getRecommended(config('homepage.limits.recommended'));
         });
     }
 

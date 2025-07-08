@@ -26,16 +26,16 @@ class ChapterRequest extends FormRequest
         $chapterId = $this->route('chapter')?->id;
 
         return [
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:' . config('upload.validation.chapter_title_max'),
             'chapter_number' => [
                 'required',
                 'numeric',
-                'min:0',
+                'min:' . config('upload.validation.chapter_number_min'),
                 Rule::unique('chapters')
                     ->where('manga_id', $mangaId)
                     ->ignore($chapterId)
             ],
-            'volume_number' => 'nullable|integer|min:1',
+            'volume_number' => 'nullable|integer|min:' . config('upload.validation.volume_number_min'),
             'published_at' => 'nullable|date|before_or_equal:now',
             'views' => 'nullable|integer|min:0'
         ];

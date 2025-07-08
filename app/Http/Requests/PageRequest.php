@@ -26,11 +26,11 @@ class PageRequest extends FormRequest
         $pageId = $this->route('page')?->id;
 
         $rules = [
-            'image_url' => 'required|string|max:500',
+            'image_url' => 'required|string|max:' . config('upload.validation.page_url_max'),
             'page_number' => [
                 'required',
                 'integer',
-                'min:1',
+                'min:' . config('upload.validation.page_number_min'),
                 Rule::unique('pages')
                     ->where('chapter_id', $chapterId)
                     ->ignore($pageId)
@@ -41,8 +41,8 @@ class PageRequest extends FormRequest
         if ($this->has('pages')) {
             $rules = [
                 'pages' => 'required|array|min:1',
-                'pages.*.image_url' => 'required|string|max:500',
-                'pages.*.page_number' => 'required|integer|min:1'
+                'pages.*.image_url' => 'required|string|max:' . config('upload.validation.page_url_max'),
+                'pages.*.page_number' => 'required|integer|min:' . config('upload.validation.page_number_min')
             ];
         }
 
@@ -50,7 +50,7 @@ class PageRequest extends FormRequest
         if ($this->has('images')) {
             $rules = [
                 'images' => 'required|array|min:1',
-                'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240' // 10MB max
+                'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:' . config('upload.limits.image_max_size') // Max file size
             ];
         }
 

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Services\SeoService;
 
 class Manga extends Model
 {
@@ -42,6 +43,17 @@ class Manga extends Model
         'rating',
         'total_rating',
     ];
+
+    /**
+     * Default pagination size for manga
+     */
+    protected $perPage;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->perPage = config('manga.pagination.per_page', 24);
+    }
 
     protected $casts = [
         'alternative_names' => 'array',
@@ -154,5 +166,30 @@ class Manga extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /**
+     * Get SEO data for this manga
+     */
+    public function getSeoData(): array
+    {
+        $seoService = app(SeoService::class);
+        return $seoService->forManga($this);
+    }
+
+    /**
+     * Get cover image URL
+     */
+    public function getCoverImageAttribute(): ?string
+    {
+        return $this->cover ? url('/storage/' . $this->cover) : null;
+    }
+
+    /**
+     * Get rating count for SEO
+     */
+    public function getRatingCountAttribute(): int
+    {
+        return $this->total_rating;
     }
 }

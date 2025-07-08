@@ -4,6 +4,7 @@ import { Badge } from '@/Components/ui/badge'
 import { AspectRatio } from '@/Components/ui/aspect-ratio'
 import { BookOpen, Heart, Star, Eye, Calendar } from 'lucide-react'
 import { formatViews, formatRating } from '@/lib/formatters'
+import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx'
 
 export function MangaHeader({ manga, translations }) {
     const statusColors = {
@@ -36,11 +37,15 @@ export function MangaHeader({ manga, translations }) {
             <div className="w-full sm:w-[160px] lg:w-[200px] flex-shrink-0 flex justify-center sm:block">
                 <div className="w-[140px] sm:w-full">
                     <AspectRatio ratio={2/3} className="bg-muted rounded-lg overflow-hidden">
-                        <img 
-                            src={manga.cover || '/api/placeholder/200/300'} 
-                            alt={manga.name}
-                            className="object-cover w-full h-full"
-                        />
+                        {isValidCover(manga.cover) ? (
+                            <img 
+                                src={manga.cover} 
+                                alt={manga.name}
+                                className="object-cover w-full h-full"
+                            />
+                        ) : (
+                            getContextualDefaultCover('header')
+                        )}
                     </AspectRatio>
                 </div>
             </div>

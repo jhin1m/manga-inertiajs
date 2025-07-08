@@ -6,21 +6,26 @@ use App\Http\Requests\ChapterRequest;
 use App\Models\Chapter;
 use App\Models\Manga;
 use App\Services\ChapterService;
+use App\Services\SeoService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ChapterController extends Controller
 {
     public function __construct(
-        private ChapterService $chapterService
+        private ChapterService $chapterService,
+        private SeoService $seoService
     ) {}
-    public function index(Manga $manga)
+    public function index(Manga $manga, Request $request)
     {
-        $chapters = $this->chapterService->getChaptersByManga($manga, 20);
+        // Allow user to specify per_page, otherwise use model default
+        $perPage = $request->get('per_page');
+        $chapters = $this->chapterService->getChaptersByManga($manga, $perPage);
 
         return Inertia::render('Chapter/Index', [
             'manga' => $manga,
-            'chapters' => $chapters
+            'chapters' => $chapters,
+            'seo' => $this->seoService->forManga($manga)
         ]);
     }
 
@@ -42,6 +47,7 @@ class ChapterController extends Controller
             'chapter' => $chapter,
             'previousChapter' => $adjacentChapters['previous'],
             'nextChapter' => $adjacentChapters['next'],
+            'seo' => $chapter->getSeoData(),
             // Defer allChapters to improve page load performance for manga with many chapters
             'allChapters' => Inertia::defer(function () use ($manga) {
                 return $this->chapterService->getAllChaptersByManga($manga);

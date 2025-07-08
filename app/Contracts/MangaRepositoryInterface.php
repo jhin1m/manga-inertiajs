@@ -8,27 +8,27 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 interface MangaRepositoryInterface
 {
-    public function getHotManga(int $limit = 10): Collection;
+    public function getHotManga(?int $limit = null): Collection;
     
-    public function getLatestUpdates(int $limit = 12): Collection;
+    public function getLatestUpdates(?int $limit = null): Collection;
     
-    public function getRankings(int $limit = 10): Collection;
+    public function getRankings(?int $limit = null): Collection;
     
-    public function getRecommended(int $limit = 6): Collection;
+    public function getRecommended(?int $limit = null): Collection;
     
-    public function getFeaturedManga(int $limit = 10): Collection;
+    public function getFeaturedManga(?int $limit = null): Collection;
     
-    public function getPopularManga(int $limit = 10): Collection;
+    public function getPopularManga(?int $limit = null): Collection;
     
-    public function getTopRatedManga(int $limit = 10): Collection;
+    public function getTopRatedManga(?int $limit = null): Collection;
     
-    public function getMangaWithFilters(array $filters, int $perPage = 20): LengthAwarePaginator;
+    public function getMangaWithFilters(array $filters, ?int $perPage = null): LengthAwarePaginator;
     
     public function getMangaDetail(Manga $manga): Manga;
     
-    public function getRelatedManga(Manga $manga, int $limit = 6): Collection;
+    public function getRelatedManga(Manga $manga, ?int $limit = null): Collection;
     
-    public function searchManga(string $query, int $perPage = 20): LengthAwarePaginator;
+    public function searchManga(string $query, ?int $perPage = null): LengthAwarePaginator;
     
     public function createManga(array $data): Manga;
     

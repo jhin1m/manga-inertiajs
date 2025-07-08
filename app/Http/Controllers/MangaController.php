@@ -7,6 +7,7 @@ use App\Models\Manga;
 use App\Models\TaxonomyTerm;
 use App\Services\MangaService;
 use App\Services\ChapterService;
+use App\Services\SeoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -15,7 +16,8 @@ class MangaController extends Controller
 {
     public function __construct(
         private MangaService $mangaService,
-        private ChapterService $chapterService
+        private ChapterService $chapterService,
+        private SeoService $seoService
     ) {}
     public function index(Request $request)
     {
@@ -27,7 +29,9 @@ class MangaController extends Controller
             'sortBy' => $request->get('sortBy', 'latest'),
         ];
 
-        $manga = $this->mangaService->getMangaList($filters, 20);
+        // Allow user to specify per_page, otherwise use model default (12)
+        $perPage = $request->get('per_page');
+        $manga = $this->mangaService->getMangaList($filters, $perPage);
 
         // Get filter options
         $genres = TaxonomyTerm::whereHas('taxonomy', function ($q) {
@@ -39,6 +43,7 @@ class MangaController extends Controller
             'filters' => $filters,
             'genres' => $genres,
             'statuses' => Manga::getStatuses(),
+            'seo' => $this->seoService->forMangaIndex($filters),
             'translations' => [
                 'title' => __('manga.index.title'),
                 'found_count' => __('manga.index.found_count'),
@@ -89,10 +94,11 @@ class MangaController extends Controller
                 'first_chapter' => $firstChapter,
                 'last_chapter' => $lastChapter,
             ]),
+            'seo' => $manga->getSeoData(),
             // Use deferred props for chapters to improve initial page load performance
             
             'chapters' => Inertia::defer(function () use ($manga) {
-                return $this->chapterService->getChaptersByManga($manga, 20);
+                return $this->chapterService->getChaptersByManga($manga);
             }),
             'translations' => [
                 'chapter_list' => __('manga.chapter_list'),
@@ -151,25 +157,27 @@ class MangaController extends Controller
             'sortBy' => $request->get('sortBy', 'latest'),
         ];
 
-        $manga = $this->mangaService->getMangaList($filters, 20);
+        // Allow user to specify per_page, otherwise use model default (12)
+        $perPage = $request->get('per_page');
+        $manga = $this->mangaService->getMangaList($filters, $perPage);
 
         // Cache genres for 1 hour since they don't change frequently
-        $genres = Cache::remember('search_genres', 3600, function () {
+        $genres = Cache::remember('search_genres', config('cache.ttl.search_genres'), function () {
             return TaxonomyTerm::whereHas('taxonomy', function ($q) {
                 $q->where('type', 'genre');
             })
             ->withCount('mangas')
             ->having('mangas_count', '>', 0) // Only genres with manga
             ->orderBy('mangas_count', 'desc')
-            ->limit(20) // Limit to top 20 genres
+            ->limit(config('manga.limits.top_genres')) // Limit to top genres
             ->get(['id', 'name', 'slug']);
         });
 
         // Cache popular manga for 30 minutes
-        $popularManga = Cache::remember('search_popular_manga', 1800, function () {
+        $popularManga = Cache::remember('search_popular_manga', config('cache.ttl.popular_manga'), function () {
             return Manga::where('status', 'published')
                 ->orderBy('views', 'desc')
-                ->limit(10)
+                ->limit(config('manga.limits.popular_display'))
                 ->get(['id', 'name', 'slug']);
         });
 
@@ -180,6 +188,7 @@ class MangaController extends Controller
             'genres' => $genres,
             'statuses' => Manga::getStatuses(),
             'popularManga' => $popularManga,
+            'seo' => $this->seoService->forSearch($query, $manga->total()),
             'translations' => [
                 'title' => __('search.title'),
                 'placeholder' => __('search.placeholder'),

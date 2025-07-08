@@ -10,7 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class ChapterRepository implements ChapterRepositoryInterface
 {
-    public function getChaptersByManga(Manga $manga, int $perPage = 20): LengthAwarePaginator
+    public function getChaptersByManga(Manga $manga, ?int $perPage = null): LengthAwarePaginator
     {
         return $manga->chapters()
             ->orderBy('chapter_number', 'desc')
@@ -47,14 +47,6 @@ class ChapterRepository implements ChapterRepositoryInterface
         return Chapter::where('manga_id', $manga->id)
             ->orderBy('chapter_number', 'asc')
             ->select('id', 'title', 'chapter_number', 'slug')
-            ->get();
-    }
-
-    public function getLatestChapters(int $limit = 20): Collection
-    {
-        return Chapter::with(['manga'])
-            ->orderBy('published_at', 'desc')
-            ->limit($limit)
             ->get();
     }
 

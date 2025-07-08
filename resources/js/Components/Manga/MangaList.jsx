@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from '@inertiajs/react';
 import { MangaCard } from './MangaCard';
 import { Card, CardContent } from '@/Components/ui/card';
+import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx';
 
 export function MangaList({ 
     mangas = [], 
@@ -53,11 +54,15 @@ export function MangaList({
                 <CardContent className="p-4">
                     <div className="flex gap-4">
                         <div className="w-16 h-20 bg-muted rounded overflow-hidden flex-shrink-0">
-                            <img 
-                                src={manga.cover || "/api/placeholder/80/100"} 
-                                alt={manga.name}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
+                            {isValidCover(manga.cover) ? (
+                                <img 
+                                    src={manga.cover} 
+                                    alt={manga.name}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                            ) : (
+                                getContextualDefaultCover('list')
+                            )}
                         </div>
                         <div className="flex-1 min-w-0">
                             <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">

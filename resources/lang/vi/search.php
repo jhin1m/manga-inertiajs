@@ -28,5 +28,5 @@ return [
     'tip_author' => 'Tìm theo tác giả',
     'tip_genre' => 'Tìm theo thể loại',
     'tip_hotkey' => 'Dùng Ctrl/Cmd + K để tìm kiếm nhanh',
-    'back_to_home' => 'Về trang chủ',
+    'back_to_home' => 'Về trang chủ'
 ];

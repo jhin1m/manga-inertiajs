@@ -14,7 +14,7 @@ class MangaService
         private MangaRepositoryInterface $mangaRepository
     ) {}
 
-    public function getMangaList(array $filters = [], int $perPage = 20): LengthAwarePaginator
+    public function getMangaList(array $filters = [], ?int $perPage = null): LengthAwarePaginator
     {
         return $this->mangaRepository->getMangaWithFilters($filters, $perPage);
     }
@@ -24,22 +24,22 @@ class MangaService
         return $this->mangaRepository->getMangaDetail($manga);
     }
 
-    public function getRelatedManga(Manga $manga, int $limit = 6): Collection
+    public function getRelatedManga(Manga $manga, ?int $limit = null): Collection
     {
         return $this->mangaRepository->getRelatedManga($manga, $limit);
     }
 
-    public function getFeaturedManga(int $limit = 10): Collection
+    public function getFeaturedManga(?int $limit = null): Collection
     {
         return $this->mangaRepository->getFeaturedManga($limit);
     }
 
-    public function getLatestManga(int $limit = 10): Collection
+    public function getLatestManga(?int $limit = null): Collection
     {
         return $this->mangaRepository->getFeaturedManga($limit);
     }
 
-    public function getPopularManga(int $limit = 10): Collection
+    public function getPopularManga(?int $limit = null): Collection
     {
         return $this->mangaRepository->getPopularManga($limit);
     }
@@ -69,12 +69,12 @@ class MangaService
         $manga->updateRating($rating);
     }
 
-    public function getTopRatedManga(int $limit = 10): Collection
+    public function getTopRatedManga(?int $limit = null): Collection
     {
         return $this->mangaRepository->getTopRatedManga($limit);
     }
 
-    public function searchManga(string $query, int $perPage = 20): LengthAwarePaginator
+    public function searchManga(string $query, ?int $perPage = null): LengthAwarePaginator
     {
         return $this->mangaRepository->searchManga($query, $perPage);
     }
