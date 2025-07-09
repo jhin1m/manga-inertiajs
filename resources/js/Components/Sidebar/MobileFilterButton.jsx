@@ -76,9 +76,6 @@ export default function MobileFilterButton({
                                     </Badge>
                                 )}
                             </SheetTitle>
-                            <SheetDescription>
-                                Lọc manga theo thể loại, trạng thái, đánh giá và các tiêu chí khác
-                            </SheetDescription>
                         </div>
                         {hasActiveFilters() && (
                             <Button

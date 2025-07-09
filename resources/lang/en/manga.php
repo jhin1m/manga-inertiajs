@@ -25,7 +25,7 @@ return [
     'expand_more' => 'Show more',
     'collapse' => 'Collapse',
     
-    // Index page
+    // Index manga page
     'index' => [
         'title' => 'Manga list',
         'found_count' => 'Found :count manga',
@@ -50,15 +50,18 @@ return [
             'sort_placeholder' => 'Choose sorting method',
             'status' => 'Status',
             'all' => 'All',
-            'rating_min' => 'Minimum rating',
             'year' => 'Release year',
             'year_placeholder' => 'Choose year',
-            'genres' => 'Genres',
-            'selected' => 'Selected',
             'applying' => 'applying',
             'clear_all' => 'Clear all',
             'close' => 'Close',
             'apply' => 'Apply',
+            'latest' => 'Latest',
+            'oldest' => 'Oldest',
+            'views' => 'Most views',
+            'rating' => 'Highest rating',
+            'name_asc' => 'Name A-Z',
+            'name_desc' => 'Name Z-A',
         ],
     ],
     

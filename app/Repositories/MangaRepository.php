@@ -293,22 +293,6 @@ class MangaRepository implements MangaRepositoryInterface
                   ->orWhere('alternative_names', 'like', '%' . $filters['search'] . '%');
         }
 
-        // Filter by genres (multiple)
-        if (!empty($filters['genres'])) {
-            $genres = is_array($filters['genres']) ? $filters['genres'] : [$filters['genres']];
-            $query->whereHas('taxonomyTerms', function ($q) use ($genres) {
-                $q->whereIn('taxonomy_terms.id', $genres)
-                  ->whereHas('taxonomy', function ($taxonomy) {
-                      $taxonomy->where('type', 'genre');
-                  });
-            });
-        }
-
-        // Filter by rating
-        if (!empty($filters['rating']) && $filters['rating'] > 0) {
-            $query->where('rating', '>=', $filters['rating']);
-        }
-
 
         // Filter by status
         if (!empty($filters['status'])) {

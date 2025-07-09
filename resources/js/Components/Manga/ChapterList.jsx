@@ -84,7 +84,7 @@ export function ChapterList({ manga, chapters, translations = {} }) {
                 {/* Loading indicator */}
                 <div className="flex items-center justify-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                    <span className="text-muted-foreground">Đang tải danh sách chương...</span>
+                    <span className="text-muted-foreground">...</span>
                 </div>
             </div>
         )
@@ -186,8 +186,8 @@ export function ChapterList({ manga, chapters, translations = {} }) {
             {chapters?.data?.length === 0 && (
                 <div className="text-center py-12">
                     <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium mb-2">Chưa có chương nào</h3>
-                    <p className="text-muted-foreground">Manga này chưa có chương nào được phát hành.</p>
+                    <h3 className="text-lg font-medium mb-2">No chapters yet</h3>
+                    <p className="text-muted-foreground">This manga has no chapters released yet.</p>
                 </div>
             )}
 

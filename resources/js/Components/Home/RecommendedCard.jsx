@@ -2,22 +2,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card.j
 import { Badge } from "@/Components/ui/badge.jsx";
 import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar.jsx";
 import { Star, Heart, Sparkles } from "lucide-react";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx';
 
-export function RecommendedCard({ recommended = [], translations = {} }) {
+export function RecommendedCard({ recommended = [] }) {
+    const { mangaTranslations = {} } = usePage().props;
+    const recommendedT = mangaTranslations.recommended || {};
     if (!recommended || recommended.length === 0) {
         return (
             <Card>
                 <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2 text-lg">
                         <Sparkles className="h-5 w-5 text-primary" />
-                        {translations.title || 'Đề xuất cho bạn'}
+                        {recommendedT.title || 'Đề xuất cho bạn'}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center py-8">
                     <div className="text-muted-foreground">
-                        {translations.no_data || 'Chưa có đề xuất nào'}
+                        {recommendedT.no_data || 'Chưa có đề xuất nào'}
                     </div>
                 </CardContent>
             </Card>
@@ -40,7 +42,7 @@ export function RecommendedCard({ recommended = [], translations = {} }) {
             <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                     <Sparkles className="h-5 w-5 text-primary" />
-                    {translations.title || 'Đề xuất cho bạn'}
+                    {recommendedT.title || 'Đề xuất cho bạn'}
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -86,7 +88,7 @@ export function RecommendedCard({ recommended = [], translations = {} }) {
                                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                     {getReasonIcon(manga.reason)}
                                     <span className="line-clamp-1">
-                                        {manga.reason || (translations.rating_reason || 'Đánh giá :rating/5').replace(':rating', manga.rating)}
+                                        {manga.reason || (recommendedT.rating_reason || 'Đánh giá :rating/5').replace(':rating', manga.rating)}
                                     </span>
                                 </div>
                             )}
@@ -99,7 +101,7 @@ export function RecommendedCard({ recommended = [], translations = {} }) {
                     href={route('manga.index', { sort: 'recommended' })}
                     className="block w-full text-center text-sm text-primary hover:underline pt-3 border-t"
                 >
-                    {translations.view_all || 'Xem thêm đề xuất →'}
+                    {recommendedT.view_all || 'Xem thêm đề xuất →'}
                 </Link>
             </CardContent>
         </Card>

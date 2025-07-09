@@ -2,23 +2,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card.j
 import { Badge } from "@/Components/ui/badge.jsx";
 import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar.jsx";
 import { Star, TrendingUp, Medal, Crown, Award } from "lucide-react";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { formatViews } from "@/lib/formatters";
 import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx';
 
-export function RankingsCard({ rankings = [], translations = {} }) {
+export function RankingsCard({ rankings = [] }) {
+    const { mangaTranslations = {} } = usePage().props;
+    const rankingsT = mangaTranslations.rankings || {};
     if (!rankings || rankings.length === 0) {
         return (
             <Card>
                 <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2 text-lg">
                         <TrendingUp className="h-5 w-5 text-primary" />
-                        {translations.title || 'Xếp hạng Manga'}
+                        {rankingsT.title || 'Xếp hạng Manga'}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center py-8">
                     <div className="text-muted-foreground">
-                        {translations.no_data || 'Chưa có dữ liệu xếp hạng'}
+                        {rankingsT.no_data || 'Chưa có dữ liệu xếp hạng'}
                     </div>
                 </CardContent>
             </Card>
@@ -45,7 +47,7 @@ export function RankingsCard({ rankings = [], translations = {} }) {
             <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                     <TrendingUp className="h-5 w-5 text-primary" />
-                    {translations.title || 'Xếp hạng Manga'}
+                    {rankingsT.title || 'Xếp hạng Manga'}
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -90,7 +92,7 @@ export function RankingsCard({ rankings = [], translations = {} }) {
                                     </span>
                                 </div>
                                 <div className="text-xs text-muted-foreground">
-                                    {formatViews(manga.views)} {translations.views || 'lượt xem'}
+                                    {formatViews(manga.views)} {rankingsT.views || 'lượt xem'}
                                 </div>
                             </div>
                         </div>
@@ -102,7 +104,7 @@ export function RankingsCard({ rankings = [], translations = {} }) {
                     href={route('manga.index', { sort: 'popular' })}
                     className="block w-full text-center text-sm text-primary hover:underline pt-2 border-t"
                 >
-                    {translations.view_all || 'Xem tất cả xếp hạng →'}
+                    {rankingsT.view_all || 'Xem tất cả xếp hạng →'}
                 </Link>
             </CardContent>
         </Card>

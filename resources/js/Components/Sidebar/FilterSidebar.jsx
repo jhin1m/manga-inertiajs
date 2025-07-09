@@ -9,7 +9,6 @@ import MangaFilters from './MangaFilters';
 export default function FilterSidebar({ 
     filters = {}, 
     onFiltersChange = () => {},
-    genres = [],
     statuses = {},
     translations = {},
     className = "",
@@ -19,17 +18,13 @@ export default function FilterSidebar({
     const [isOpen, setIsOpen] = useState(false);
 
     const hasActiveFilters = useMemo(() => {
-        return filters.genres?.length > 0 ||
-               filters.status ||
-               (filters.rating > 0) ||
+        return filters.status ||
                (filters.sortBy && filters.sortBy !== 'latest');
     }, [filters]);
 
     const activeFiltersCount = useMemo(() => {
         let count = 0;
-        if (filters.genres?.length > 0) count += filters.genres.length;
         if (filters.status) count += 1;
-        if (filters.rating > 0) count += 1;
         if (filters.sortBy && filters.sortBy !== 'latest') count += 1;
         return count;
     }, [filters]);
@@ -72,7 +67,6 @@ export default function FilterSidebar({
                         <MangaFilters
                             filters={filters}
                             onFiltersChange={onFiltersChange}
-                            genres={genres}
                             statuses={statuses}
                             translations={translations}
                             className="border-0 shadow-none"
@@ -89,7 +83,6 @@ export default function FilterSidebar({
                 <MangaFilters
                     filters={filters}
                     onFiltersChange={onFiltersChange}
-                    genres={genres}
                     statuses={statuses}
                     translations={translations}
                 />

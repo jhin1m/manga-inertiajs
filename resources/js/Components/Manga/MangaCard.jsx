@@ -97,8 +97,8 @@ export function MangaCard({
 
                 {/* No chapters message */}
                 {chaptersToShow.length === 0 && (
-                    <div className="text-xs text-muted-foreground text-center py-2">
-                        {status === 'loading' ? (translations.loading || 'Đang tải...') : (translations.no_chapters || 'Chưa có chapter nào')}
+                    <div className="text-xs text-muted-foreground text-center">
+                        {status === 'loading' ? (translations.loading || 'Đang tải...') : (translations.no_chapters || 'No chapters yet')}
                     </div>
                 )}
             </CardContent>

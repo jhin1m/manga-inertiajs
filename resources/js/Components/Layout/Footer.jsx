@@ -11,8 +11,8 @@ export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     const quickLinks = [
-        { name: 'Thư viện Manga', href: route('manga.index'), icon: BookOpen },
-        { name: 'Tìm kiếm', href: route('search'), icon: BookOpen },
+        { name: 'Manga List', href: route('manga.index'), icon: BookOpen },
+        { name: 'Search', href: route('search'), icon: BookOpen },
     ];
 
     return (
@@ -56,16 +56,6 @@ export default function Footer() {
                                 </Link>
                             ))}
                         </nav>
-                    </div>
-
-                    {/* Tech Stack */}
-                    <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-foreground">Công nghệ</h4>
-                        <div className="text-sm text-muted-foreground space-y-1">
-                            <p>React + Inertia.js</p>
-                            <p>Laravel + MySQL</p>
-                            <p>Tailwind CSS</p>
-                        </div>
                     </div>
                 </div>
 

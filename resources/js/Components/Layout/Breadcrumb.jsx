@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { 
     Breadcrumb as ShadcnBreadcrumb,
     BreadcrumbEllipsis,
@@ -27,12 +27,13 @@ import { VisuallyHidden } from "@/Components/ui/visually-hidden.jsx";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { ChevronDown, Home } from 'lucide-react';
 
-export function Breadcrumb({ items = [], className = "", translations = {} }) {
+export function Breadcrumb({ items = [], className = "" }) {
+    const { breadcrumbTranslations = {} } = usePage().props;
     const isMobile = useIsMobile();
     
     // Luôn có Home làm item đầu tiên
     const allItems = [
-        { label: translations.home || 'Trang chủ', href: route('home'), icon: Home },
+        { label: breadcrumbTranslations.home || 'Trang chủ', href: route('home'), icon: Home },
         ...items
     ];
 
@@ -117,21 +118,21 @@ export function Breadcrumb({ items = [], className = "", translations = {} }) {
                                             variant="ghost"
                                             size="sm"
                                             className="h-auto p-0 text-muted-foreground hover:text-foreground"
-                                            aria-label={translations.more || 'Xem thêm'}
+                                            aria-label={breadcrumbTranslations.more || 'Xem thêm'}
                                         >
                                             <BreadcrumbEllipsis className="h-4 w-4" />
-                                            <span className="sr-only">{translations.more || 'Xem thêm'}</span>
+                                            <span className="sr-only">{breadcrumbTranslations.more || 'Xem thêm'}</span>
                                         </Button>
                                     </SheetTrigger>
                                     <SheetContent side="bottom" className="h-[300px]">
                                         <VisuallyHidden>
-                                            <SheetTitle>{translations.navigation || 'Đường dẫn'}</SheetTitle>
+                                            <SheetTitle>{breadcrumbTranslations.navigation || 'Đường dẫn'}</SheetTitle>
                                             <SheetDescription>
                                                 Danh sách đường dẫn điều hướng
                                             </SheetDescription>
                                         </VisuallyHidden>
                                         <div className="py-4">
-                                            <h3 className="font-semibold mb-4">{translations.navigation || 'Đường dẫn'}</h3>
+                                            <h3 className="font-semibold mb-4">{breadcrumbTranslations.navigation || 'Đường dẫn'}</h3>
                                             <div className="space-y-2">
                                                 {hiddenItems.map((item, index) => (
                                                     <Link
@@ -190,11 +191,11 @@ export function Breadcrumb({ items = [], className = "", translations = {} }) {
                                         variant="ghost"
                                         size="sm"
                                         className="h-auto p-0 text-muted-foreground hover:text-foreground"
-                                        aria-label={translations.more || 'Xem thêm'}
+                                        aria-label={breadcrumbTranslations.more || 'Xem thêm'}
                                     >
                                         <BreadcrumbEllipsis className="h-4 w-4" />
                                         <ChevronDown className="ml-1 h-3 w-3" />
-                                        <span className="sr-only">{translations.more || 'Xem thêm'}</span>
+                                        <span className="sr-only">{breadcrumbTranslations.more || 'Xem thêm'}</span>
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="start" className="w-48">
@@ -228,7 +229,8 @@ export function Breadcrumb({ items = [], className = "", translations = {} }) {
 }
 
 // Helper component để tạo breadcrumb items dễ dàng hơn với Ziggy
-export function BreadcrumbBuilder(translations = {}) {
+export function BreadcrumbBuilder() {
+    const { breadcrumbTranslations = {} } = usePage().props;
     const items = [];
     
     const builder = {
@@ -252,7 +254,7 @@ export function BreadcrumbBuilder(translations = {}) {
             const mangaSlug = manga?.slug || chapter.manga_slug;
             
             items.push({ 
-                label: (translations.chapter_prefix || 'Chương :number').replace(':number', chapterNumber), 
+                label: (breadcrumbTranslations.chapter_prefix || 'Chương :number').replace(':number', chapterNumber), 
                 href: route('manga.chapters.show', [mangaSlug, chapterSlug]),
                 icon: null 
             });
@@ -297,7 +299,7 @@ export function BreadcrumbBuilder(translations = {}) {
         
         addMangaList: () => {
             items.push({
-                label: translations.manga_list || 'Danh sách manga',
+                label: breadcrumbTranslations.manga_list || 'Danh sách manga',
                 href: route('manga.index'),
                 icon: null
             });
@@ -306,7 +308,7 @@ export function BreadcrumbBuilder(translations = {}) {
         
         addChapterList: (manga) => {
             items.push({
-                label: translations.chapter_list || 'Danh sách chương',
+                label: breadcrumbTranslations.chapter_list || 'Danh sách chương',
                 href: route('manga.chapters.index', manga.slug),
                 icon: null
             });
@@ -315,7 +317,7 @@ export function BreadcrumbBuilder(translations = {}) {
         
         addSearch: (query = '') => {
             items.push({
-                label: query ? (translations.search_results || 'Kết quả tìm kiếm') : (translations.search || 'Tìm kiếm'),
+                label: query ? (breadcrumbTranslations.search_results || 'Kết quả tìm kiếm') : (breadcrumbTranslations.search || 'Tìm kiếm'),
                 href: route('search', query ? { q: query } : {}),
                 icon: null
             });

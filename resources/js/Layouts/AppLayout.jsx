@@ -15,13 +15,10 @@ import { ScrollArea } from "@/Components/ui/scroll-area.jsx";
 import { Separator } from "@/Components/ui/separator.jsx";
 import { 
     NavigationMenu,
-    NavigationMenuContent,
     NavigationMenuItem,
     NavigationMenuLink,
     NavigationMenuList,
-    NavigationMenuTrigger,
 } from "@/Components/ui/navigation-menu.jsx";
-import { Badge } from "@/Components/ui/badge.jsx";
 import { 
     Home, 
     Search, 
@@ -38,7 +35,7 @@ import SearchDialog from '@/Components/Common/SearchDialog';
 import Footer from '@/Components/Layout/Footer';
 import { Breadcrumb } from '@/Components/Layout/Breadcrumb';
 
-export function AppLayout({ children, header, breadcrumbItems = [], hideHeader = false, translations = {} }) {
+export function AppLayout({ children, header, breadcrumbItems = [], hideHeader = false }) {
     const { auth, appName, layoutTranslations = {} } = usePage().props;
     const user = auth?.user;
     
@@ -321,7 +318,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
             {breadcrumbItems.length > 0 && (
                 <div className="border-b bg-muted/20">
                     <div className="container mx-auto px-4 py-3">
-                        <Breadcrumb items={breadcrumbItems} translations={translations} />
+                        <Breadcrumb items={breadcrumbItems} />
                     </div>
                 </div>
             )}
