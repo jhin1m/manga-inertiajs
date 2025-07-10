@@ -13,13 +13,16 @@ class MangaRepository implements MangaRepositoryInterface
 {
     public function getHotManga(?int $limit = null): Collection
     {
-        $query = Manga::with([
-            'chapters' => function ($query) {
-                $query->orderBy('chapter_number', 'desc')->limit(config('manga.limits.latest_chapter'));
-            }
-        ])
-        ->where('views', '>', config('manga.thresholds.hot_manga_views'))
-        ->orderByRaw('(views * ' . config('manga.thresholds.hot_manga_view_weight') . ') + (rating * total_rating * ' . config('manga.thresholds.hot_manga_rating_weight') . ') DESC');
+        $query = Manga::select('id', 'name', 'slug', 'cover', 'status', 'views', 'rating', 'total_rating')
+            ->with([
+                'chapters' => function ($query) {
+                    $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug', 'updated_at')
+                        ->orderBy('chapter_number', 'desc')
+                        ->limit(config('manga.limits.latest_chapter'));
+                }
+            ])
+            ->where('views', '>', config('manga.thresholds.hot_manga_views'))
+            ->orderByRaw('(views * ' . config('manga.thresholds.hot_manga_view_weight') . ') + (rating * total_rating * ' . config('manga.thresholds.hot_manga_rating_weight') . ') DESC');
         
         if ($limit) {
             $query->limit($limit);
@@ -48,14 +51,17 @@ class MangaRepository implements MangaRepositoryInterface
 
     public function getLatestUpdates(?int $limit = null): Collection
     {
-        $query = Manga::with([
-            'taxonomyTerms', 
-            'chapters' => function ($query) {
-                $query->orderBy('chapter_number', 'desc')->limit(config('manga.limits.recent_chapters'));
-            }
-        ])
-        ->whereHas('chapters')
-        ->orderBy('updated_at', 'desc');
+        $query = Manga::select('id', 'name', 'slug', 'cover', 'status', 'updated_at')
+            ->with([
+                'taxonomyTerms:id,name,slug', 
+                'chapters' => function ($query) {
+                    $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug', 'updated_at', 'created_at')
+                        ->orderBy('chapter_number', 'desc')
+                        ->limit(config('manga.limits.recent_chapters'));
+                }
+            ])
+            ->whereHas('chapters')
+            ->orderBy('updated_at', 'desc');
         
         if ($limit) {
             $query->limit($limit);
@@ -114,7 +120,8 @@ class MangaRepository implements MangaRepositoryInterface
 
     public function getRecommended(?int $limit = null): Collection
     {
-        $query = Manga::where('rating', '>=', config('manga.thresholds.recommended_rating'))
+        $query = Manga::select('id', 'name', 'slug', 'cover', 'rating')
+            ->where('rating', '>=', config('manga.thresholds.recommended_rating'))
             ->orderBy('rating', 'desc');
             
         if ($limit) {
@@ -138,7 +145,13 @@ class MangaRepository implements MangaRepositoryInterface
 
     public function getFeaturedManga(?int $limit = null): Collection
     {
-        $query = Manga::with(['taxonomyTerms', 'chapters'])
+        $query = Manga::select('id', 'name', 'slug', 'cover', 'status', 'views', 'rating')
+            ->with([
+                'taxonomyTerms:id,name,slug',
+                'chapters' => function ($query) {
+                    $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug');
+                }
+            ])
             ->withCount('chapters')
             ->orderBy('views', 'desc')
             ->orderBy('rating', 'desc');
@@ -152,7 +165,13 @@ class MangaRepository implements MangaRepositoryInterface
 
     public function getPopularManga(?int $limit = null): Collection
     {
-        $query = Manga::with(['taxonomyTerms', 'chapters'])
+        $query = Manga::select('id', 'name', 'slug', 'cover', 'status', 'views')
+            ->with([
+                'taxonomyTerms:id,name,slug',
+                'chapters' => function ($query) {
+                    $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug');
+                }
+            ])
             ->withCount('chapters')
             ->orderBy('views', 'desc');
             
@@ -165,7 +184,13 @@ class MangaRepository implements MangaRepositoryInterface
 
     public function getTopRatedManga(?int $limit = null): Collection
     {
-        $query = Manga::with(['taxonomyTerms', 'chapters'])
+        $query = Manga::select('id', 'name', 'slug', 'cover', 'status', 'rating', 'total_rating')
+            ->with([
+                'taxonomyTerms:id,name,slug',
+                'chapters' => function ($query) {
+                    $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug');
+                }
+            ])
             ->withCount('chapters')
             ->topRated();
             
@@ -178,13 +203,16 @@ class MangaRepository implements MangaRepositoryInterface
 
     public function getMangaWithFilters(array $filters, ?int $perPage = null): LengthAwarePaginator
     {
-        $query = Manga::with([
-            'taxonomyTerms', 
-            'chapters' => function ($query) {
-                $query->orderBy('chapter_number', 'desc')->limit(config('manga.limits.recent_chapters'));
-            }
-        ])
-        ->withCount('chapters');
+        $query = Manga::select('id', 'name', 'slug', 'cover', 'status', 'views', 'rating', 'created_at', 'updated_at')
+            ->with([
+                'taxonomyTerms:id,name,slug',
+                'chapters' => function ($query) {
+                    $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug', 'updated_at', 'created_at')
+                        ->orderBy('chapter_number', 'desc')
+                        ->limit(config('manga.limits.recent_chapters'));
+                }
+            ])
+            ->withCount('chapters');
 
         $query = $this->applyFilters($query, $filters);
         $query = $this->applySorting($query, $filters);
@@ -217,10 +245,12 @@ class MangaRepository implements MangaRepositoryInterface
 
     public function getRelatedManga(Manga $manga, ?int $limit = null): Collection
     {
-        $query = Manga::whereHas('taxonomyTerms', function ($query) use ($manga) {
-            $query->whereIn('manga_taxonomy_terms.taxonomy_term_id', $manga->taxonomyTerms->pluck('id'));
-        })
-        ->where('mangas.id', '!=', $manga->id);
+        $query = Manga::select('id', 'name', 'slug', 'cover', 'status', 'views', 'rating')
+            ->with('taxonomyTerms:id,name,slug')
+            ->whereHas('taxonomyTerms', function ($query) use ($manga) {
+                $query->whereIn('manga_taxonomy_terms.taxonomy_term_id', $manga->taxonomyTerms->pluck('id'));
+            })
+            ->where('mangas.id', '!=', $manga->id);
         
         if ($limit) {
             $query->limit($limit);
@@ -231,7 +261,16 @@ class MangaRepository implements MangaRepositoryInterface
 
     public function searchManga(string $query, ?int $perPage = null): LengthAwarePaginator
     {
-        return Manga::with(['taxonomyTerms.taxonomy', 'chapters'])
+        return Manga::select('id', 'name', 'slug', 'cover', 'status', 'views', 'rating', 'alternative_names', 'description')
+            ->with([
+                'taxonomyTerms' => function ($query) {
+                    $query->select('taxonomy_terms.id', 'taxonomy_terms.name', 'taxonomy_terms.slug')
+                        ->with('taxonomy:id,name,slug');
+                },
+                'chapters' => function ($query) {
+                    $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug');
+                }
+            ])
             ->withCount('chapters')
             ->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")

@@ -13,25 +13,32 @@ class ChapterRepository implements ChapterRepositoryInterface
     public function getChaptersByManga(Manga $manga, ?int $perPage = null): LengthAwarePaginator
     {
         return $manga->chapters()
+            ->select('id', 'manga_id', 'title', 'chapter_number', 'volume_number', 'slug', 'views', 'published_at', 'created_at', 'updated_at')
             ->orderBy('chapter_number', 'desc')
             ->paginate($perPage);
     }
 
     public function getChapterDetail(Chapter $chapter): Chapter
     {
-        return $chapter->load(['manga', 'pages' => function ($query) {
-            $query->orderBy('page_number');
-        }]);
+        return $chapter->load([
+            'manga:id,name,slug,status',
+            'pages' => function ($query) {
+                $query->select('id', 'chapter_id', 'page_number', 'image_url')
+                    ->orderBy('page_number');
+            }
+        ]);
     }
 
     public function getAdjacentChapters(Chapter $chapter): array
     {
-        $previousChapter = Chapter::where('manga_id', $chapter->manga_id)
+        $previousChapter = Chapter::select('id', 'manga_id', 'title', 'chapter_number', 'slug')
+            ->where('manga_id', $chapter->manga_id)
             ->where('chapter_number', '<', $chapter->chapter_number)
             ->orderBy('chapter_number', 'desc')
             ->first();
 
-        $nextChapter = Chapter::where('manga_id', $chapter->manga_id)
+        $nextChapter = Chapter::select('id', 'manga_id', 'title', 'chapter_number', 'slug')
+            ->where('manga_id', $chapter->manga_id)
             ->where('chapter_number', '>', $chapter->chapter_number)
             ->orderBy('chapter_number', 'asc')
             ->first();
@@ -53,7 +60,8 @@ class ChapterRepository implements ChapterRepositoryInterface
     public function createChapter(Manga $manga, array $data): Chapter
     {
         // Check if chapter number already exists
-        $existingChapter = Chapter::where('manga_id', $manga->id)
+        $existingChapter = Chapter::select('id')
+            ->where('manga_id', $manga->id)
             ->where('chapter_number', $data['chapter_number'])
             ->first();
 
@@ -71,7 +79,8 @@ class ChapterRepository implements ChapterRepositoryInterface
     {
         // Check if chapter number already exists (excluding current chapter)
         if (isset($data['chapter_number'])) {
-            $existingChapter = Chapter::where('manga_id', $chapter->manga_id)
+            $existingChapter = Chapter::select('id')
+                ->where('manga_id', $chapter->manga_id)
                 ->where('chapter_number', $data['chapter_number'])
                 ->where('id', '!=', $chapter->id)
                 ->first();
@@ -99,6 +108,7 @@ class ChapterRepository implements ChapterRepositoryInterface
     public function getNextChapterNumber(Manga $manga): float
     {
         $lastChapter = $manga->chapters()
+            ->select('chapter_number')
             ->orderBy('chapter_number', 'desc')
             ->first();
 
@@ -107,7 +117,8 @@ class ChapterRepository implements ChapterRepositoryInterface
 
     public function validateChapterNumber(Manga $manga, float $chapterNumber, ?int $excludeChapterId = null): bool
     {
-        $query = Chapter::where('manga_id', $manga->id)
+        $query = Chapter::select('id')
+            ->where('manga_id', $manga->id)
             ->where('chapter_number', $chapterNumber);
 
         if ($excludeChapterId) {
