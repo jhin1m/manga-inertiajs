@@ -14,7 +14,7 @@ export function MangaList({
     emptyMessage = null,
     translations = {},
 }) {
-    const defaultEmptyMessage = emptyMessage || translations.empty_message || 'Không có manga nào để hiển thị';
+    const defaultEmptyMessage = emptyMessage || translations.empty_message || 'Hello World!';
     if (!mangas.length && showEmpty) {
         return (
             <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -34,7 +34,7 @@ export function MangaList({
                     </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {translations.no_manga_title || 'Chưa có manga'}
+                    {translations.no_manga_title || '...'}
                 </h3>
                 <p className="text-gray-500 max-w-sm">{defaultEmptyMessage}</p>
             </div>
