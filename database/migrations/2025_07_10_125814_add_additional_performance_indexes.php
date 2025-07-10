@@ -28,11 +28,8 @@ return new class extends Migration
                 $table->index(['rating', 'total_rating'], 'idx_mangas_rating_composite');
             }
             
-            // Index for alternative_names search
-            $indexExists = collect(DB::select("SHOW INDEX FROM mangas WHERE Key_name = 'idx_mangas_alt_names'"))->isNotEmpty();
-            if (!$indexExists) {
-                $table->index(['alternative_names'], 'idx_mangas_alt_names');
-            }
+            // Note: alternative_names is JSON column, cannot create regular index
+            // Use JSON_SEARCH or other JSON functions for searching instead
             
             // Composite index for status + rating (filtered rankings)
             $indexExists = collect(DB::select("SHOW INDEX FROM mangas WHERE Key_name = 'idx_mangas_status_rating'"))->isNotEmpty();
@@ -111,7 +108,7 @@ return new class extends Migration
         Schema::table('mangas', function (Blueprint $table) {
             $table->dropIndex('idx_mangas_hot_ranking');
             $table->dropIndex('idx_mangas_rating_composite');
-            $table->dropIndex('idx_mangas_alt_names');
+            // idx_mangas_alt_names was not created due to JSON column limitation
             $table->dropIndex('idx_mangas_status_rating');
             $table->dropIndex('idx_mangas_created_at');
         });
