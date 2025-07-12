@@ -2,8 +2,10 @@ import React from "react";
 import { Link } from "@inertiajs/react";
 import { MangaCard } from "./MangaCard";
 import { Card, CardContent } from "@/Components/ui/card";
+import { Skeleton } from "@/Components/ui/skeleton";
 import { getContextualDefaultCover, isValidCover } from "@/lib/image-utils.jsx";
 import { formatRelativeTime } from "@/lib/formatters";
+import { Loader2 } from "lucide-react";
 
 export function MangaList({
     mangas = [],
@@ -15,6 +17,69 @@ export function MangaList({
     translations = {},
 }) {
     const defaultEmptyMessage = emptyMessage || translations.empty_message || 'Hello World!';
+    
+    // Grid columns configuration
+    const getGridColumns = () => {
+        if (columns !== "auto") return columns;
+
+        // Default responsive grid
+        return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
+    };
+    
+    // Loading state for deferred props
+    if (mangas === undefined) {
+        return (
+            <div>
+                {/* Loading Skeleton - Grid variant */}
+                {variant === "grid" && (
+                    <div className={`grid ${getGridColumns()} gap-4 ${className}`}>
+                        {Array.from({ length: 12 }).map((_, index) => (
+                            <Card key={index} className="overflow-hidden">
+                                <div className="aspect-[3/4] bg-muted">
+                                    <Skeleton className="w-full h-full" />
+                                </div>
+                                <div className="p-3 space-y-2">
+                                    <Skeleton className="h-4 w-full" />
+                                    <Skeleton className="h-3 w-3/4" />
+                                    <Skeleton className="h-3 w-1/2" />
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+
+                {/* Loading Skeleton - List variant */}
+                {variant === "list" && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {Array.from({ length: 10 }).map((_, index) => (
+                            <Card key={index}>
+                                <div className="flex">
+                                    <div className="w-26 h-40 bg-muted flex-shrink-0">
+                                        <Skeleton className="w-full h-full" />
+                                    </div>
+                                    <CardContent className="p-3 flex-1 space-y-2">
+                                        <Skeleton className="h-4 w-full" />
+                                        <div className="space-y-1">
+                                            <Skeleton className="h-3 w-full" />
+                                            <Skeleton className="h-3 w-5/6" />
+                                            <Skeleton className="h-3 w-4/6" />
+                                        </div>
+                                    </CardContent>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+
+                {/* Loading indicator */}
+                <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                    <span className="text-muted-foreground">...</span>
+                </div>
+            </div>
+        );
+    }
+
     if (!mangas.length && showEmpty) {
         return (
             <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -40,14 +105,6 @@ export function MangaList({
             </div>
         );
     }
-
-    // Grid columns configuration
-    const getGridColumns = () => {
-        if (columns !== "auto") return columns;
-
-        // Default responsive grid
-        return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
-    };
 
     const getListVariant = () => {
         switch (variant) {

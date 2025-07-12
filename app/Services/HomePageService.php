@@ -18,7 +18,6 @@ class HomePageService
             'canLogin' => \Route::has('login'),
             'canRegister' => \Route::has('register'),
             'hotManga' => $this->getCachedHotManga(),
-            'latestUpdates' => $this->getCachedLatestUpdates(),
             'featuredManga' => [],
             'rankings' => $this->getCachedRankings(),
             'recentComments' => [],
@@ -40,7 +39,7 @@ class HomePageService
         });
     }
 
-    private function getCachedLatestUpdates(): Collection
+    public function getCachedLatestUpdates(): Collection
     {
         return Cache::remember('homepage.latest_updates', config('homepage.cache.latest_updates_ttl'), function () {
             return $this->mangaRepository->getLatestUpdates(config('homepage.limits.latest_updates'));

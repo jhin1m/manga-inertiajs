@@ -31,7 +31,6 @@ class MangaController extends Controller
 
         // Allow user to specify per_page, otherwise use model default (12)
         $perPage = $request->get('per_page');
-        $manga = $this->mangaService->getMangaList($filters, $perPage);
 
         // Get filter options
         $genres = TaxonomyTerm::whereHas('taxonomy', function ($q) {
@@ -39,7 +38,10 @@ class MangaController extends Controller
         })->withCount('mangas')->get(['id', 'name', 'slug']);
 
         return Inertia::render('Manga/Index', [
-            'manga' => $manga,
+            // Use deferred props for manga list to improve initial page load performance
+            'manga' => Inertia::defer(function () use ($filters, $perPage) {
+                return $this->mangaService->getMangaList($filters, $perPage);
+            }),
             'filters' => $filters,
             'genres' => $genres,
             'statuses' => Manga::getStatuses(),
@@ -159,7 +161,6 @@ class MangaController extends Controller
 
         // Allow user to specify per_page, otherwise use model default (12)
         $perPage = $request->get('per_page');
-        $manga = $this->mangaService->getMangaList($filters, $perPage);
 
         // Cache genres for 1 hour since they don't change frequently
         $genres = Cache::remember('search_genres', config('cache.ttl.search_genres'), function () {
@@ -182,7 +183,10 @@ class MangaController extends Controller
         });
 
         return Inertia::render('Search/Index', [
-            'manga' => $manga,
+            // Use deferred props for search results to improve initial page load performance
+            'manga' => Inertia::defer(function () use ($filters, $perPage) {
+                return $this->mangaService->getMangaList($filters, $perPage);
+            }),
             'query' => $query,
             'filters' => $filters,
             'genres' => $genres,

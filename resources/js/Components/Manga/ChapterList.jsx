@@ -35,7 +35,7 @@ export function ChapterList({ manga, chapters, translations = {} }) {
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-semibold flex items-center gap-2">
                         <BookOpen className="w-5 h-5" />
-                        {t.title || 'Danh sách chương'} ({manga.total_chapters || 0})
+                        {t.title || 'Chapters'} ({manga.total_chapters || 0})
                     </h2>
                 </div>
 
@@ -44,10 +44,10 @@ export function ChapterList({ manga, chapters, translations = {} }) {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-[100px]">{t.chapter_column || 'Chương'}</TableHead>
-                                <TableHead>{t.title_column || 'Tiêu đề'}</TableHead>
-                                <TableHead className="w-[140px]">{t.updated_column || 'Ngày cập nhật'}</TableHead>
-                                <TableHead className="w-[100px] text-right">{t.read_column || 'Đọc'}</TableHead>
+                                <TableHead className="w-[100px]">{t.chapter_column || 'Ch.'}</TableHead>
+                                <TableHead>{t.title_column || 'Chapter'}</TableHead>
+                                <TableHead className="w-[140px]">{t.updated_column || 'Updated At'}</TableHead>
+                                <TableHead className="w-[100px] text-right">{t.read_column || 'Read'}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -96,7 +96,7 @@ export function ChapterList({ manga, chapters, translations = {} }) {
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
                     <BookOpen className="w-5 h-5" />
-                    {t.title || 'Danh sách chương'} ({manga.total_chapters || chapters?.total || 0})
+                    {t.title || 'Chapters'} ({manga.total_chapters || chapters?.total || 0})
                 </h2>
             </div>
 
@@ -105,10 +105,10 @@ export function ChapterList({ manga, chapters, translations = {} }) {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[100px]">{t.chapter_column || 'Chương'}</TableHead>
-                            <TableHead>{t.title_column || 'Tiêu đề'}</TableHead>
-                            <TableHead className="w-[140px]">{t.updated_column || 'Ngày cập nhật'}</TableHead>
-                            <TableHead className="w-[100px] text-right">{t.read_column || 'Đọc'}</TableHead>
+                            <TableHead className="w-[100px]">{t.chapter_column || 'Ch.'}</TableHead>
+                            <TableHead>{t.title_column || 'Chapter'}</TableHead>
+                            <TableHead className="w-[140px]">{t.updated_column || 'Updated At'}</TableHead>
+                            <TableHead className="w-[100px] text-right">{t.read_column || 'Read'}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -202,7 +202,7 @@ export function ChapterList({ manga, chapters, translations = {} }) {
                                     href={chapters.prev_page_url} 
                                     preserveScroll
                                 >
-                                    {t.previous || 'Trước'}
+                                    {t.previous || 'Previous'}
                                 </PaginationPrevious>
                             </PaginationItem>
                         )}
@@ -227,7 +227,7 @@ export function ChapterList({ manga, chapters, translations = {} }) {
                                     href={chapters.next_page_url} 
                                     preserveScroll
                                 >
-                                    {t.next || 'Tiếp'}
+                                    {t.next || 'Next'}
                                 </PaginationNext>
                             </PaginationItem>
                         )}
