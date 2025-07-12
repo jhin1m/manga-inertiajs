@@ -46,7 +46,7 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                     <option key={chap.id} value={chap.id.toString()}>
                         {mobile 
                             ? `${translations.chapter_short || 'Ch.'} ${chap.chapter_number}: ${chap.title}`
-                            : `${translations.chapter_prefix || 'Chương'} ${chap.chapter_number}: ${chap.title}`
+                            : `${translations.chapter_prefix || 'Chapter'} ${chap.chapter_number}: ${chap.title}`
                         }
                     </option>
                 ))}

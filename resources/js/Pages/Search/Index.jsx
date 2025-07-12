@@ -3,7 +3,6 @@ import { Head, Link, router } from '@inertiajs/react';
 import { AppLayout } from '@/Layouts/AppLayout';
 import { Button } from "@/Components/ui/button.jsx";
 import { Card, CardContent } from "@/Components/ui/card.jsx";
-import { Badge } from "@/Components/ui/badge.jsx";
 import { Input } from "@/Components/ui/input.jsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select.jsx";
 import { MangaCard } from "@/Components/Manga/MangaCard.jsx";

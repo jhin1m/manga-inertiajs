@@ -107,7 +107,7 @@ export function HotMangaSlider({ hotManga = [], translations = {} }) {
                 <div className="flex justify-center mt-4 md:hidden">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <ChevronLeft className="h-4 w-4" />
-                        <span>{translations.scroll_hint || 'Vuốt để xem thêm'}</span>
+                        <span>{translations.scroll_hint || 'Swipe to view more'}</span>
                         <ChevronRight className="h-4 w-4" />
                     </div>
                 </div>

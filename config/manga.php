@@ -7,7 +7,7 @@ return [
     ],
     
     'thresholds' => [
-        'hot_manga_views' => env('MANGA_HOT_VIEWS', 1000),
+        'hot_manga_views' => env('MANGA_HOT_VIEWS', 0),
         'recommended_rating' => env('MANGA_RECOMMENDED_RATING', 4.0),
         'hot_manga_view_weight' => env('MANGA_HOT_VIEW_WEIGHT', 0.7),
         'hot_manga_rating_weight' => env('MANGA_HOT_RATING_WEIGHT', 0.3),
@@ -15,7 +15,6 @@ return [
     
     'limits' => [
         'recent_chapters' => env('MANGA_RECENT_CHAPTERS', 3),
-        'latest_chapter' => env('MANGA_LATEST_CHAPTER', 1),
         'popular_display' => env('MANGA_POPULAR_DISPLAY', 10),
         'top_genres' => env('MANGA_TOP_GENRES', 20),
     ],

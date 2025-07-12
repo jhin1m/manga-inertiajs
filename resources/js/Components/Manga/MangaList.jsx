@@ -164,12 +164,9 @@ export function MangaList({
 
     // List item component for horizontal layout
     const MangaListItem = ({ manga }) => {
-        // Get chapters to display (use recent_chapters if available, otherwise latest_chapter)
         const chaptersToShow =
             manga.recent_chapters?.length > 0
                 ? manga.recent_chapters
-                : manga.latest_chapter
-                ? [manga.latest_chapter]
                 : [];
 
         return (

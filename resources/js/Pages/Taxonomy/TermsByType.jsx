@@ -5,7 +5,7 @@ import { Button } from "@/Components/ui/button.jsx";
 import { Card, CardContent } from "@/Components/ui/card.jsx";
 import { MangaList } from '@/Components/Manga/MangaList';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { Grid, List, Search, BookOpen, Tag, User, Palette, Hash } from 'lucide-react';
+import { Grid, List, BookOpen, Tag, User, Palette, Hash } from 'lucide-react';
 
 const getTypeIcon = (type) => {
     switch (type) {

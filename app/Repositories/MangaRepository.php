@@ -18,7 +18,7 @@ class MangaRepository implements MangaRepositoryInterface
                 'chapters' => function ($query) {
                     $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug', 'updated_at')
                         ->orderBy('chapter_number', 'desc')
-                        ->limit(config('manga.limits.latest_chapter'));
+                        ->limit(config('manga.limits.recent_chapters'));
                 }
             ])
             ->where('views', '>', config('manga.thresholds.hot_manga_views'))
@@ -37,12 +37,14 @@ class MangaRepository implements MangaRepositoryInterface
                 'slug' => $manga->slug,
                 'cover' => $manga->cover,
                 'status' => $manga->status,
-                'latest_chapter' => $manga->chapters->first() ? [
-                    'chapter_number' => $manga->chapters->first()->chapter_number,
-                    'title' => $manga->chapters->first()->title,
-                    'slug' => $manga->chapters->first()->slug,
-                    'updated_at' => $manga->chapters->first()->updated_at->format('Y-m-d')
-                ] : null
+                'recent_chapters' => $manga->chapters->map(function ($chapter) {
+                    return [
+                        'chapter_number' => $chapter->chapter_number,
+                        'title' => $chapter->title,
+                        'slug' => $chapter->slug,
+                        'updated_at' => $chapter->updated_at,
+                    ];
+                }),
             ];
         });
 

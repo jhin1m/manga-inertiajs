@@ -2,13 +2,11 @@ import React from 'react';
 import { Link } from '@inertiajs/react';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
-import { BookOpen } from 'lucide-react';
 import { formatRelativeTime } from '@/lib/formatters';
 import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx';
 
 export function MangaCard({ 
     manga, 
-    variant = 'default', 
     className = '', 
     priority = false,
     translations = {}
@@ -20,7 +18,6 @@ export function MangaCard({
         status,
         status_label,
         recent_chapters = [],
-        latest_chapter
     } = manga;
 
     const statusVariants = {
@@ -33,9 +30,8 @@ export function MangaCard({
 
     const statusConfig = statusVariants[status] || { variant: 'outline' };
 
-    // Sử dụng recent_chapters nếu có, nếu không thì dùng latest_chapter
-    const chaptersToShow = recent_chapters.length > 0 ? recent_chapters : 
-        (latest_chapter ? [latest_chapter] : []);
+    // Change this to only show recent chapters only if they exist
+    const chaptersToShow = recent_chapters.length > 0 ? recent_chapters : [];
 
     return (
         <Card className={`group hover:shadow-lg transition-all duration-300 ${className}`}>
@@ -68,7 +64,7 @@ export function MangaCard({
             <CardContent className="p-3 sm:p-4">
                 {/* Title */}
                 <Link href={route('manga.show', slug)}>
-                    <h3 className="font-semibold text-sm sm:text-base line-clamp-2 mb-3 group-hover:text-primary transition-colors">
+                    <h3 className="font-semibold text-sm sm:text-base line-clamp-2 mb-3 group-hover:text-primary transition-colors h-8 sm:h-11">
                         {name}
                     </h3>
                 </Link>

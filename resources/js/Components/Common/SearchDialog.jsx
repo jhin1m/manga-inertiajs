@@ -18,8 +18,6 @@ import { VisuallyHidden } from "@/Components/ui/visually-hidden.jsx";
 import { Badge } from "@/Components/ui/badge.jsx";
 import { 
     Search, 
-    BookOpen, 
-    User, 
     Tag, 
     TrendingUp,
     Clock

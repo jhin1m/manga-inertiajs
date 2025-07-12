@@ -21,7 +21,7 @@ export const getDefaultCover = (size = 'default', type = 'book') => {
     const IconComponent = type === 'image' ? Image : BookOpen;
     
     return (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 px-9">
             <IconComponent className={`${sizeClasses[size]} text-gray-400`} />
         </div>
     );

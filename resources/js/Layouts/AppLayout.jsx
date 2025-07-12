@@ -56,15 +56,15 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
     }, []);
 
     const navigationItems = [
-        { name: layoutTranslations.home || 'Trang chủ', href: route('home'), icon: Home, current: route().current('home') },
-        { name: layoutTranslations.library || 'Thư viện', href: route('manga.index'), icon: Library, current: route().current('manga.*') },
-        { name: layoutTranslations.search || 'Tìm kiếm', href: route('search'), icon: Search, current: route().current('search') },
+        { name: layoutTranslations.home || 'Home', href: route('home'), icon: Home, current: route().current('home') },
+        { name: layoutTranslations.library || 'Library', href: route('manga.index'), icon: Library, current: route().current('manga.*') },
+        { name: layoutTranslations.search || 'Search', href: route('search'), icon: Search, current: route().current('search') },
     ];
 
     const userMenuItems = user ? [
-        { name: layoutTranslations.favorites || 'Yêu thích', href: route('favorites'), icon: Heart },
-        { name: layoutTranslations.history || 'Lịch sử', href: route('history'), icon: History },
-        { name: layoutTranslations.ratings || 'Đánh giá', href: route('ratings'), icon: Star },
+        { name: layoutTranslations.favorites || 'Favorites', href: route('favorites'), icon: Heart },
+        { name: layoutTranslations.history || 'History', href: route('history'), icon: History },
+        { name: layoutTranslations.ratings || 'Ratings', href: route('ratings'), icon: Star },
     ] : [];
 
     return (
@@ -110,7 +110,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                 onClick={() => setSearchOpen(true)}
                             >
                                 <Search className="mr-2 h-4 w-4" />
-                                <span className="flex-1 text-left">{layoutTranslations.search_placeholder || 'Tìm kiếm manga...'}</span>
+                                <span className="flex-1 text-left">{layoutTranslations.search_placeholder || 'Search manga...'}</span>
                                 <kbd className="pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 hidden sm:flex">
                                     <span className="text-xs">⌘</span>K
                                 </kbd>
@@ -127,7 +127,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                 onClick={() => setSearchOpen(true)}
                             >
                                 <Search className="h-5 w-5" />
-                                <span className="sr-only">{layoutTranslations.search || 'Tìm kiếm'}</span>
+                                <span className="sr-only">{layoutTranslations.search || 'Search'}</span>
                             </Button>
 
                             {user ? (
@@ -164,7 +164,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                             <DropdownMenuItem asChild>
                                                 <Link href={route('profile.edit')} className="flex items-center">
                                                     <Settings className="mr-2 h-4 w-4" />
-                                                    <span>{layoutTranslations.settings || 'Cài đặt'}</span>
+                                                    <span>{layoutTranslations.settings || 'Settings'}</span>
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
@@ -175,7 +175,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                                     className="flex items-center w-full"
                                                 >
                                                     <LogOut className="mr-2 h-4 w-4" />
-                                                    <span>{layoutTranslations.logout || 'Đăng xuất'}</span>
+                                                    <span>{layoutTranslations.logout || 'Logout'}</span>
                                                 </Link>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
@@ -184,10 +184,10 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                             ) : (
                                 <div className="hidden md:flex items-center space-x-2">
                                     <Button variant="ghost" asChild>
-                                        <Link href={route('login')}>{layoutTranslations.login || 'Đăng nhập'}</Link>
+                                        <Link href={route('login')}>{layoutTranslations.login || 'Login'}</Link>
                                     </Button>
                                     <Button asChild>
-                                        <Link href={route('register')}>{layoutTranslations.register || 'Đăng ký'}</Link>
+                                        <Link href={route('register')}>{layoutTranslations.register || 'Register'}</Link>
                                     </Button>
                                 </div>
                             )}
@@ -201,7 +201,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                         size="icon"
                                     >
                                         <Menu className="h-5 w-5" />
-                                        <span className="sr-only">{layoutTranslations.toggle_menu || 'Mở/đóng menu'}</span>
+                                        <span className="sr-only">{layoutTranslations.toggle_menu || 'Toggle menu'}</span>
                                     </Button>
                                 </SheetTrigger>
                                 <SheetContent side="right" className="w-[300px] sm:w-[400px]">
@@ -272,7 +272,7 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                                     <Button variant="ghost" className="w-full justify-start" asChild>
                                                         <Link href={route('profile.edit')}>
                                                             <Settings className="mr-2 h-4 w-4" />
-                                                            {layoutTranslations.settings || 'Cài đặt'}
+                                                            {layoutTranslations.settings || 'Settings'}
                                                         </Link>
                                                     </Button>
                                                     <Button variant="ghost" className="w-full justify-start" asChild>
@@ -289,10 +289,10 @@ export function AppLayout({ children, header, breadcrumbItems = [], hideHeader =
                                             ) : (
                                                 <div className="space-y-2">
                                                     <Button className="w-full" asChild>
-                                                        <Link href={route('login')}>{layoutTranslations.login || 'Đăng nhập'}</Link>
+                                                        <Link href={route('login')}>{layoutTranslations.login || 'Login'}</Link>
                                                     </Button>
                                                     <Button variant="outline" className="w-full" asChild>
-                                                        <Link href={route('register')}>{layoutTranslations.register || 'Đăng ký'}</Link>
+                                                        <Link href={route('register')}>{layoutTranslations.register || 'Register'}</Link>
                                                     </Button>
                                                 </div>
                                             )}

@@ -2,8 +2,7 @@ import { Link } from '@inertiajs/react';
 import { Badge } from "@/Components/ui/badge.jsx";
 import { Separator } from "@/Components/ui/separator.jsx";
 import { 
-    BookOpen, 
-    Heart
+    BookOpen
 } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
