@@ -8,13 +8,14 @@ import { formatRelativeTime } from "@/lib/formatters";
 import { Loader2 } from "lucide-react";
 
 export function MangaList({
-    mangas = [],
+    mangas,
     variant = "grid",
     columns = "auto",
     className = "",
     showEmpty = true,
     emptyMessage = null,
     translations = {},
+    isLoading = false,
 }) {
     const defaultEmptyMessage = emptyMessage || translations.empty_message || 'Hello World!';
     
@@ -27,7 +28,7 @@ export function MangaList({
     };
     
     // Loading state for deferred props
-    if (mangas === undefined) {
+    if (mangas === undefined || isLoading) {
         return (
             <div>
                 {/* Loading Skeleton - Grid variant */}
@@ -71,16 +72,58 @@ export function MangaList({
                     </div>
                 )}
 
+                {/* Loading Skeleton - Compact variant */}
+                {variant === "compact" && (
+                    <div className={`grid ${getGridColumns()} gap-3 ${className}`}>
+                        {Array.from({ length: 8 }).map((_, index) => (
+                            <Card key={index} className="overflow-hidden">
+                                <div className="aspect-[3/4] bg-muted">
+                                    <Skeleton className="w-full h-full" />
+                                </div>
+                                <div className="p-2 space-y-1">
+                                    <Skeleton className="h-3 w-full" />
+                                    <Skeleton className="h-3 w-2/3" />
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+
+                {/* Loading Skeleton - Featured variant */}
+                {variant === "featured" && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {Array.from({ length: 6 }).map((_, index) => (
+                            <Card key={index} className="overflow-hidden">
+                                <div className="aspect-[3/4] bg-muted">
+                                    <Skeleton className="w-full h-full" />
+                                </div>
+                                <div className="p-4 space-y-3">
+                                    <Skeleton className="h-5 w-full" />
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-3 w-full" />
+                                        <Skeleton className="h-3 w-4/5" />
+                                        <Skeleton className="h-3 w-3/5" />
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <Skeleton className="h-4 w-16" />
+                                        <Skeleton className="h-4 w-12" />
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+
                 {/* Loading indicator */}
                 <div className="flex items-center justify-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                    <span className="text-muted-foreground">...</span>
+                    <span className="text-muted-foreground">{translations.loading || 'Loading...'}</span>
                 </div>
             </div>
         );
     }
 
-    if (!mangas.length && showEmpty) {
+    if (!mangas?.length && showEmpty) {
         return (
             <div className="flex flex-col items-center justify-center py-12 text-center">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -210,7 +253,7 @@ export function MangaList({
 
     return (
         <div className={`${getListVariant()} ${className}`}>
-            {mangas.map((manga) =>
+            {mangas?.map((manga) =>
                 variant === "list" ? (
                     <MangaListItem key={manga.id} manga={manga} />
                 ) : (
@@ -222,7 +265,7 @@ export function MangaList({
                         translations={translations}
                     />
                 )
-            )}
+            ) || []}
         </div>
     );
 }

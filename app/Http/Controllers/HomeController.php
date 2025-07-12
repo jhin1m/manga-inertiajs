@@ -16,21 +16,11 @@ class HomeController extends Controller
     public function index()
     {
         $data = $this->homePageService->getHomePageData();
+        $data['seo'] = $this->seoService->forHome();
         
-        return Inertia::render('Home', [
-            'canLogin' => $data['canLogin'],
-            'canRegister' => $data['canRegister'],
-            'hotManga' => $data['hotManga'],
-            // Use deferred props for latestUpdates to improve initial page load performance
-            'latestUpdates' => Inertia::defer(function () {
-                return $this->homePageService->getCachedLatestUpdates();
-            }),
-            'featuredManga' => $data['featuredManga'],
-            'rankings' => $data['rankings'],
-            'recentComments' => $data['recentComments'],
-            'recommended' => $data['recommended'],
-            'seo' => $this->seoService->forHome(),
-            'translations' => $data['translations'],
-        ]);
+        // Convert latestUpdates to use defer mechanism
+        $data['latestUpdates'] = Inertia::defer(fn() => $this->homePageService->getCachedLatestUpdates());
+        
+        return Inertia::render('Home', $data);
     }
 }

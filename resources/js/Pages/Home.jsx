@@ -8,7 +8,7 @@ import { Link } from '@inertiajs/react';
 
 export default function Home({
     hotManga = [],
-    latestUpdates = [],
+    latestUpdates,
     rankings = [],
     recommended = [],
     seo,
@@ -44,6 +44,7 @@ export default function Home({
                             mangas={latestUpdates}
                             variant="grid"
                             className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+                            translations={translations}
                         />
                         
                         <div className="flex justify-center mt-8">

@@ -38,10 +38,7 @@ class MangaController extends Controller
         })->withCount('mangas')->get(['id', 'name', 'slug']);
 
         return Inertia::render('Manga/Index', [
-            // Use deferred props for manga list to improve initial page load performance
-            'manga' => Inertia::defer(function () use ($filters, $perPage) {
-                return $this->mangaService->getMangaList($filters, $perPage);
-            }),
+            'manga' => Inertia::defer(fn() => $this->mangaService->getMangaList($filters, $perPage)),
             'filters' => $filters,
             'genres' => $genres,
             'statuses' => Manga::getStatuses(),
@@ -182,11 +179,10 @@ class MangaController extends Controller
                 ->get(['id', 'name', 'slug']);
         });
 
+        $manga = $this->mangaService->getMangaList($filters, $perPage);
+
         return Inertia::render('Search/Index', [
-            // Use deferred props for search results to improve initial page load performance
-            'manga' => Inertia::defer(function () use ($filters, $perPage) {
-                return $this->mangaService->getMangaList($filters, $perPage);
-            }),
+            'manga' => $manga,
             'query' => $query,
             'filters' => $filters,
             'genres' => $genres,

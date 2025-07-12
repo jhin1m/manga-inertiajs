@@ -18,6 +18,7 @@ class HomePageService
             'canLogin' => \Route::has('login'),
             'canRegister' => \Route::has('register'),
             'hotManga' => $this->getCachedHotManga(),
+            // latestUpdates now handled via defer in controller
             'featuredManga' => [],
             'rankings' => $this->getCachedRankings(),
             'recentComments' => [],

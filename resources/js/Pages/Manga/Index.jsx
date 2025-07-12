@@ -94,13 +94,15 @@ export default function MangaIndex({
 
                     <main>
                         <MangaList
-                            mangas={manga?.data || []}
+                            mangas={manga?.data}
                             variant={viewMode}
                             columns={viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4' : 'auto'}
                             showEmpty={false}
+                            translations={translations}
+                            isLoading={manga === undefined}
                         />
 
-                        {(!manga?.data || manga.data.length === 0) && (
+                        {manga && manga.data.length === 0 && (
                             <Card className="text-center py-12">
                                 <CardContent>
                                     <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
