@@ -4,6 +4,7 @@ import { MangaList } from '@/Components/Manga';
 import { HotMangaSlider, RankingsCard, RecommendedCard } from '@/Components/Home';
 import SeoHead from '@/Components/SeoHead';
 import { ArrowRight } from 'lucide-react';
+import { Link } from '@inertiajs/react';
 
 export default function Home({
     hotManga = [],
@@ -32,10 +33,10 @@ export default function Home({
                                 </h2>
                             </div>
                             <Button variant="outline" asChild>
-                                <a href="/manga?sort=latest">
+                                <Link href="/manga?sort=latest">
                                     {translations.view_all}
                                     <ArrowRight className="ml-2 h-4 w-4" />
-                                </a>
+                                </Link>
                             </Button>
                         </div>
 
@@ -44,6 +45,15 @@ export default function Home({
                             variant="grid"
                             className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
                         />
+                        
+                        <div className="flex justify-center mt-8">
+                            <Button variant="outline" asChild>
+                                <Link href="/manga">
+                                    {translations.view_all || 'View All'}
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
+                            </Button>
+                        </div>
                     </section>
 
                     {/* Sidebar */}

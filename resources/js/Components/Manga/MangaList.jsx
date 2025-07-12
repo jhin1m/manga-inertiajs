@@ -141,7 +141,7 @@ export function MangaList({
                                 ))}
                             {chaptersToShow.length === 0 && (
                                 <div className="text-xs text-muted-foreground">
-                                    {translations.no_chapters || 'Chưa có chapter'}
+                                    {translations.no_chapters || 'No chapters yet'}
                                 </div>
                             )}
                         </div>
