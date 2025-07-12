@@ -15,6 +15,7 @@ class Page extends Model
         'chapter_id',
         'page_number',
         'image_url',
+        'image_url_2',
     ];
 
     protected $casts = [
@@ -45,5 +46,25 @@ class Page extends Model
                     ->where('page_number', '<', $this->page_number)
                     ->orderBy('page_number', 'desc')
                     ->first();
+    }
+
+    public function getAvailableImageUrls(): array
+    {
+        $urls = [];
+        
+        if ($this->image_url) {
+            $urls[] = $this->image_url;
+        }
+        
+        if ($this->image_url_2) {
+            $urls[] = $this->image_url_2;
+        }
+        
+        return $urls;
+    }
+
+    public function getPrimaryImageUrl(): ?string
+    {
+        return $this->image_url ?: $this->image_url_2;
     }
 }
