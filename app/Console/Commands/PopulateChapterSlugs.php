@@ -27,36 +27,37 @@ class PopulateChapterSlugs extends Command
     public function handle()
     {
         $force = $this->option('force');
-        
+
         $query = Chapter::query();
-        
-        if (!$force) {
+
+        if (! $force) {
             $query->whereNull('slug');
         }
-        
+
         $chapters = $query->get();
-        
+
         if ($chapters->isEmpty()) {
             $this->info('No chapters need slug population.');
+
             return;
         }
-        
+
         $this->info("Found {$chapters->count()} chapters to update.");
-        
+
         $bar = $this->output->createProgressBar($chapters->count());
         $bar->start();
-        
+
         foreach ($chapters as $chapter) {
             $slug = Chapter::generateSlug(floatval($chapter->chapter_number), $chapter->manga_id);
-            
+
             // Update without triggering model events to avoid infinite loop
             Chapter::withoutEvents(function () use ($chapter, $slug) {
                 $chapter->update(['slug' => $slug]);
             });
-            
+
             $bar->advance();
         }
-        
+
         $bar->finish();
         $this->newLine();
         $this->info('Chapter slugs populated successfully!');

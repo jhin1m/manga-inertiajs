@@ -2,41 +2,41 @@
 
 namespace App\Services;
 
-use App\Models\Manga;
 use App\Models\Chapter;
+use App\Models\Manga;
 use App\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class SearchService
 {
-    public function searchAll(string $query, int $perPage = null): array
+    public function searchAll(string $query, ?int $perPage = null): array
     {
         $perPage = $perPage ?? config('search.pagination.per_page');
-        
+
         return [
             'manga' => $this->searchManga($query, $perPage),
             'chapters' => $this->searchChapters($query, $perPage),
-            'terms' => $this->searchTaxonomyTerms($query, $perPage)
+            'terms' => $this->searchTaxonomyTerms($query, $perPage),
         ];
     }
 
-    public function searchManga(string $query, int $perPage = null): LengthAwarePaginator
+    public function searchManga(string $query, ?int $perPage = null): LengthAwarePaginator
     {
         $perPage = $perPage ?? config('search.pagination.per_page');
-        
+
         return Manga::with(['taxonomyTerms.taxonomy', 'chapters'])
             ->withCount('chapters')
             ->where(function ($q) use ($query) {
                 $q->where('title', 'like', "%{$query}%")
-                  ->orWhere('description', 'like', "%{$query}%")
-                  ->orWhere('author', 'like', "%{$query}%")
-                  ->orWhere('artist', 'like', "%{$query}%");
+                    ->orWhere('description', 'like', "%{$query}%")
+                    ->orWhere('author', 'like', "%{$query}%")
+                    ->orWhere('artist', 'like', "%{$query}%");
             })
             ->orWhereHas('taxonomyTerms', function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%");
             })
-            ->orderByRaw("
+            ->orderByRaw('
                 CASE 
                     WHEN title LIKE ? THEN 1
                     WHEN author LIKE ? THEN 2
@@ -44,131 +44,117 @@ class SearchService
                     WHEN description LIKE ? THEN 4
                     ELSE 5
                 END
-            ", ["%{$query}%", "%{$query}%", "%{$query}%", "%{$query}%"])
+            ', ["%{$query}%", "%{$query}%", "%{$query}%", "%{$query}%"])
             ->orderBy('views', 'desc')
             ->paginate($perPage);
     }
 
-    public function searchChapters(string $query, int $perPage = null): LengthAwarePaginator
+    public function searchChapters(string $query, ?int $perPage = null): LengthAwarePaginator
     {
         $perPage = $perPage ?? config('search.pagination.per_page');
-        
+
         return Chapter::with(['manga'])
             ->where('title', 'like', "%{$query}%")
             ->orWhereHas('manga', function ($q) use ($query) {
                 $q->where('title', 'like', "%{$query}%");
             })
-            ->orderByRaw("
+            ->orderByRaw('
                 CASE 
                     WHEN title LIKE ? THEN 1
                     ELSE 2
                 END
-            ", ["%{$query}%"])
+            ', ["%{$query}%"])
             ->orderBy('published_at', 'desc')
             ->paginate($perPage);
     }
 
-    public function searchTaxonomyTerms(string $query, int $perPage = null): LengthAwarePaginator
+    public function searchTaxonomyTerms(string $query, ?int $perPage = null): LengthAwarePaginator
     {
         $perPage = $perPage ?? config('search.pagination.per_page');
-        
+
         return TaxonomyTerm::with(['taxonomy'])
             ->withCount('manga')
             ->where('name', 'like', "%{$query}%")
-            ->orderByRaw("
+            ->orderByRaw('
                 CASE 
                     WHEN name LIKE ? THEN 1
                     ELSE 2
                 END
-            ", ["%{$query}%"])
+            ', ["%{$query}%"])
             ->orderBy('manga_count', 'desc')
             ->paginate($perPage);
     }
 
-    public function advancedMangaSearch(array $criteria, int $perPage = null): LengthAwarePaginator
+    public function advancedMangaSearch(array $criteria, ?int $perPage = null): LengthAwarePaginator
     {
         $perPage = $perPage ?? config('search.pagination.per_page');
-        
+
         $query = Manga::with(['taxonomyTerms.taxonomy', 'chapters'])
             ->withCount('chapters');
 
         // Text search
-        if (!empty($criteria['search'])) {
+        if (! empty($criteria['search'])) {
             $search = $criteria['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('author', 'like', "%{$search}%")
-                  ->orWhere('artist', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('author', 'like', "%{$search}%")
+                    ->orWhere('artist', 'like', "%{$search}%");
             });
         }
 
         // Genre filter
-        if (!empty($criteria['genres'])) {
+        if (! empty($criteria['genres'])) {
             $genres = is_array($criteria['genres']) ? $criteria['genres'] : [$criteria['genres']];
             $query->whereHas('taxonomyTerms', function ($q) use ($genres) {
                 $q->whereIn('slug', $genres)
-                  ->whereHas('taxonomy', function ($taxonomy) {
-                      $taxonomy->where('type', 'genre');
-                  });
+                    ->whereHas('taxonomy', function ($taxonomy) {
+                        $taxonomy->where('type', 'genre');
+                    });
             });
         }
 
         // Author filter
-        if (!empty($criteria['authors'])) {
+        if (! empty($criteria['authors'])) {
             $authors = is_array($criteria['authors']) ? $criteria['authors'] : [$criteria['authors']];
             $query->whereHas('taxonomyTerms', function ($q) use ($authors) {
                 $q->whereIn('slug', $authors)
-                  ->whereHas('taxonomy', function ($taxonomy) {
-                      $taxonomy->where('type', 'author');
-                  });
+                    ->whereHas('taxonomy', function ($taxonomy) {
+                        $taxonomy->where('type', 'author');
+                    });
             });
         }
 
         // Status filter
-        if (!empty($criteria['status'])) {
+        if (! empty($criteria['status'])) {
             $statuses = is_array($criteria['status']) ? $criteria['status'] : [$criteria['status']];
             $query->whereIn('status', $statuses);
         }
 
-        // Rating filter
-        if (!empty($criteria['min_rating'])) {
-            $query->where('rating', '>=', $criteria['min_rating']);
-        }
-
-        if (!empty($criteria['max_rating'])) {
-            $query->where('rating', '<=', $criteria['max_rating']);
-        }
-
-        // Minimum ratings count filter
-        if (!empty($criteria['min_total_rating'])) {
-            $query->where('total_rating', '>=', $criteria['min_total_rating']);
-        }
-
         // Publication year filter
-        if (!empty($criteria['year_from'])) {
+        if (! empty($criteria['year_from'])) {
             $query->where('publication_year', '>=', $criteria['year_from']);
         }
 
-        if (!empty($criteria['year_to'])) {
+        if (! empty($criteria['year_to'])) {
             $query->where('publication_year', '<=', $criteria['year_to']);
         }
 
         // Chapter count filter
-        if (!empty($criteria['min_chapters'])) {
+        if (! empty($criteria['min_chapters'])) {
             $query->having('chapters_count', '>=', $criteria['min_chapters']);
         }
 
-        if (!empty($criteria['max_chapters'])) {
+        if (! empty($criteria['max_chapters'])) {
             $query->having('chapters_count', '<=', $criteria['max_chapters']);
         }
 
         // Exclude completed/ongoing
-        if (!empty($criteria['exclude_completed'])) {
+        if (! empty($criteria['exclude_completed'])) {
             $query->where('status', '!=', 'completed');
         }
 
-        if (!empty($criteria['exclude_ongoing'])) {
+        if (! empty($criteria['exclude_ongoing'])) {
             $query->where('status', '!=', 'ongoing');
         }
 
@@ -178,10 +164,10 @@ class SearchService
         return $query->paginate($perPage)->withQueryString();
     }
 
-    public function getSearchSuggestions(string $query, int $limit = null): array
+    public function getSearchSuggestions(string $query, ?int $limit = null): array
     {
         $limit = $limit ?? config('search.pagination.suggestions_limit');
-        
+
         $mangaTitles = Manga::where('title', 'like', "%{$query}%")
             ->limit($limit)
             ->pluck('title')
@@ -196,8 +182,8 @@ class SearchService
             ->toArray();
 
         $genres = TaxonomyTerm::whereHas('taxonomy', function ($q) {
-                $q->where('type', 'genre');
-            })
+            $q->where('type', 'genre');
+        })
             ->where('name', 'like', "%{$query}%")
             ->limit($limit)
             ->pluck('name')
@@ -206,30 +192,7 @@ class SearchService
         return [
             'manga' => $mangaTitles,
             'authors' => $authors,
-            'genres' => $genres
-        ];
-    }
-
-    public function getPopularSearches(int $limit = null): array
-    {
-        $limit = $limit ?? config('search.pagination.popular_limit');
-        
-        // This would typically be stored in a separate table tracking search queries
-        // For now, return popular manga titles and genres
-        return [
-            'manga' => Manga::orderBy('views', 'desc')
-                ->limit($limit)
-                ->pluck('title')
-                ->toArray(),
-            
-            'genres' => TaxonomyTerm::whereHas('taxonomy', function ($q) {
-                    $q->where('type', 'genre');
-                })
-                ->withCount('manga')
-                ->orderBy('manga_count', 'desc')
-                ->limit($limit)
-                ->pluck('name')
-                ->toArray()
+            'genres' => $genres,
         ];
     }
 
@@ -237,15 +200,15 @@ class SearchService
     {
         return [
             'genres' => TaxonomyTerm::whereHas('taxonomy', function ($q) {
-                    $q->where('type', 'genre');
-                })
+                $q->where('type', 'genre');
+            })
                 ->withCount('manga')
                 ->orderBy('name')
                 ->get(['id', 'name', 'slug', 'manga_count']),
 
             'authors' => TaxonomyTerm::whereHas('taxonomy', function ($q) {
-                    $q->where('type', 'author');
-                })
+                $q->where('type', 'author');
+            })
                 ->withCount('manga')
                 ->orderBy('name')
                 ->get(['id', 'name', 'slug', 'manga_count']),
@@ -259,13 +222,6 @@ class SearchService
                 ->filter()
                 ->values(),
 
-            'rating_ranges' => [
-                ['min' => config('search.rating_filters.excellent.min'), 'max' => config('search.rating_filters.excellent.max'), 'label' => config('search.rating_filters.excellent.min') . ' - ' . config('search.rating_filters.excellent.max')],
-                ['min' => config('search.rating_filters.very_good.min'), 'max' => config('search.rating_filters.very_good.max'), 'label' => config('search.rating_filters.very_good.min') . ' - ' . config('search.rating_filters.very_good.max')],
-                ['min' => config('search.rating_filters.good.min'), 'max' => config('search.rating_filters.good.max'), 'label' => config('search.rating_filters.good.min') . ' - ' . config('search.rating_filters.good.max')],
-                ['min' => config('search.rating_filters.average.min'), 'max' => config('search.rating_filters.average.max'), 'label' => config('search.rating_filters.average.min') . ' - ' . config('search.rating_filters.average.max')],
-                ['min' => config('search.rating_filters.poor.min'), 'max' => config('search.rating_filters.poor.max'), 'label' => 'Dưới ' . config('search.rating_filters.below_average.min')]
-            ]
         ];
     }
 
@@ -301,9 +257,9 @@ class SearchService
                 break;
             case 'relevance':
             default:
-                if (!empty($criteria['search'])) {
+                if (! empty($criteria['search'])) {
                     $search = $criteria['search'];
-                    $query->orderByRaw("
+                    $query->orderByRaw('
                         CASE 
                             WHEN title LIKE ? THEN 1
                             WHEN author LIKE ? THEN 2
@@ -311,10 +267,10 @@ class SearchService
                             WHEN description LIKE ? THEN 4
                             ELSE 5
                         END
-                    ", ["%{$search}%", "%{$search}%", "%{$search}%", "%{$search}%"]);
+                    ', ["%{$search}%", "%{$search}%", "%{$search}%", "%{$search}%"]);
                 }
                 $query->orderBy('views', 'desc');
                 break;
         }
     }
-} 
+}

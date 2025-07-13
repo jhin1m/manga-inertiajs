@@ -8,9 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MangaCard } from "@/Components/Manga/MangaCard.jsx";
 import { 
     Search, 
-    BookOpen, 
-    TrendingUp,
-    Tag,
     Filter,
     X
 } from 'lucide-react';
@@ -21,14 +18,12 @@ export default function SearchIndex({
     filters = {}, 
     genres = [], 
     statuses = [],
-    popularManga = [],
     translations = {}
 }) {
     const [searchQuery, setSearchQuery] = useState(query);
     const [selectedGenres, setSelectedGenres] = useState(filters.genres || []);
     const [selectedStatus, setSelectedStatus] = useState(filters.status || 'all');
     const [selectedSort, setSelectedSort] = useState(filters.sortBy || 'latest');
-    const [minRating, setMinRating] = useState(filters.rating || 0);
     const [showFilters, setShowFilters] = useState(false);
 
     const handleSearch = () => {
@@ -50,9 +45,6 @@ export default function SearchIndex({
             params.set('sortBy', selectedSort);
         }
         
-        if (minRating > 0) {
-            params.set('rating', minRating);
-        }
 
         router.visit(route('search') + '?' + params.toString());
     };
@@ -67,7 +59,6 @@ export default function SearchIndex({
         setSelectedGenres([]);
         setSelectedStatus('all');
         setSelectedSort('latest');
-        setMinRating(0);
         router.visit(route('search', searchQuery ? { q: searchQuery } : {}));
     };
 
@@ -79,7 +70,7 @@ export default function SearchIndex({
         );
     };
 
-    const hasFilters = selectedGenres.length > 0 || (selectedStatus && selectedStatus !== 'all') || selectedSort !== 'latest' || minRating > 0;
+    const hasFilters = selectedGenres.length > 0 || (selectedStatus && selectedStatus !== 'all') || selectedSort !== 'latest';
 
     return (
         <AppLayout>
@@ -181,20 +172,6 @@ export default function SearchIndex({
                                         </Select>
                                     </div>
 
-                                    {/* Rating */}
-                                    <div>
-                                        <label className="text-sm font-medium mb-2 block">
-                                            {translations.min_rating || 'Min Rating'}
-                                        </label>
-                                        <Input
-                                            type="number"
-                                            min="0"
-                                            max="10"
-                                            step="0.1"
-                                            value={minRating}
-                                            onChange={(e) => setMinRating(parseFloat(e.target.value) || 0)}
-                                        />
-                                    </div>
                                 </div>
 
                                 <div className="flex justify-between items-center mt-4">
@@ -257,54 +234,8 @@ export default function SearchIndex({
                         )}
                     </div>
                 ) : (
-                    /* No Search Query - Show Popular */
+                    /* No Search Query - Show Search Tips */
                     <div className="space-y-8">
-                        <div>
-                            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                                <TrendingUp className="h-5 w-5 text-primary" />
-                                {translations.popular_manga || 'Popular Manga'}
-                            </h2>
-                            <div className="flex flex-wrap gap-2">
-                                {popularManga.map((manga) => (
-                                    <Button
-                                        key={manga.id}
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => {
-                                            setSearchQuery(manga.title);
-                                            router.visit(route('search', { q: manga.title }));
-                                        }}
-                                    >
-                                        <BookOpen className="h-3 w-3 mr-1" />
-                                        {manga.title}
-                                    </Button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div>
-                            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                                <Tag className="h-5 w-5 text-primary" />
-                                {translations.popular_genres || 'Popular Genres'}
-                            </h2>
-                            <div className="flex flex-wrap gap-2">
-                                {genres.slice(0, 10).map((genre) => (
-                                    <Button
-                                        key={genre.id}
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => {
-                                            setSelectedGenres([genre.id]);
-                                            router.visit(route('search') + `?genres[]=${genre.id}`);
-                                        }}
-                                    >
-                                        <Tag className="h-3 w-3 mr-1" />
-                                        {genre.name}
-                                    </Button>
-                                ))}
-                            </div>
-                        </div>
-
                         <Card>
                             <CardContent className="p-6">
                                 <h3 className="text-lg font-semibold mb-2">

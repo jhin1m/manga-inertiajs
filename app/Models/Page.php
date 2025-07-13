@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
 
 class Page extends Model
 {
@@ -35,31 +35,31 @@ class Page extends Model
     public function getNextPageAttribute()
     {
         return $this->chapter->pages()
-                    ->where('page_number', '>', $this->page_number)
-                    ->orderBy('page_number')
-                    ->first();
+            ->where('page_number', '>', $this->page_number)
+            ->orderBy('page_number')
+            ->first();
     }
 
     public function getPreviousPageAttribute()
     {
         return $this->chapter->pages()
-                    ->where('page_number', '<', $this->page_number)
-                    ->orderBy('page_number', 'desc')
-                    ->first();
+            ->where('page_number', '<', $this->page_number)
+            ->orderBy('page_number', 'desc')
+            ->first();
     }
 
     public function getAvailableImageUrls(): array
     {
         $urls = [];
-        
+
         if ($this->image_url) {
             $urls[] = $this->image_url;
         }
-        
+
         if ($this->image_url_2) {
             $urls[] = $this->image_url_2;
         }
-        
+
         return $urls;
     }
 

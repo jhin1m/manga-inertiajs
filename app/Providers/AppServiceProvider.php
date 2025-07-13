@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use App\Contracts\MangaRepositoryInterface;
 use App\Contracts\ChapterRepositoryInterface;
-use App\Repositories\MangaRepository;
+use App\Contracts\MangaRepositoryInterface;
 use App\Repositories\ChapterRepository;
+use App\Repositories\MangaRepository;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
-        
+
         // Share translations globally with all Inertia pages
         Inertia::share([
             'appName' => config('app.name'),

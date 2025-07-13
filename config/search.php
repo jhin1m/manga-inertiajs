@@ -6,7 +6,7 @@ return [
         'suggestions_limit' => env('SEARCH_SUGGESTIONS_LIMIT', 10),
         'popular_limit' => env('SEARCH_POPULAR_LIMIT', 10),
     ],
-    
+
     'rating_filters' => [
         'excellent' => [
             'min' => env('SEARCH_RATING_EXCELLENT_MIN', 9.0),

@@ -17,25 +17,25 @@ return [
             'description' => env('SEO_MANGA_INDEX_DESCRIPTION', 'Khám phá hàng ngàn bộ manga hay nhất. Tìm kiếm theo thể loại, xếp hạng và cập nhật mới nhất.'),
             'keywords' => env('SEO_MANGA_INDEX_KEYWORDS', 'danh sách manga, tìm kiếm manga, manga hay, manga mới'),
         ],
-        
+
         'manga_show' => [
             'title' => env('SEO_MANGA_SHOW_TITLE', '{manga_name} - Đọc Truyện Tranh Online'),
             'description' => env('SEO_MANGA_SHOW_DESCRIPTION', '{manga_description}'),
             'keywords' => env('SEO_MANGA_SHOW_KEYWORDS', '{manga_name}, {manga_genres}, manga, truyện tranh'),
         ],
-        
+
         'chapter_show' => [
             'title' => env('SEO_CHAPTER_SHOW_TITLE', '{manga_name} - Chương {chapter_number}: {chapter_title}'),
             'description' => env('SEO_CHAPTER_SHOW_DESCRIPTION', 'Đọc {manga_name} chương {chapter_number} - {chapter_title}. Cập nhật nhanh nhất, hình ảnh chất lượng cao.'),
             'keywords' => env('SEO_CHAPTER_SHOW_KEYWORDS', '{manga_name}, chương {chapter_number}, {manga_genres}, đọc online'),
         ],
-        
+
         'search' => [
             'title' => env('SEO_SEARCH_TITLE', 'Tìm Kiếm Manga - {query}'),
             'description' => env('SEO_SEARCH_DESCRIPTION', 'Kết quả tìm kiếm cho "{query}". Tìm thấy {count} manga phù hợp.'),
             'keywords' => env('SEO_SEARCH_KEYWORDS', 'tìm kiếm manga, {query}, kết quả tìm kiếm'),
         ],
-        
+
         'home' => [
             'title' => env('SEO_HOME_TITLE', 'Trang Chủ - Manga Reader'),
             'description' => env('SEO_HOME_DESCRIPTION', 'Đọc manga online miễn phí. Cập nhật manga mới nhất, manga hot, manga được đánh giá cao. Trải nghiệm đọc truyện tuyệt vời.'),
@@ -49,11 +49,11 @@ return [
             '@type' => 'Organization',
             'name' => env('SEO_SITE_NAME', 'Manga Reader'),
             'url' => env('APP_URL'),
-            'logo' => env('APP_URL') . env('SEO_SCHEMA_LOGO_PATH', '/images/logo.png'),
+            'logo' => env('APP_URL').env('SEO_SCHEMA_LOGO_PATH', '/images/logo.png'),
             'description' => env('SEO_DEFAULT_DESCRIPTION', 'Website đọc truyện tranh manga online miễn phí'),
             'sameAs' => array_filter(explode(',', env('SEO_SCHEMA_SOCIAL_MEDIA_LINKS', ''))),
         ],
-        
+
         'website' => [
             '@context' => 'https://schema.org',
             '@type' => 'WebSite',
@@ -64,7 +64,7 @@ return [
                 '@type' => 'SearchAction',
                 'target' => [
                     '@type' => 'EntryPoint',
-                    'urlTemplate' => env('APP_URL') . '/search?q={search_term_string}',
+                    'urlTemplate' => env('APP_URL').'/search?q={search_term_string}',
                 ],
                 'query-input' => 'required name=search_term_string',
             ],

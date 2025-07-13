@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Schema;
  * - Add slug column with index
  * - Add unique constraint for manga_id + slug
  * - Remove pages_count column (no longer needed)
- * 
+ *
  * Replaces these migrations:
  * - 2025_07_06_082829_add_slug_to_chapters_table.php
  * - 2025_07_06_083031_add_unique_constraint_to_chapters_slug.php
@@ -25,30 +25,30 @@ return new class extends Migration
     {
         Schema::table('chapters', function (Blueprint $table) {
             // Add slug column (nullable initially for existing records)
-            if (!Schema::hasColumn('chapters', 'slug')) {
+            if (! Schema::hasColumn('chapters', 'slug')) {
                 $table->string('slug')->nullable()->after('title');
             }
-            
+
             // Remove pages_count column (no longer used)
             if (Schema::hasColumn('chapters', 'pages_count')) {
                 $table->dropColumn('pages_count');
             }
         });
-        
+
         // In a separate Schema::table call to avoid conflicts
         Schema::table('chapters', function (Blueprint $table) {
             // Make slug non-nullable if it's currently nullable
             if (Schema::hasColumn('chapters', 'slug')) {
                 $table->string('slug')->nullable(false)->change();
             }
-            
+
             // Add unique constraint if it doesn't exist
-            if (!$this->constraintExists('chapters', 'chapters_manga_slug_unique')) {
+            if (! $this->constraintExists('chapters', 'chapters_manga_slug_unique')) {
                 $table->unique(['manga_id', 'slug'], 'chapters_manga_slug_unique');
             }
-            
+
             // Add index for slug lookups if it doesn't exist
-            if (!$this->indexExists('chapters', 'chapters_slug_index')) {
+            if (! $this->indexExists('chapters', 'chapters_slug_index')) {
                 $table->index('slug', 'chapters_slug_index');
             }
         });
@@ -64,23 +64,23 @@ return new class extends Migration
             if ($this->constraintExists('chapters', 'chapters_manga_slug_unique')) {
                 $table->dropUnique('chapters_manga_slug_unique');
             }
-            
+
             if ($this->indexExists('chapters', 'chapters_slug_index')) {
                 $table->dropIndex('chapters_slug_index');
             }
-            
+
             // Drop slug column
             if (Schema::hasColumn('chapters', 'slug')) {
                 $table->dropColumn('slug');
             }
-            
+
             // Restore pages_count column
-            if (!Schema::hasColumn('chapters', 'pages_count')) {
+            if (! Schema::hasColumn('chapters', 'pages_count')) {
                 $table->integer('pages_count')->default(0)->after('volume_number');
             }
         });
     }
-    
+
     /**
      * Check if index exists
      */
@@ -88,12 +88,13 @@ return new class extends Migration
     {
         try {
             $indexes = \DB::select("SHOW INDEX FROM {$table} WHERE Key_name = '{$indexName}'");
-            return !empty($indexes);
+
+            return ! empty($indexes);
         } catch (\Exception $e) {
             return false;
         }
     }
-    
+
     /**
      * Check if constraint exists
      */
@@ -107,7 +108,8 @@ return new class extends Migration
                 AND TABLE_NAME = '{$table}' 
                 AND CONSTRAINT_NAME = '{$constraintName}'
             ");
-            return !empty($constraints);
+
+            return ! empty($constraints);
         } catch (\Exception $e) {
             return false;
         }

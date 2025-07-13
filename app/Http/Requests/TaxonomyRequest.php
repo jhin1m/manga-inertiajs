@@ -29,10 +29,10 @@ class TaxonomyRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('taxonomies')->ignore($taxonomyId)
+                Rule::unique('taxonomies')->ignore($taxonomyId),
             ],
             'type' => 'required|in:genre,author,tag,status',
-            'description' => 'nullable|string|max:1000'
+            'description' => 'nullable|string|max:1000',
         ];
     }
 
@@ -44,7 +44,7 @@ class TaxonomyRequest extends FormRequest
             'name.unique' => 'Tên taxonomy này đã tồn tại.',
             'type.required' => 'Loại taxonomy là bắt buộc.',
             'type.in' => 'Loại taxonomy phải là một trong: genre, author, tag, status.',
-            'description.max' => 'Mô tả không được vượt quá 1000 ký tự.'
+            'description.max' => 'Mô tả không được vượt quá 1000 ký tự.',
         ];
     }
 
@@ -53,7 +53,7 @@ class TaxonomyRequest extends FormRequest
         return [
             'name' => 'tên taxonomy',
             'type' => 'loại taxonomy',
-            'description' => 'mô tả'
+            'description' => 'mô tả',
         ];
     }
 }
@@ -78,9 +78,9 @@ class TaxonomyTermRequest extends FormRequest
                 'max:255',
                 Rule::unique('taxonomy_terms')
                     ->where('taxonomy_id', $taxonomyId)
-                    ->ignore($termId)
+                    ->ignore($termId),
             ],
-            'description' => 'nullable|string|max:1000'
+            'description' => 'nullable|string|max:1000',
         ];
     }
 
@@ -90,7 +90,7 @@ class TaxonomyTermRequest extends FormRequest
             'name.required' => 'Tên term là bắt buộc.',
             'name.max' => 'Tên term không được vượt quá 255 ký tự.',
             'name.unique' => 'Tên term này đã tồn tại trong taxonomy này.',
-            'description.max' => 'Mô tả không được vượt quá 1000 ký tự.'
+            'description.max' => 'Mô tả không được vượt quá 1000 ký tự.',
         ];
     }
 
@@ -98,7 +98,7 @@ class TaxonomyTermRequest extends FormRequest
     {
         return [
             'name' => 'tên term',
-            'description' => 'mô tả'
+            'description' => 'mô tả',
         ];
     }
 }

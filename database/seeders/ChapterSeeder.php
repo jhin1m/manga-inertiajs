@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\Manga;
 use App\Models\Chapter;
+use App\Models\Manga;
+use Illuminate\Database\Seeder;
 
 class ChapterSeeder extends Seeder
 {
@@ -18,7 +17,7 @@ class ChapterSeeder extends Seeder
 
         foreach ($manga as $mangaItem) {
             $chapterCount = $this->getChapterCount($mangaItem->status);
-            
+
             for ($i = 1; $i <= $chapterCount; $i++) {
                 Chapter::create([
                     'manga_id' => $mangaItem->id,
@@ -26,7 +25,7 @@ class ChapterSeeder extends Seeder
                     'chapter_number' => $i,
                     'volume_number' => ceil($i / 10), // Assume 10 chapters per volume
                     'published_at' => now()->subDays(rand(1, 365)),
-                    'views' => rand(100, 5000)
+                    'views' => rand(100, 5000),
                 ]);
             }
         }
@@ -58,7 +57,7 @@ class ChapterSeeder extends Seeder
                 'Reverse Mountain',
                 'Whiskey Peak',
                 'Little Garden',
-                'Drum Island'
+                'Drum Island',
             ],
             'Naruto' => [
                 'Enter: Naruto Uzumaki!',
@@ -70,7 +69,7 @@ class ChapterSeeder extends Seeder
                 'The Assassin of the Mist!',
                 'The Oath of Pain',
                 'Kakashi: Sharingan Warrior!',
-                'The Forest of Death'
+                'The Forest of Death',
             ],
             'Attack on Titan' => [
                 'To You, in 2000 Years',
@@ -82,12 +81,12 @@ class ChapterSeeder extends Seeder
                 'Small Blade',
                 'I Can Hear His Heartbeat',
                 'The Beating of a Heart Can Be Heard',
-                'Where\'s the Left Arm?'
-            ]
+                'Where\'s the Left Arm?',
+            ],
         ];
 
         if (isset($titles[$mangaName]) && isset($titles[$mangaName][$chapterNumber - 1])) {
-            return "Chapter {$chapterNumber}: " . $titles[$mangaName][$chapterNumber - 1];
+            return "Chapter {$chapterNumber}: ".$titles[$mangaName][$chapterNumber - 1];
         }
 
         $genericTitles = [
@@ -110,12 +109,11 @@ class ChapterSeeder extends Seeder
             'Bonds of Friendship',
             'The Ultimate Challenge',
             'Turning Point',
-            'New Beginnings'
+            'New Beginnings',
         ];
 
         $titleIndex = ($chapterNumber - 1) % count($genericTitles);
-        return "Chapter {$chapterNumber}: " . $genericTitles[$titleIndex];
+
+        return "Chapter {$chapterNumber}: ".$genericTitles[$titleIndex];
     }
-
-
 }

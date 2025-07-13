@@ -24,13 +24,13 @@ class MangaRequest extends FormRequest
         $mangaId = $this->route('manga')?->id;
 
         return [
-            'name' => 'required|string|max:' . config('upload.validation.manga_name_max'),
+            'name' => 'required|string|max:'.config('upload.validation.manga_name_max'),
             'alternative_names' => 'nullable|array',
             'description' => 'nullable|string',
             'status' => 'required|in:ongoing,completed,hiatus,cancelled',
-            'cover' => 'nullable|string|max:' . config('upload.validation.manga_cover_max'),
-            'slug' => 'required|string|unique:mangas,slug,' . $mangaId,
-            'rating' => 'nullable|numeric|min:' . config('upload.validation.rating_min') . '|max:' . config('upload.validation.rating_max'),
+            'cover' => 'nullable|string|max:'.config('upload.validation.manga_cover_max'),
+            'slug' => 'required|string|unique:mangas,slug,'.$mangaId,
+            'rating' => 'nullable|numeric|min:'.config('upload.validation.rating_min').'|max:'.config('upload.validation.rating_max'),
             'total_rating' => 'nullable|integer|min:0',
             'views' => 'nullable|integer|min:0',
             'genre_ids' => 'nullable|array',
@@ -38,7 +38,7 @@ class MangaRequest extends FormRequest
             'author_ids' => 'nullable|array',
             'author_ids.*' => 'exists:taxonomy_terms,id',
             'tag_ids' => 'nullable|array',
-            'tag_ids.*' => 'exists:taxonomy_terms,id'
+            'tag_ids.*' => 'exists:taxonomy_terms,id',
         ];
     }
 
@@ -65,7 +65,7 @@ class MangaRequest extends FormRequest
             'author_ids.array' => 'Danh sách tác giả phải là một mảng.',
             'author_ids.*.exists' => 'Tác giả được chọn không tồn tại.',
             'tag_ids.array' => 'Danh sách tag phải là một mảng.',
-            'tag_ids.*.exists' => 'Tag được chọn không tồn tại.'
+            'tag_ids.*.exists' => 'Tag được chọn không tồn tại.',
         ];
     }
 
@@ -83,7 +83,7 @@ class MangaRequest extends FormRequest
             'views' => 'số lượt xem',
             'genre_ids' => 'thể loại',
             'author_ids' => 'tác giả',
-            'tag_ids' => 'tag'
+            'tag_ids' => 'tag',
         ];
     }
 }

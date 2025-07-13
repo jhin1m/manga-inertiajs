@@ -15,7 +15,7 @@ class TaxonomyController extends Controller
             ->get();
 
         return Inertia::render('Taxonomy/Index', [
-            'taxonomies' => $taxonomies
+            'taxonomies' => $taxonomies,
         ]);
     }
 
@@ -28,14 +28,14 @@ class TaxonomyController extends Controller
 
         return Inertia::render('Taxonomy/Show', [
             'taxonomy' => $taxonomy,
-            'terms' => $terms
+            'terms' => $terms,
         ]);
     }
 
     public function terms(TaxonomyTerm $term)
     {
         $term->load('taxonomy');
-        
+
         $manga = $term->mangas()
             ->with(['taxonomyTerms', 'chapters'])
             ->withCount('chapters')
@@ -44,23 +44,23 @@ class TaxonomyController extends Controller
 
         return Inertia::render('Taxonomy/Terms', [
             'term' => $term,
-            'manga' => $manga
+            'manga' => $manga,
         ]);
     }
 
     public function termsByType(TaxonomyTerm $term, Request $request)
     {
         $term->load('taxonomy');
-        
+
         // Get the type from the route name
         $routeName = $request->route()->getName();
         $type = explode('.', $routeName)[0]; // genre.show -> genre
-        
+
         // Validate that the term belongs to the correct taxonomy type
         if ($term->taxonomy->type !== $type) {
             abort(404);
         }
-        
+
         $manga = $term->mangas()
             ->with(['taxonomyTerms.taxonomy', 'chapters'])
             ->withCount('chapters')
@@ -78,6 +78,7 @@ class TaxonomyController extends Controller
                     'created_at' => $chapter->created_at,
                 ];
             });
+
             return $manga;
         });
 
@@ -86,12 +87,12 @@ class TaxonomyController extends Controller
             'manga' => $manga,
             'type' => $type,
             'translations' => [
-                'title' => __('manga.taxonomy.' . $type . '_title', ['name' => $term->name]),
-                'description' => __('manga.taxonomy.' . $type . '_description', ['name' => $term->name]),
+                'title' => __('manga.taxonomy.'.$type.'_title', ['name' => $term->name]),
+                'description' => __('manga.taxonomy.'.$type.'_description', ['name' => $term->name]),
                 'found_count' => __('manga.index.found_count'),
                 'no_manga_found' => __('manga.index.no_manga_found'),
                 'no_manga_message' => __('manga.index.no_manga_message'),
-            ]
+            ],
         ]);
     }
 
@@ -100,7 +101,7 @@ class TaxonomyController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:genre,author,tag,status',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
         ]);
 
         $validatedData['slug'] = \Str::slug($validatedData['name']);
@@ -116,7 +117,7 @@ class TaxonomyController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:genre,author,tag,status',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
         ]);
 
         $validatedData['slug'] = \Str::slug($validatedData['name']);
@@ -132,7 +133,7 @@ class TaxonomyController extends Controller
         // Check if taxonomy has terms
         if ($taxonomy->terms()->count() > 0) {
             return back()->withErrors([
-                'taxonomy' => 'Không thể xóa taxonomy có chứa terms. Vui lòng xóa tất cả terms trước.'
+                'taxonomy' => 'Không thể xóa taxonomy có chứa terms. Vui lòng xóa tất cả terms trước.',
             ]);
         }
 
@@ -147,7 +148,7 @@ class TaxonomyController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
         ]);
 
         $validatedData['taxonomy_id'] = $taxonomy->id;
@@ -160,7 +161,7 @@ class TaxonomyController extends Controller
 
         if ($existingTerm) {
             return back()->withErrors([
-                'name' => 'Term với tên này đã tồn tại trong taxonomy này.'
+                'name' => 'Term với tên này đã tồn tại trong taxonomy này.',
             ]);
         }
 
@@ -179,7 +180,7 @@ class TaxonomyController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
         ]);
 
         $validatedData['slug'] = \Str::slug($validatedData['name']);
@@ -192,7 +193,7 @@ class TaxonomyController extends Controller
 
         if ($existingTerm) {
             return back()->withErrors([
-                'name' => 'Term với tên này đã tồn tại trong taxonomy này.'
+                'name' => 'Term với tên này đã tồn tại trong taxonomy này.',
             ]);
         }
 
@@ -212,7 +213,7 @@ class TaxonomyController extends Controller
         // Check if term is used by any manga
         if ($term->mangas()->count() > 0) {
             return back()->withErrors([
-                'term' => 'Không thể xóa term đang được sử dụng bởi manga. Vui lòng gỡ liên kết trước.'
+                'term' => 'Không thể xóa term đang được sử dụng bởi manga. Vui lòng gỡ liên kết trước.',
             ]);
         }
 
@@ -226,17 +227,17 @@ class TaxonomyController extends Controller
     public function getTermsByType(Request $request)
     {
         $type = $request->get('type');
-        
-        if (!in_array($type, ['genre', 'author', 'tag', 'status'])) {
+
+        if (! in_array($type, ['genre', 'author', 'tag', 'status'])) {
             return response()->json(['error' => 'Invalid type'], 400);
         }
 
         $terms = TaxonomyTerm::whereHas('taxonomy', function ($query) use ($type) {
             $query->where('type', $type);
         })
-        ->select('id', 'name', 'slug')
-        ->orderBy('name')
-        ->get();
+            ->select('id', 'name', 'slug')
+            ->orderBy('name')
+            ->get();
 
         return response()->json($terms);
     }

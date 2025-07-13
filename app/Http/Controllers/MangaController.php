@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\MangaRequest;
 use App\Models\Manga;
 use App\Models\TaxonomyTerm;
-use App\Services\MangaService;
 use App\Services\ChapterService;
+use App\Services\MangaService;
 use App\Services\SeoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -19,13 +19,13 @@ class MangaController extends Controller
         private ChapterService $chapterService,
         private SeoService $seoService
     ) {}
+
     public function index(Request $request)
     {
         $filters = [
             'search' => $request->search,
             'genres' => $request->genres ?: [],
             'status' => $request->status,
-            'rating' => $request->rating ? (float) $request->rating : 0,
             'sortBy' => $request->get('sortBy', 'latest'),
         ];
 
@@ -38,7 +38,7 @@ class MangaController extends Controller
         })->withCount('mangas')->get(['id', 'name', 'slug']);
 
         return Inertia::render('Manga/Index', [
-            'manga' => Inertia::defer(fn() => $this->mangaService->getMangaList($filters, $perPage)),
+            'manga' => Inertia::defer(fn () => $this->mangaService->getMangaList($filters, $perPage)),
             'filters' => $filters,
             'genres' => $genres,
             'statuses' => Manga::getStatuses(),
@@ -95,7 +95,7 @@ class MangaController extends Controller
             ]),
             'seo' => $manga->getSeoData(),
             // Use deferred props for chapters to improve initial page load performance
-            
+
             'chapters' => Inertia::defer(function () use ($manga) {
                 return $this->chapterService->getChaptersByManga($manga);
             }),
@@ -152,7 +152,6 @@ class MangaController extends Controller
             'search' => $query,
             'genres' => $request->get('genres', []),
             'status' => $request->get('status'),
-            'rating' => $request->get('rating') ? (float) $request->get('rating') : 0,
             'sortBy' => $request->get('sortBy', 'latest'),
         ];
 
@@ -164,18 +163,10 @@ class MangaController extends Controller
             return TaxonomyTerm::whereHas('taxonomy', function ($q) {
                 $q->where('type', 'genre');
             })
-            ->withCount('mangas')
-            ->having('mangas_count', '>', 0) // Only genres with manga
-            ->orderBy('mangas_count', 'desc')
-            ->limit(config('manga.limits.top_genres')) // Limit to top genres
-            ->get(['id', 'name', 'slug']);
-        });
-
-        // Cache popular manga for 30 minutes
-        $popularManga = Cache::remember('search_popular_manga', config('cache.ttl.popular_manga'), function () {
-            return Manga::where('status', 'published')
-                ->orderBy('views', 'desc')
-                ->limit(config('manga.limits.popular_display'))
+                ->withCount('mangas')
+                ->having('mangas_count', '>', 0) // Only genres with manga
+                ->orderBy('mangas_count', 'desc')
+                ->limit(config('manga.limits.top_genres')) // Limit to top genres
                 ->get(['id', 'name', 'slug']);
         });
 
@@ -187,7 +178,6 @@ class MangaController extends Controller
             'filters' => $filters,
             'genres' => $genres,
             'statuses' => Manga::getStatuses(),
-            'popularManga' => $popularManga,
             'seo' => $this->seoService->forSearch($query, $manga->total()),
             'translations' => [
                 'title' => __('search.title'),
@@ -209,9 +199,6 @@ class MangaController extends Controller
                 'sort_popular' => __('search.sort_popular'),
                 'sort_rating' => __('search.sort_rating'),
                 'sort_alphabetical' => __('search.sort_alphabetical'),
-                'min_rating' => __('search.min_rating'),
-                'popular_manga' => __('search.popular_manga'),
-                'popular_genres' => __('search.popular_genres'),
                 'search_tips' => __('search.search_tips'),
                 'tip_title' => __('search.tip_title'),
                 'tip_author' => __('search.tip_author'),
@@ -221,5 +208,4 @@ class MangaController extends Controller
             ],
         ]);
     }
-
 }

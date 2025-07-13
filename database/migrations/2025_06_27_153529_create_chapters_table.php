@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('pages_count')->default(0);
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['manga_id', 'chapter_number']);
             $table->index(['manga_id', 'published_at']);
             $table->index(['manga_id', 'chapter_number']);

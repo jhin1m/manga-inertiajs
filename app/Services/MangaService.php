@@ -5,8 +5,8 @@ namespace App\Services;
 use App\Contracts\MangaRepositoryInterface;
 use App\Models\Manga;
 use App\Models\TaxonomyTerm;
-use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class MangaService
 {
@@ -85,13 +85,13 @@ class MangaService
             'genres' => TaxonomyTerm::whereHas('taxonomy', function ($q) {
                 $q->where('type', 'genre');
             })->orderBy('name')->get(['id', 'name', 'slug']),
-            
+
             'authors' => TaxonomyTerm::whereHas('taxonomy', function ($q) {
                 $q->where('type', 'author');
             })->orderBy('name')->get(['id', 'name', 'slug']),
-            
+
             'statuses' => Manga::getStatuses(),
-            
+
         ];
     }
-} 
+}

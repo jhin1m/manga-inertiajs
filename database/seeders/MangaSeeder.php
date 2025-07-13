@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Manga;
-use App\Models\TaxonomyTerm;
 use App\Models\Taxonomy;
+use App\Models\TaxonomyTerm;
+use Illuminate\Database\Seeder;
 
 class MangaSeeder extends Seeder
 {
@@ -27,7 +26,7 @@ class MangaSeeder extends Seeder
                 'cover' => '/images/covers/one-piece.jpg',
                 'slug' => 'one-piece',
                 'genres' => ['Shounen', 'Adventure', 'Comedy', 'Drama'],
-                'author' => 'Eiichiro Oda'
+                'author' => 'Eiichiro Oda',
             ],
             [
                 'name' => 'Naruto',
@@ -40,7 +39,7 @@ class MangaSeeder extends Seeder
                 'cover' => '/images/covers/naruto.jpg',
                 'slug' => 'naruto',
                 'genres' => ['Shounen', 'Action', 'Martial Arts', 'Super Power'],
-                'author' => 'Masashi Kishimoto'
+                'author' => 'Masashi Kishimoto',
             ],
             [
                 'name' => 'Attack on Titan',
@@ -53,7 +52,7 @@ class MangaSeeder extends Seeder
                 'cover' => '/images/covers/attack-on-titan.jpg',
                 'slug' => 'attack-on-titan',
                 'genres' => ['Shounen', 'Action', 'Drama', 'Horror'],
-                'author' => 'Hajime Isayama'
+                'author' => 'Hajime Isayama',
             ],
             [
                 'name' => 'Death Note',
@@ -66,7 +65,7 @@ class MangaSeeder extends Seeder
                 'cover' => '/images/covers/death-note.jpg',
                 'slug' => 'death-note',
                 'genres' => ['Shounen', 'Supernatural', 'Thriller', 'Psychological'],
-                'author' => 'Tsugumi Ohba'
+                'author' => 'Tsugumi Ohba',
             ],
             [
                 'name' => 'Dragon Ball',
@@ -79,7 +78,7 @@ class MangaSeeder extends Seeder
                 'cover' => '/images/covers/dragon-ball.jpg',
                 'slug' => 'dragon-ball',
                 'genres' => ['Shounen', 'Action', 'Adventure', 'Martial Arts'],
-                'author' => 'Akira Toriyama'
+                'author' => 'Akira Toriyama',
             ],
             [
                 'name' => 'My Hero Academia',
@@ -92,7 +91,7 @@ class MangaSeeder extends Seeder
                 'cover' => '/images/covers/my-hero-academia.jpg',
                 'slug' => 'my-hero-academia',
                 'genres' => ['Shounen', 'Action', 'School', 'Super Power'],
-                'author' => 'Kohei Horikoshi'
+                'author' => 'Kohei Horikoshi',
             ],
             [
                 'name' => 'Demon Slayer',
@@ -105,7 +104,7 @@ class MangaSeeder extends Seeder
                 'cover' => '/images/covers/demon-slayer.jpg',
                 'slug' => 'demon-slayer',
                 'genres' => ['Shounen', 'Action', 'Historical', 'Supernatural'],
-                'author' => 'Koyoharu Gotouge'
+                'author' => 'Koyoharu Gotouge',
             ],
             [
                 'name' => 'Jujutsu Kaisen',
@@ -118,7 +117,7 @@ class MangaSeeder extends Seeder
                 'cover' => '/images/covers/jujutsu-kaisen.jpg',
                 'slug' => 'jujutsu-kaisen',
                 'genres' => ['Shounen', 'Action', 'School', 'Supernatural'],
-                'author' => 'Gege Akutami'
+                'author' => 'Gege Akutami',
             ],
             [
                 'name' => 'Chainsaw Man',
@@ -131,7 +130,7 @@ class MangaSeeder extends Seeder
                 'cover' => '/images/covers/chainsaw-man.jpg',
                 'slug' => 'chainsaw-man',
                 'genres' => ['Shounen', 'Action', 'Horror', 'Supernatural'],
-                'author' => 'Tatsuki Fujimoto'
+                'author' => 'Tatsuki Fujimoto',
             ],
             [
                 'name' => 'Tokyo Ghoul',
@@ -144,8 +143,8 @@ class MangaSeeder extends Seeder
                 'cover' => '/images/covers/tokyo-ghoul.jpg',
                 'slug' => 'tokyo-ghoul',
                 'genres' => ['Seinen', 'Action', 'Horror', 'Supernatural'],
-                'author' => 'Sui Ishida'
-            ]
+                'author' => 'Sui Ishida',
+            ],
         ];
 
         foreach ($sampleManga as $mangaData) {
@@ -176,11 +175,11 @@ class MangaSeeder extends Seeder
                     ->where('name', $author)
                     ->first();
 
-                if (!$authorTerm) {
+                if (! $authorTerm) {
                     $authorTerm = TaxonomyTerm::create([
                         'taxonomy_id' => $authorTaxonomy->id,
                         'name' => $author,
-                        'slug' => \Str::slug($author)
+                        'slug' => \Str::slug($author),
                     ]);
                 }
 
@@ -190,6 +189,6 @@ class MangaSeeder extends Seeder
             }
         }
 
-        $this->command->info('Created ' . count($sampleManga) . ' sample manga with genres and authors.');
+        $this->command->info('Created '.count($sampleManga).' sample manga with genres and authors.');
     }
 }

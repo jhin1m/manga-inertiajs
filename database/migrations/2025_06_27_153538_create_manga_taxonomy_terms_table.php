@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('manga_id')->constrained()->cascadeOnDelete();
             $table->foreignId('taxonomy_term_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
-            
+
             $table->unique(['manga_id', 'taxonomy_term_id']);
             $table->index('manga_id');
             $table->index('taxonomy_term_id');

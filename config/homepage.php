@@ -7,7 +7,7 @@ return [
         'rankings_ttl' => env('HOMEPAGE_RANKINGS_TTL', 7200),
         'recommended_ttl' => env('HOMEPAGE_RECOMMENDED_TTL', 3600),
     ],
-    
+
     'limits' => [
         'hot_manga' => env('HOMEPAGE_HOT_MANGA_LIMIT', 10),
         'latest_updates' => env('HOMEPAGE_LATEST_UPDATES_LIMIT', 24),

@@ -26,18 +26,18 @@ class ChapterRequest extends FormRequest
         $chapterId = $this->route('chapter')?->id;
 
         return [
-            'title' => 'required|string|max:' . config('upload.validation.chapter_title_max'),
+            'title' => 'required|string|max:'.config('upload.validation.chapter_title_max'),
             'chapter_number' => [
                 'required',
                 'numeric',
-                'min:' . config('upload.validation.chapter_number_min'),
+                'min:'.config('upload.validation.chapter_number_min'),
                 Rule::unique('chapters')
                     ->where('manga_id', $mangaId)
-                    ->ignore($chapterId)
+                    ->ignore($chapterId),
             ],
-            'volume_number' => 'nullable|integer|min:' . config('upload.validation.volume_number_min'),
+            'volume_number' => 'nullable|integer|min:'.config('upload.validation.volume_number_min'),
             'published_at' => 'nullable|date|before_or_equal:now',
-            'views' => 'nullable|integer|min:0'
+            'views' => 'nullable|integer|min:0',
         ];
     }
 
@@ -55,7 +55,7 @@ class ChapterRequest extends FormRequest
             'published_at.date' => 'Ngày xuất bản phải là một ngày hợp lệ.',
             'published_at.before_or_equal' => 'Ngày xuất bản không được lớn hơn ngày hiện tại.',
             'views.integer' => 'Số lượt xem phải là một số nguyên.',
-            'views.min' => 'Số lượt xem không được nhỏ hơn 0.'
+            'views.min' => 'Số lượt xem không được nhỏ hơn 0.',
         ];
     }
 
@@ -66,7 +66,7 @@ class ChapterRequest extends FormRequest
             'chapter_number' => 'số chương',
             'volume_number' => 'số tập',
             'published_at' => 'ngày xuất bản',
-            'views' => 'số lượt xem'
+            'views' => 'số lượt xem',
         ];
     }
 }

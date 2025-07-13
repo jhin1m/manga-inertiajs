@@ -13,6 +13,7 @@ class ChapterService
     public function __construct(
         private ChapterRepositoryInterface $chapterRepository
     ) {}
+
     public function getChaptersByManga(Manga $manga, ?int $perPage = null): LengthAwarePaginator
     {
         return $this->chapterRepository->getChaptersByManga($manga, $perPage);
@@ -57,7 +58,7 @@ class ChapterService
     // public function getChapterProgress(Chapter $chapter): array
     // {
     //     $totalPages = $chapter->pages()->count();
-        
+
     //     return [
     //         'total_pages' => $totalPages,
     //         'current_page' => 1, // This would be tracked per user in a real app
@@ -83,7 +84,7 @@ class ChapterService
             $query->where('id', '!=', $excludeChapterId);
         }
 
-        return !$query->exists();
+        return ! $query->exists();
     }
 
     public function bulkUpdateChapterNumbers(Manga $manga, array $chapterUpdates): bool
@@ -93,7 +94,7 @@ class ChapterService
 
             foreach ($chapterUpdates as $update) {
                 $chapter = Chapter::findOrFail($update['id']);
-                
+
                 if ($chapter->manga_id !== $manga->id) {
                     throw new \InvalidArgumentException('Chapter không thuộc về manga này.');
                 }
@@ -102,6 +103,7 @@ class ChapterService
             }
 
             \DB::commit();
+
             return true;
         } catch (\Exception $e) {
             \DB::rollBack();
@@ -125,4 +127,4 @@ class ChapterService
     //     $pagesCount = $chapter->pages()->count();
     //     return $pagesCount * 30; // seconds
     // }
-} 
+}

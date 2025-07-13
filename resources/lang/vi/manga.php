@@ -23,7 +23,7 @@ return [
     'favorite' => 'Yêu thích',
     'expand_more' => 'Xem thêm',
     'collapse' => 'Thu gọn',
-    
+
     // Index page
     'index' => [
         'title' => 'Danh sách manga',
@@ -63,7 +63,7 @@ return [
             'name_desc' => 'Tên Z-A',
         ],
     ],
-    
+
     // ChapterList component
     'chapter_list' => [
         'title' => 'Danh sách chương',
@@ -77,7 +77,7 @@ return [
         'previous' => 'Trước',
         'next' => 'Tiếp',
     ],
-    
+
     // Taxonomy pages
     'taxonomy' => [
         'genre_title' => 'Thể loại: :name',
@@ -89,7 +89,7 @@ return [
         'tag_title' => 'Tag: :name',
         'tag_description' => 'Danh sách manga có tag :name',
     ],
-    
+
     // Rankings Card
     'rankings' => [
         'title' => 'Xếp hạng Manga',
@@ -97,7 +97,7 @@ return [
         'view_all' => 'Xem tất cả xếp hạng →',
         'views' => 'lượt xem',
     ],
-    
+
     // Recommended Card
     'recommended' => [
         'title' => 'Đề xuất cho bạn',

@@ -26,23 +26,23 @@ class PageRequest extends FormRequest
         $pageId = $this->route('page')?->id;
 
         $rules = [
-            'image_url' => 'required|string|max:' . config('upload.validation.page_url_max'),
+            'image_url' => 'required|string|max:'.config('upload.validation.page_url_max'),
             'page_number' => [
                 'required',
                 'integer',
-                'min:' . config('upload.validation.page_number_min'),
+                'min:'.config('upload.validation.page_number_min'),
                 Rule::unique('pages')
                     ->where('chapter_id', $chapterId)
-                    ->ignore($pageId)
-            ]
+                    ->ignore($pageId),
+            ],
         ];
 
         // For bulk upload
         if ($this->has('pages')) {
             $rules = [
                 'pages' => 'required|array|min:1',
-                'pages.*.image_url' => 'required|string|max:' . config('upload.validation.page_url_max'),
-                'pages.*.page_number' => 'required|integer|min:' . config('upload.validation.page_number_min')
+                'pages.*.image_url' => 'required|string|max:'.config('upload.validation.page_url_max'),
+                'pages.*.page_number' => 'required|integer|min:'.config('upload.validation.page_number_min'),
             ];
         }
 
@@ -50,7 +50,7 @@ class PageRequest extends FormRequest
         if ($this->has('images')) {
             $rules = [
                 'images' => 'required|array|min:1',
-                'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:' . config('upload.limits.image_max_size') // Max file size
+                'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:'.config('upload.limits.image_max_size'), // Max file size
             ];
         }
 
@@ -67,7 +67,6 @@ class PageRequest extends FormRequest
             'page_number.min' => 'Số trang phải lớn hơn 0.',
             'page_number.unique' => 'Số trang này đã tồn tại cho chương này.',
 
-            
             // Bulk upload messages
             'pages.required' => 'Danh sách trang là bắt buộc.',
             'pages.array' => 'Danh sách trang phải là một mảng.',
@@ -78,7 +77,6 @@ class PageRequest extends FormRequest
             'pages.*.page_number.integer' => 'Số trang cho trang :position phải là một số nguyên.',
             'pages.*.page_number.min' => 'Số trang cho trang :position phải lớn hơn 0.',
 
-            
             // File upload messages
             'images.required' => 'Danh sách hình ảnh là bắt buộc.',
             'images.array' => 'Danh sách hình ảnh phải là một mảng.',
@@ -86,7 +84,7 @@ class PageRequest extends FormRequest
             'images.*.required' => 'Hình ảnh :position là bắt buộc.',
             'images.*.image' => 'File :position phải là một hình ảnh.',
             'images.*.mimes' => 'Hình ảnh :position phải có định dạng: jpeg, png, jpg, gif, webp.',
-            'images.*.max' => 'Hình ảnh :position không được vượt quá 10MB.'
+            'images.*.max' => 'Hình ảnh :position không được vượt quá 10MB.',
         ];
     }
 
@@ -96,7 +94,7 @@ class PageRequest extends FormRequest
             'image_url' => 'URL hình ảnh',
             'page_number' => 'số trang',
             'pages' => 'danh sách trang',
-            'images' => 'danh sách hình ảnh'
+            'images' => 'danh sách hình ảnh',
         ];
     }
 }

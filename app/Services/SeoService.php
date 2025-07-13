@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Manga;
 use App\Models\Chapter;
-use Illuminate\Support\Str;
+use App\Models\Manga;
 use Illuminate\Support\Facades\Config;
 
 class SeoService
@@ -49,16 +48,16 @@ class SeoService
         $defaults = $this->getDefaults();
 
         $genres = $manga->taxonomyTerms()
-            ->whereHas('taxonomy', fn($q) => $q->where('type', 'genre'))
+            ->whereHas('taxonomy', fn ($q) => $q->where('type', 'genre'))
             ->pluck('name')
             ->implode(', ');
 
         $title = str_replace('{manga_name}', $manga->name, $template['title']);
         $cleanDescription = strip_tags($manga->description ?? '');
-        $limitedDescription = mb_strlen($cleanDescription) > 160 
-            ? mb_substr($cleanDescription, 0, 160) . '...' 
+        $limitedDescription = mb_strlen($cleanDescription) > 160
+            ? mb_substr($cleanDescription, 0, 160).'...'
             : $cleanDescription;
-        
+
         $description = str_replace(
             '{manga_description}',
             $limitedDescription,
@@ -87,7 +86,7 @@ class SeoService
         $manga = $chapter->manga;
 
         $genres = $manga->taxonomyTerms()
-            ->whereHas('taxonomy', fn($q) => $q->where('type', 'genre'))
+            ->whereHas('taxonomy', fn ($q) => $q->where('type', 'genre'))
             ->pluck('name')
             ->implode(', ');
 
@@ -168,12 +167,12 @@ class SeoService
     private function getMangaSchema(Manga $manga): array
     {
         $genres = $manga->taxonomyTerms()
-            ->whereHas('taxonomy', fn($q) => $q->where('type', 'genre'))
+            ->whereHas('taxonomy', fn ($q) => $q->where('type', 'genre'))
             ->pluck('name')
             ->toArray();
 
         $authors = $manga->taxonomyTerms()
-            ->whereHas('taxonomy', fn($q) => $q->where('type', 'author'))
+            ->whereHas('taxonomy', fn ($q) => $q->where('type', 'author'))
             ->pluck('name')
             ->toArray();
 
@@ -185,7 +184,7 @@ class SeoService
             'url' => route('manga.show', $manga->slug),
             'image' => $manga->cover_image ? url($manga->cover_image) : null,
             'genre' => $genres,
-            'author' => array_map(fn($name) => ['@type' => 'Person', 'name' => $name], $authors),
+            'author' => array_map(fn ($name) => ['@type' => 'Person', 'name' => $name], $authors),
             'publisher' => [
                 '@type' => 'Organization',
                 'name' => Config::get('seo.defaults.site_name'),
@@ -238,12 +237,12 @@ class SeoService
     private function getChapterSchema(Chapter $chapter): array
     {
         $manga = $chapter->manga;
-        
+
         return [
             '@context' => 'https://schema.org',
             '@type' => 'Article',
-            'headline' => $manga->name . ' - ' . Config::get('seo.labels.chapter', 'Chương') . ' ' . $chapter->chapter_number,
-            'description' => Config::get('seo.labels.chapter_description_prefix', 'Đọc') . ' ' . $manga->name . ' ' . Config::get('seo.labels.chapter_description_suffix', 'chương') . ' ' . $chapter->chapter_number,
+            'headline' => $manga->name.' - '.Config::get('seo.labels.chapter', 'Chương').' '.$chapter->chapter_number,
+            'description' => Config::get('seo.labels.chapter_description_prefix', 'Đọc').' '.$manga->name.' '.Config::get('seo.labels.chapter_description_suffix', 'chương').' '.$chapter->chapter_number,
             'url' => route('manga.chapters.show', [$manga->slug, $chapter->slug]),
             'image' => $manga->cover_image ? url($manga->cover_image) : null,
             'datePublished' => $chapter->created_at?->toISOString(),
@@ -285,7 +284,7 @@ class SeoService
                     [
                         '@type' => 'ListItem',
                         'position' => 4,
-                        'name' => Config::get('seo.labels.chapter', 'Chương') . ' ' . $chapter->chapter_number,
+                        'name' => Config::get('seo.labels.chapter', 'Chương').' '.$chapter->chapter_number,
                         'item' => route('manga.chapters.show', [$manga->slug, $chapter->slug]),
                     ],
                 ],
@@ -316,15 +315,15 @@ class SeoService
         }
 
         if (isset($robots['max_image_preview'])) {
-            $content[] = 'max-image-preview:' . $robots['max_image_preview'];
+            $content[] = 'max-image-preview:'.$robots['max_image_preview'];
         }
 
         if (isset($robots['max_snippet'])) {
-            $content[] = 'max-snippet:' . $robots['max_snippet'];
+            $content[] = 'max-snippet:'.$robots['max_snippet'];
         }
 
         if (isset($robots['max_video_preview'])) {
-            $content[] = 'max-video-preview:' . $robots['max_video_preview'];
+            $content[] = 'max-video-preview:'.$robots['max_video_preview'];
         }
 
         return implode(', ', $content);

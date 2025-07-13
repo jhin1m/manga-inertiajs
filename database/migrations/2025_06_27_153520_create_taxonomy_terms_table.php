@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('slug');
             $table->text('description')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['taxonomy_id', 'slug']);
             $table->index(['taxonomy_id', 'name']);
         });

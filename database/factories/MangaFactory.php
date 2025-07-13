@@ -20,7 +20,7 @@ class MangaFactory extends Factory
         $name = fake()->words(rand(2, 4), true);
         $rating = fake()->randomFloat(1, 6.0, 10.0);
         $totalRating = fake()->numberBetween(100, 20000);
-        
+
         return [
             'name' => $name,
             'alternative_names' => [

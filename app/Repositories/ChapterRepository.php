@@ -25,7 +25,7 @@ class ChapterRepository implements ChapterRepositoryInterface
             'pages' => function ($query) {
                 $query->select('id', 'chapter_id', 'page_number', 'image_url')
                     ->orderBy('page_number');
-            }
+            },
         ]);
     }
 
@@ -45,7 +45,7 @@ class ChapterRepository implements ChapterRepositoryInterface
 
         return [
             'previous' => $previousChapter,
-            'next' => $nextChapter
+            'next' => $nextChapter,
         ];
     }
 
@@ -91,12 +91,14 @@ class ChapterRepository implements ChapterRepositoryInterface
         }
 
         $chapter->update($data);
+
         return $chapter;
     }
 
     public function deleteChapter(Chapter $chapter): bool
     {
         $chapter->pages()->delete();
+
         return $chapter->delete();
     }
 
@@ -125,6 +127,6 @@ class ChapterRepository implements ChapterRepositoryInterface
             $query->where('id', '!=', $excludeChapterId);
         }
 
-        return !$query->exists();
+        return ! $query->exists();
     }
 }

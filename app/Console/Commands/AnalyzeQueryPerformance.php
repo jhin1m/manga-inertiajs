@@ -2,11 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Manga;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use App\Models\Manga;
-use App\Models\Chapter;
-use App\Models\TaxonomyTerm;
 
 class AnalyzeQueryPerformance extends Command
 {
@@ -34,13 +32,13 @@ class AnalyzeQueryPerformance extends Command
 
         // Test common queries
         $this->testCommonQueries();
-        
+
         if ($this->option('detailed')) {
             $this->showDetailedAnalysis();
         }
-        
+
         $this->showIndexRecommendations();
-        
+
         $this->info('✅ Analysis completed!');
     }
 
@@ -50,43 +48,44 @@ class AnalyzeQueryPerformance extends Command
         $this->newLine();
 
         $queries = [
-            'Popular Manga' => function() {
+            'Popular Manga' => function () {
                 return Manga::popular()->limit(10)->get();
             },
-            'Recent Manga' => function() {
+            'Recent Manga' => function () {
                 return Manga::recent()->limit(10)->get();
             },
-            'Ongoing Manga' => function() {
+            'Ongoing Manga' => function () {
                 return Manga::byStatus('ongoing')->limit(10)->get();
             },
-            'Manga with Genres' => function() {
+            'Manga with Genres' => function () {
                 return Manga::with('genres')->limit(5)->get();
             },
-            'Chapters by Manga' => function() {
+            'Chapters by Manga' => function () {
                 $manga = Manga::first();
+
                 return $manga ? $manga->chapters()->limit(10)->get() : collect();
             },
-            'Search Manga by Name' => function() {
+            'Search Manga by Name' => function () {
                 return Manga::where('name', 'like', '%manga%')->limit(10)->get();
-            }
+            },
         ];
 
         foreach ($queries as $name => $query) {
             $start = microtime(true);
-            
+
             try {
                 $result = $query();
                 $duration = round((microtime(true) - $start) * 1000, 2);
                 $count = $result->count();
-                
+
                 $status = $duration < 50 ? '🟢' : ($duration < 200 ? '🟡' : '🔴');
                 $this->line("$status $name: {$duration}ms ({$count} records)");
-                
+
             } catch (\Exception $e) {
-                $this->error("❌ $name: Error - " . $e->getMessage());
+                $this->error("❌ $name: Error - ".$e->getMessage());
             }
         }
-        
+
         $this->newLine();
     }
 
@@ -97,17 +96,17 @@ class AnalyzeQueryPerformance extends Command
 
         // Show table sizes
         $tables = ['mangas', 'chapters', 'pages', 'taxonomies', 'taxonomy_terms', 'manga_taxonomy_terms'];
-        
+
         $this->line('📈 Table Sizes:');
         foreach ($tables as $table) {
             try {
                 $count = DB::table($table)->count();
-                $this->line("  • $table: " . number_format($count) . ' records');
+                $this->line("  • $table: ".number_format($count).' records');
             } catch (\Exception $e) {
                 $this->line("  • $table: Error getting count");
             }
         }
-        
+
         $this->newLine();
 
         // Show indexes
@@ -119,29 +118,29 @@ class AnalyzeQueryPerformance extends Command
     private function showMySQLIndexes()
     {
         $this->line('🗂️  Current Indexes:');
-        
+
         $tables = ['mangas', 'chapters', 'pages', 'taxonomies', 'taxonomy_terms', 'manga_taxonomy_terms'];
-        
+
         foreach ($tables as $table) {
             try {
                 $indexes = DB::select("SHOW INDEX FROM $table");
                 $this->line("  📋 $table:");
-                
+
                 $indexGroups = [];
                 foreach ($indexes as $index) {
                     $indexGroups[$index->Key_name][] = $index->Column_name;
                 }
-                
+
                 foreach ($indexGroups as $indexName => $columns) {
                     $columnList = implode(', ', $columns);
                     $this->line("    • $indexName: ($columnList)");
                 }
-                
+
             } catch (\Exception $e) {
-                $this->line("    Error: " . $e->getMessage());
+                $this->line('    Error: '.$e->getMessage());
             }
         }
-        
+
         $this->newLine();
     }
 
@@ -153,24 +152,24 @@ class AnalyzeQueryPerformance extends Command
         $recommendations = [
             '🔍 Search Optimization' => [
                 'FULLTEXT index on mangas(name, description) for better search',
-                'Consider using Laravel Scout for advanced search features'
+                'Consider using Laravel Scout for advanced search features',
             ],
             '📊 Query Optimization' => [
                 'Monitor slow queries using Laravel Telescope',
                 'Use EXPLAIN to analyze query execution plans',
-                'Consider query caching for frequently accessed data'
+                'Consider query caching for frequently accessed data',
             ],
             '⚡ Performance Tips' => [
                 'Use eager loading to prevent N+1 queries',
                 'Implement pagination for large result sets',
                 'Consider Redis caching for popular manga data',
-                'Use database connection pooling in production'
+                'Use database connection pooling in production',
             ],
             '🔧 Maintenance' => [
                 'Regularly run ANALYZE TABLE to update statistics',
                 'Monitor index usage and remove unused indexes',
-                'Consider partitioning for very large tables'
-            ]
+                'Consider partitioning for very large tables',
+            ],
         ];
 
         foreach ($recommendations as $category => $tips) {

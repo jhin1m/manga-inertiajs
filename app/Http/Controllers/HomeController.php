@@ -17,10 +17,10 @@ class HomeController extends Controller
     {
         $data = $this->homePageService->getHomePageData();
         $data['seo'] = $this->seoService->forHome();
-        
+
         // Convert latestUpdates to use defer mechanism
-        $data['latestUpdates'] = Inertia::defer(fn() => $this->homePageService->getCachedLatestUpdates());
-        
+        $data['latestUpdates'] = Inertia::defer(fn () => $this->homePageService->getCachedLatestUpdates());
+
         return Inertia::render('Home', $data);
     }
 }

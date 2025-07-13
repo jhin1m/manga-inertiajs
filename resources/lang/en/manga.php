@@ -24,7 +24,7 @@ return [
     'favorite' => 'Favorite',
     'expand_more' => 'Show more',
     'collapse' => 'Collapse',
-    
+
     // Index manga page
     'index' => [
         'title' => 'Manga list',
@@ -64,7 +64,7 @@ return [
             'name_desc' => 'Name Z-A',
         ],
     ],
-    
+
     // ChapterList component
     'chapter_list' => [
         'title' => 'Chapter list',
@@ -78,7 +78,7 @@ return [
         'previous' => 'Previous',
         'next' => 'Next',
     ],
-    
+
     // Taxonomy pages
     'taxonomy' => [
         'genre_title' => 'Genre: :name',
@@ -90,7 +90,7 @@ return [
         'tag_title' => 'Tag: :name',
         'tag_description' => 'Manga list with tag :name',
     ],
-    
+
     // Rankings Card
     'rankings' => [
         'title' => 'Manga Rankings',
@@ -98,7 +98,7 @@ return [
         'view_all' => 'View all rankings →',
         'views' => 'views',
     ],
-    
+
     // Recommended Card
     'recommended' => [
         'title' => 'Recommended for you',

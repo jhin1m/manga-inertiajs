@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -16,30 +16,30 @@ return new class extends Migration
         Schema::table('mangas', function (Blueprint $table) {
             // Check if index exists before creating
             $indexExists = collect(DB::select("SHOW INDEX FROM mangas WHERE Key_name = 'idx_mangas_hot_ranking'"))->isNotEmpty();
-            
-            if (!$indexExists) {
+
+            if (! $indexExists) {
                 // Composite index for hot manga calculations (views + rating)
                 $table->index(['views', 'rating', 'total_rating'], 'idx_mangas_hot_ranking');
             }
-            
+
             // Composite index for recommended manga filter
             $indexExists = collect(DB::select("SHOW INDEX FROM mangas WHERE Key_name = 'idx_mangas_rating_composite'"))->isNotEmpty();
-            if (!$indexExists) {
+            if (! $indexExists) {
                 $table->index(['rating', 'total_rating'], 'idx_mangas_rating_composite');
             }
-            
+
             // Note: alternative_names is JSON column, cannot create regular index
             // Use JSON_SEARCH or other JSON functions for searching instead
-            
+
             // Composite index for status + rating (filtered rankings)
             $indexExists = collect(DB::select("SHOW INDEX FROM mangas WHERE Key_name = 'idx_mangas_status_rating'"))->isNotEmpty();
-            if (!$indexExists) {
+            if (! $indexExists) {
                 $table->index(['status', 'rating', 'total_rating'], 'idx_mangas_status_rating');
             }
-            
+
             // Index for created_at (oldest sorting)
             $indexExists = collect(DB::select("SHOW INDEX FROM mangas WHERE Key_name = 'idx_mangas_created_at'"))->isNotEmpty();
-            if (!$indexExists) {
+            if (! $indexExists) {
                 $table->index(['created_at'], 'idx_mangas_created_at');
             }
         });
@@ -48,19 +48,19 @@ return new class extends Migration
         Schema::table('chapters', function (Blueprint $table) {
             // Composite index for chapter navigation (prev/next)
             $indexExists = collect(DB::select("SHOW INDEX FROM chapters WHERE Key_name = 'idx_chapters_navigation'"))->isNotEmpty();
-            if (!$indexExists) {
+            if (! $indexExists) {
                 $table->index(['manga_id', 'chapter_number', 'id'], 'idx_chapters_navigation');
             }
-            
-            // Index for slug-based chapter lookups  
+
+            // Index for slug-based chapter lookups
             $indexExists = collect(DB::select("SHOW INDEX FROM chapters WHERE Key_name = 'idx_chapters_slug'"))->isNotEmpty();
-            if (!$indexExists) {
+            if (! $indexExists) {
                 $table->index(['slug'], 'idx_chapters_slug');
             }
-            
+
             // Composite index for chapter ordering with updated_at
             $indexExists = collect(DB::select("SHOW INDEX FROM chapters WHERE Key_name = 'idx_chapters_manga_updated'"))->isNotEmpty();
-            if (!$indexExists) {
+            if (! $indexExists) {
                 $table->index(['manga_id', 'updated_at', 'chapter_number'], 'idx_chapters_manga_updated');
             }
         });
@@ -69,13 +69,13 @@ return new class extends Migration
         Schema::table('taxonomy_terms', function (Blueprint $table) {
             // Composite index for taxonomy filtering
             $indexExists = collect(DB::select("SHOW INDEX FROM taxonomy_terms WHERE Key_name = 'idx_taxonomy_terms_type_name'"))->isNotEmpty();
-            if (!$indexExists) {
+            if (! $indexExists) {
                 $table->index(['taxonomy_id', 'name'], 'idx_taxonomy_terms_type_name');
             }
-            
+
             // Index for slug-based term lookups
             $indexExists = collect(DB::select("SHOW INDEX FROM taxonomy_terms WHERE Key_name = 'idx_taxonomy_terms_slug'"))->isNotEmpty();
-            if (!$indexExists) {
+            if (! $indexExists) {
                 $table->index(['slug'], 'idx_taxonomy_terms_slug');
             }
         });
@@ -84,7 +84,7 @@ return new class extends Migration
         Schema::table('manga_taxonomy_terms', function (Blueprint $table) {
             // Covering index for related manga queries
             $indexExists = collect(DB::select("SHOW INDEX FROM manga_taxonomy_terms WHERE Key_name = 'idx_manga_taxonomy_covering'"))->isNotEmpty();
-            if (!$indexExists) {
+            if (! $indexExists) {
                 $table->index(['taxonomy_term_id', 'manga_id', 'created_at'], 'idx_manga_taxonomy_covering');
             }
         });
@@ -93,7 +93,7 @@ return new class extends Migration
         Schema::table('pages', function (Blueprint $table) {
             // Composite index for page ordering
             $indexExists = collect(DB::select("SHOW INDEX FROM pages WHERE Key_name = 'idx_pages_ordering'"))->isNotEmpty();
-            if (!$indexExists) {
+            if (! $indexExists) {
                 $table->index(['chapter_id', 'page_number', 'id'], 'idx_pages_ordering');
             }
         });

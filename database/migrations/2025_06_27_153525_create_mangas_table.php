@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('cover')->nullable();
             $table->string('slug')->unique();
             $table->timestamps();
-            
+
             $table->index(['status', 'created_at']);
             $table->index(['views', 'created_at']);
             $table->index('slug');

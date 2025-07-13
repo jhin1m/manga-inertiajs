@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
+use App\Services\SeoService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
-use App\Services\SeoService;
 
 class Chapter extends Model
 {
@@ -45,13 +44,13 @@ class Chapter extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($chapter) {
             if (empty($chapter->slug)) {
                 $chapter->slug = self::generateSlug($chapter->chapter_number, $chapter->manga_id);
             }
         });
-        
+
         static::updating(function ($chapter) {
             if ($chapter->isDirty('chapter_number') && empty($chapter->slug)) {
                 $chapter->slug = self::generateSlug($chapter->chapter_number, $chapter->manga_id);
@@ -61,20 +60,20 @@ class Chapter extends Model
 
     public static function generateSlug($chapterNumber, $mangaId = null)
     {
-        $baseSlug = 'chapter-' . $chapterNumber;
-        
-        if (!$mangaId) {
+        $baseSlug = 'chapter-'.$chapterNumber;
+
+        if (! $mangaId) {
             return $baseSlug;
         }
-        
+
         $slug = $baseSlug;
         $counter = 1;
-        
+
         while (static::where('manga_id', $mangaId)->where('slug', $slug)->exists()) {
-            $slug = $baseSlug . '-' . $counter;
+            $slug = $baseSlug.'-'.$counter;
             $counter++;
         }
-        
+
         return $slug;
     }
 
@@ -96,7 +95,7 @@ class Chapter extends Model
     public function scopePublished(Builder $query): Builder
     {
         return $query->whereNotNull('published_at')
-                    ->where('published_at', '<=', now());
+            ->where('published_at', '<=', now());
     }
 
     public function scopeByVolume(Builder $query, int $volume): Builder
@@ -107,17 +106,17 @@ class Chapter extends Model
     public function getNextChapterAttribute()
     {
         return $this->manga->chapters()
-                    ->where('chapter_number', '>', $this->chapter_number)
-                    ->orderBy('chapter_number')
-                    ->first();
+            ->where('chapter_number', '>', $this->chapter_number)
+            ->orderBy('chapter_number')
+            ->first();
     }
 
     public function getPreviousChapterAttribute()
     {
         return $this->manga->chapters()
-                    ->where('chapter_number', '<', $this->chapter_number)
-                    ->orderBy('chapter_number', 'desc')
-                    ->first();
+            ->where('chapter_number', '<', $this->chapter_number)
+            ->orderBy('chapter_number', 'desc')
+            ->first();
     }
 
     /**
@@ -126,6 +125,7 @@ class Chapter extends Model
     public function getSeoData(): array
     {
         $seoService = app(SeoService::class);
+
         return $seoService->forChapter($this);
     }
 

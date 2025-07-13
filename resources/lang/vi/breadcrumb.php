@@ -19,4 +19,4 @@ return [
     'close' => 'Đóng',
     'chapter_prefix' => 'Chương :number',
     'volume_prefix' => 'Tập :number',
-]; 
+];

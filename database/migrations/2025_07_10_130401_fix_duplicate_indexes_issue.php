@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
@@ -18,14 +16,14 @@ return new class extends Migration
         $this->dropIndexIfExists('mangas', 'idx_mangas_alt_names');
         $this->dropIndexIfExists('mangas', 'idx_mangas_status_rating');
         $this->dropIndexIfExists('mangas', 'idx_mangas_created_at');
-        
+
         $this->dropIndexIfExists('chapters', 'idx_chapters_navigation');
         $this->dropIndexIfExists('chapters', 'idx_chapters_slug');
         $this->dropIndexIfExists('chapters', 'idx_chapters_manga_updated');
-        
+
         $this->dropIndexIfExists('taxonomy_terms', 'idx_taxonomy_terms_type_name');
         $this->dropIndexIfExists('taxonomy_terms', 'idx_taxonomy_terms_slug');
-        
+
         $this->dropIndexIfExists('manga_taxonomy_terms', 'idx_manga_taxonomy_covering');
         $this->dropIndexIfExists('pages', 'idx_pages_ordering');
     }
@@ -37,7 +35,7 @@ return new class extends Migration
     {
         // Nothing to rollback
     }
-    
+
     private function dropIndexIfExists($table, $indexName)
     {
         try {

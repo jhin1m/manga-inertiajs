@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Contracts\MangaRepositoryInterface;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class HomePageService
 {
@@ -29,7 +29,7 @@ class HomePageService
                 'view_all' => __('page.home.view_all'),
                 'hot_manga_title' => __('page.home.hot_manga_title'),
                 'scroll_hint' => __('page.home.scroll_hint'),
-            ]
+            ],
         ];
     }
 

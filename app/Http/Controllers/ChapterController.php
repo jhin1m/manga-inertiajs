@@ -16,6 +16,7 @@ class ChapterController extends Controller
         private ChapterService $chapterService,
         private SeoService $seoService
     ) {}
+
     public function index(Manga $manga, Request $request)
     {
         // Allow user to specify per_page, otherwise use model default
@@ -25,7 +26,7 @@ class ChapterController extends Controller
         return Inertia::render('Chapter/Index', [
             'manga' => $manga,
             'chapters' => $chapters,
-            'seo' => $this->seoService->forManga($manga)
+            'seo' => $this->seoService->forManga($manga),
         ]);
     }
 
@@ -62,7 +63,7 @@ class ChapterController extends Controller
                 'views' => __('chapter.views'),
                 'chapter_short' => __('chapter.chapter_short'),
                 'chapter_prefix' => __('chapter.chapter_prefix'),
-            ]
+            ],
         ]);
     }
 
@@ -70,6 +71,7 @@ class ChapterController extends Controller
     {
         try {
             $chapter = $this->chapterService->createChapter($manga, $request->validated());
+
             return redirect()->route('manga.chapters.show', [$manga, $chapter])
                 ->with('success', 'Chương đã được tạo thành công!');
         } catch (\InvalidArgumentException $e) {
@@ -86,6 +88,7 @@ class ChapterController extends Controller
 
         try {
             $chapter = $this->chapterService->updateChapter($chapter, $request->validated());
+
             return redirect()->route('manga.chapters.show', [$manga, $chapter])
                 ->with('success', 'Chương đã được cập nhật thành công!');
         } catch (\InvalidArgumentException $e) {

@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Services\SeoService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use App\Services\SeoService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Manga extends Model
 {
@@ -20,15 +20,16 @@ class Manga extends Model
     {
         $statuses = [];
         foreach (self::STATUS_KEYS as $key) {
-            $statuses[$key] = __('manga.statuses.' . $key);
+            $statuses[$key] = __('manga.statuses.'.$key);
         }
+
         return $statuses;
     }
 
     protected function statusLabel(): Attribute
     {
         return Attribute::make(
-            get: fn () => __('manga.statuses.' . $this->status, [], app()->getLocale()),
+            get: fn () => __('manga.statuses.'.$this->status, [], app()->getLocale()),
         );
     }
 
@@ -113,7 +114,7 @@ class Manga extends Model
     public function scopeTopRated(Builder $query): Builder
     {
         return $query->orderBy('rating', 'desc')
-                    ->orderBy('total_rating', 'desc');
+            ->orderBy('total_rating', 'desc');
     }
 
     public function scopeRecent(Builder $query): Builder
@@ -130,13 +131,13 @@ class Manga extends Model
     {
         $currentTotal = $this->total_rating;
         $currentRating = $this->rating;
-        
+
         $newTotal = $currentTotal + 1;
         $newAverageRating = (($currentRating * $currentTotal) + $newRating) / $newTotal;
-        
+
         $this->update([
             'rating' => round($newAverageRating, 2),
-            'total_rating' => $newTotal
+            'total_rating' => $newTotal,
         ]);
     }
 
@@ -174,6 +175,7 @@ class Manga extends Model
     public function getSeoData(): array
     {
         $seoService = app(SeoService::class);
+
         return $seoService->forManga($this);
     }
 
@@ -182,7 +184,7 @@ class Manga extends Model
      */
     public function getCoverImageAttribute(): ?string
     {
-        return $this->cover ? url('/storage/' . $this->cover) : null;
+        return $this->cover ? url('/storage/'.$this->cover) : null;
     }
 
     /**

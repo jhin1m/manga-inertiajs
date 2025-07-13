@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('type', ['genre', 'author', 'tag', 'status'])->default('genre');
             $table->text('description')->nullable();
             $table->timestamps();
-            
+
             $table->index(['name', 'slug']);
         });
     }

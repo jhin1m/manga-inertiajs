@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Manga;
 use App\Models\Chapter;
-use Illuminate\Http\Response;
+use App\Models\Manga;
 use Illuminate\Support\Facades\Cache;
 
 class SitemapController extends Controller
@@ -17,26 +16,26 @@ class SitemapController extends Controller
 
             // Homepage
             $xml .= '<url>';
-            $xml .= '<loc>' . url('/') . '</loc>';
+            $xml .= '<loc>'.url('/').'</loc>';
             $xml .= '<changefreq>daily</changefreq>';
             $xml .= '<priority>1.0</priority>';
-            $xml .= '<lastmod>' . now()->toISOString() . '</lastmod>';
+            $xml .= '<lastmod>'.now()->toISOString().'</lastmod>';
             $xml .= '</url>';
 
             // Manga index
             $xml .= '<url>';
-            $xml .= '<loc>' . route('manga.index') . '</loc>';
+            $xml .= '<loc>'.route('manga.index').'</loc>';
             $xml .= '<changefreq>daily</changefreq>';
             $xml .= '<priority>0.9</priority>';
-            $xml .= '<lastmod>' . now()->toISOString() . '</lastmod>';
+            $xml .= '<lastmod>'.now()->toISOString().'</lastmod>';
             $xml .= '</url>';
 
             // Search page
             $xml .= '<url>';
-            $xml .= '<loc>' . route('search') . '</loc>';
+            $xml .= '<loc>'.route('search').'</loc>';
             $xml .= '<changefreq>weekly</changefreq>';
             $xml .= '<priority>0.8</priority>';
-            $xml .= '<lastmod>' . now()->toISOString() . '</lastmod>';
+            $xml .= '<lastmod>'.now()->toISOString().'</lastmod>';
             $xml .= '</url>';
 
             // All manga
@@ -45,10 +44,10 @@ class SitemapController extends Controller
                 ->chunk(config('manga.sitemap.chunk_size'), function ($mangas) use (&$xml) {
                     foreach ($mangas as $manga) {
                         $xml .= '<url>';
-                        $xml .= '<loc>' . route('manga.show', $manga->slug) . '</loc>';
+                        $xml .= '<loc>'.route('manga.show', $manga->slug).'</loc>';
                         $xml .= '<changefreq>weekly</changefreq>';
                         $xml .= '<priority>0.8</priority>';
-                        $xml .= '<lastmod>' . $manga->updated_at->toISOString() . '</lastmod>';
+                        $xml .= '<lastmod>'.$manga->updated_at->toISOString().'</lastmod>';
                         $xml .= '</url>';
                     }
                 });
@@ -60,15 +59,16 @@ class SitemapController extends Controller
                 ->chunk(config('manga.sitemap.chunk_size'), function ($chapters) use (&$xml) {
                     foreach ($chapters as $chapter) {
                         $xml .= '<url>';
-                        $xml .= '<loc>' . route('chapter.show', [$chapter->manga->slug, $chapter->slug]) . '</loc>';
+                        $xml .= '<loc>'.route('chapter.show', [$chapter->manga->slug, $chapter->slug]).'</loc>';
                         $xml .= '<changefreq>monthly</changefreq>';
                         $xml .= '<priority>0.6</priority>';
-                        $xml .= '<lastmod>' . $chapter->updated_at->toISOString() . '</lastmod>';
+                        $xml .= '<lastmod>'.$chapter->updated_at->toISOString().'</lastmod>';
                         $xml .= '</url>';
                     }
                 });
 
             $xml .= '</urlset>';
+
             return $xml;
         });
 
@@ -85,7 +85,7 @@ class SitemapController extends Controller
         $robots .= "Disallow: /login\n";
         $robots .= "Disallow: /register\n";
         $robots .= "\n";
-        $robots .= "Sitemap: " . url('/sitemap.xml') . "\n";
+        $robots .= 'Sitemap: '.url('/sitemap.xml')."\n";
 
         return response($robots, 200)
             ->header('Content-Type', 'text/plain');
