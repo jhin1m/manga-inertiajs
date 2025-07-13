@@ -77,7 +77,7 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
             />
 
             {/* Content */}
-            <div className="pt-16">
+            <div className="pt-20">
                 {/* Chapter Header */}
                 <div className="bg-muted/30 py-6">
                     <div className="container mx-auto px-4">
