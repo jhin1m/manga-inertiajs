@@ -10,14 +10,7 @@ import {
     TableHeader, 
     TableRow 
 } from '@/Components/ui/table'
-import { 
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from '@/Components/ui/pagination'
+import { Paginator } from '@/Components/Common/Paginator'
 import { BookOpen, Calendar, Hash, Loader2 } from 'lucide-react'
 import { formatDistanceToNow } from '@/lib/formatters'
 
@@ -192,48 +185,7 @@ export function ChapterList({ manga, chapters, translations = {} }) {
             )}
 
             {/* Pagination */}
-            {chapters?.links && chapters.links.length > 3 && (
-                <Pagination className="mt-6">
-                    <PaginationContent>
-                        {chapters.prev_page_url && (
-                            <PaginationItem>
-                                <PaginationPrevious 
-                                    as={Link} 
-                                    href={chapters.prev_page_url} 
-                                    preserveScroll
-                                >
-                                    {t.previous || 'Previous'}
-                                </PaginationPrevious>
-                            </PaginationItem>
-                        )}
-                        
-                        {chapters.links.slice(1, -1).map((link, index) => (
-                            <PaginationItem key={index}>
-                                <PaginationLink 
-                                    as={Link}
-                                    href={link.url} 
-                                    preserveScroll
-                                    isActive={link.active}
-                                >
-                                    {link.label}
-                                </PaginationLink>
-                            </PaginationItem>
-                        ))}
-                        
-                        {chapters.next_page_url && (
-                            <PaginationItem>
-                                <PaginationNext 
-                                    as={Link} 
-                                    href={chapters.next_page_url} 
-                                    preserveScroll
-                                >
-                                    {t.next || 'Next'}
-                                </PaginationNext>
-                            </PaginationItem>
-                        )}
-                    </PaginationContent>
-                </Pagination>
-            )}
+            <Paginator paginator={chapters} translations={translations} preserveScroll />
         </div>
     )
 } 

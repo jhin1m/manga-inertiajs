@@ -7,6 +7,7 @@ import { MangaList } from '@/Components/Manga/MangaList';
 import FilterSidebar from '@/Components/Sidebar/FilterSidebar';
 import MobileFilterButton from '@/Components/Sidebar/MobileFilterButton';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { Paginator } from '@/Components/Common/Paginator';
 import { Grid, List, Search, BookOpen } from 'lucide-react';
 
 export default function MangaIndex({ 
@@ -116,40 +117,7 @@ export default function MangaIndex({
                             </Card>
                         )}
 
-                        {manga?.last_page > 1 && (
-                            <div className="flex justify-center mt-8">
-                                <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 max-w-full">
-                                    {manga?.links?.map((link, index) => {
-                                        // On mobile, show only: prev, current-2, current-1, current, current+1, current+2, next
-                                        const currentPage = manga.current_page;
-                                        const isFirstOrLast = link.label.includes('Previous') || link.label.includes('Next') || 
-                                                            link.label.includes('&laquo;') || link.label.includes('&raquo;');
-                                        
-                                        if (isMobile && !isFirstOrLast) {
-                                            const pageNum = parseInt(link.label);
-                                            if (!isNaN(pageNum) && Math.abs(pageNum - currentPage) > 2) {
-                                                return null;
-                                            }
-                                        }
-                                        
-                                        return (
-                                            <Button
-                                                key={index}
-                                                variant={link.active ? 'default' : 'outline'}
-                                                size="sm"
-                                                disabled={!link.url}
-                                                onClick={() => link.url && router.get(link.url, {}, {
-                                                    preserveState: true,
-                                                    preserveScroll: true
-                                                })}
-                                                dangerouslySetInnerHTML={{ __html: link.label }}
-                                                className="min-w-[36px] h-9 text-xs sm:text-sm px-2 sm:px-3"
-                                            />
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
+                        <Paginator paginator={manga} translations={translations} className="mt-8" />
                     </main>
                 </div>
             </div>

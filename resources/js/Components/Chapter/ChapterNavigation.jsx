@@ -43,8 +43,8 @@ export function ChapterNavigation({
                 {allChapters?.map((chap) => (
                     <option key={chap.id} value={chap.slug}>
                         {mobile 
-                            ? `Ch.${chap.chapter_number}`
-                            : `Chương ${chap.chapter_number}: ${chap.title}`
+                            ? `${chap.title}`
+                            : `${chap.title}`
                         }
                     </option>
                 ))}
@@ -56,7 +56,7 @@ export function ChapterNavigation({
         <div className={`fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transition-transform duration-300 ${
             isNavVisible ? 'translate-y-0' : '-translate-y-full'
         } ${className}`}>
-            <div className="container mx-auto px-4 py-2">
+            <div className="container mx-auto px-4 py-1">
                 {/* Desktop Layout */}
                 <div className="hidden md:flex items-center justify-center gap-4">
                     <Button variant="ghost" size="sm" asChild>

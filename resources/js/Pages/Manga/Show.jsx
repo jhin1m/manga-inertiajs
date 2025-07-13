@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react'
+import { Head } from '@inertiajs/react'
 import { AppLayout } from '@/Layouts/AppLayout'
 import { MangaHeader } from '@/Components/Manga/MangaHeader'
 import { MangaInfo } from '@/Components/Manga/MangaInfo'

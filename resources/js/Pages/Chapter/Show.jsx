@@ -45,8 +45,8 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                 {allChapters?.map((chap) => (
                     <option key={chap.id} value={chap.id.toString()}>
                         {mobile 
-                            ? `${translations.chapter_short || 'Ch.'} ${chap.chapter_number}: ${chap.title}`
-                            : `${translations.chapter_prefix || 'Chapter'} ${chap.chapter_number}: ${chap.title}`
+                            ? `${chap.title}`
+                            : `${chap.title}`
                         }
                     </option>
                 ))}
@@ -87,7 +87,7 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                             </div>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Eye className="h-4 w-4" />
-                                {chapter.views.toLocaleString()} {translations.views || 'lượt xem'}
+                                {chapter.views.toLocaleString()} {translations.views || 'Views'}
                             </div>
                         </div>
                     </div>
@@ -110,14 +110,14 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                     <Button variant="outline" asChild>
                                         <Link href={route('home')}>
                                             <Home className="h-4 w-4 mr-2" />
-                                            {translations.home || 'Trang chủ'}
+                                            {translations.home || 'Home'}
                                         </Link>
                                     </Button>
                                     
                                     <Button variant="outline" asChild>
                                         <Link href={route('manga.show', manga.slug)}>
                                             <List className="h-4 w-4 mr-2" />
-                                            {translations.chapter_list || 'Danh sách chương'}
+                                            {translations.chapter_list || 'Chapter List'}
                                         </Link>
                                     </Button>
                                     
@@ -129,12 +129,12 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                         {previousChapter ? (
                                             <Link href={route('manga.chapters.show', [manga.slug, previousChapter.slug || previousChapter.chapter_number])}>
                                                 <ChevronLeft className="h-4 w-4 mr-2" />
-                                                {translations.previous_chapter || 'Chương trước'}
+                                                {translations.previous_chapter || 'Previous Chapter'}
                                             </Link>
                                         ) : (
                                             <>
                                                 <ChevronLeft className="h-4 w-4 mr-2" />
-                                                {translations.previous_chapter || 'Chương trước'}
+                                                {translations.previous_chapter || 'Previous Chapter'}
                                             </>
                                         )}
                                     </Button>
@@ -147,12 +147,12 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                     >
                                         {nextChapter ? (
                                             <Link href={route('manga.chapters.show', [manga.slug, nextChapter.slug || nextChapter.chapter_number])}>
-                                                {translations.next_chapter || 'Chương tiếp'}
+                                                {translations.next_chapter || 'Next Chapter'}
                                                 <ChevronRight className="h-4 w-4 ml-2" />
                                             </Link>
                                         ) : (
                                             <>
-                                                {translations.next_chapter || 'Chương tiếp'}
+                                                {translations.next_chapter || 'Next Chapter'}
                                                 <ChevronRight className="h-4 w-4 ml-2" />
                                             </>
                                         )}
@@ -166,14 +166,14 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                         <Button variant="outline" size="sm" asChild>
                                             <Link href={route('home')}>
                                                 <Home className="h-4 w-4 mr-2" />
-                                                {translations.home || 'Trang chủ'}
+                                                {translations.home || 'Home'}
                                             </Link>
                                         </Button>
                                         
                                         <Button variant="outline" size="sm" asChild>
                                             <Link href={route('manga.show', manga.slug)}>
                                                 <List className="h-4 w-4 mr-2" />
-                                                {translations.chapter_list || 'Danh sách'}
+                                                {translations.chapter_list || 'Chapter List'}
                                             </Link>
                                         </Button>
                                     </div>
@@ -192,12 +192,12 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                             {previousChapter ? (
                                                 <Link href={route('manga.chapters.show', [manga.slug, previousChapter.slug || previousChapter.chapter_number])}>
                                                     <ChevronLeft className="h-4 w-4 mr-2" />
-                                                    {translations.previous_chapter || 'Trước'}
+                                                    {translations.previous_chapter || 'Previous'}
                                                 </Link>
                                             ) : (
                                                 <>
                                                     <ChevronLeft className="h-4 w-4 mr-2" />
-                                                    {translations.previous_chapter || 'Trước'}
+                                                    {translations.previous_chapter || 'Previous'}
                                                 </>
                                             )}
                                         </Button>
@@ -210,12 +210,12 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                         >
                                             {nextChapter ? (
                                                 <Link href={route('manga.chapters.show', [manga.slug, nextChapter.slug || nextChapter.chapter_number])}>
-                                                    {translations.next_chapter || 'Tiếp'}
+                                                    {translations.next_chapter || 'Next'}
                                                     <ChevronRight className="h-4 w-4 ml-2" />
                                                 </Link>
                                             ) : (
                                                 <>
-                                                    {translations.next_chapter || 'Tiếp'}
+                                                    {translations.next_chapter || 'Next'}
                                                     <ChevronRight className="h-4 w-4 ml-2" />
                                                 </>
                                             )}
