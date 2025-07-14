@@ -22,9 +22,8 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Brand Section */}
                     <div className="space-y-4">
-                        <div className="flex items-center space-x-2">
-                            <ApplicationLogo className="h-8 w-8 text-primary" />
-                            <span className="font-bold text-xl text-primary">{appName || 'MangaReader'}</span>
+                        <div className="flex items-center">
+                            <ApplicationLogo className="h-10 text-primary" />
                         </div>
                         <p className="text-sm text-muted-foreground leading-relaxed">
                             {layoutTranslations.footer_description || 'Nền tảng đọc manga trực tuyến với trải nghiệm đọc mượt mà trên mọi thiết bị.'}
@@ -67,7 +66,7 @@ export default function Footer() {
                 {/* Bottom Footer */}
                 <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
                     <div className="text-sm text-muted-foreground">
-                        <p>© {currentYear} {appName || 'MangaReader'}. {layoutTranslations.copyright || 'Tất cả quyền được bảo lưu.'}</p>
+                        <p>© {currentYear} {layoutTranslations.copyright || 'Tất cả quyền được bảo lưu.'}</p>
                     </div>
                     
                     <div className="flex items-center space-x-2 text-sm text-muted-foreground">

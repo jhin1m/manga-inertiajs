@@ -35,4 +35,9 @@ return [
     'press_enter_to_search' => 'Nhấn Enter để tìm kiếm',
     'manga_badge' => 'Manga',
     'genre_badge' => 'Thể loại',
+    // Genres
+    'genres' => 'Thể loại',
+    'view_all_genres' => 'Xem tất cả thể loại',
+    // Mobile menu
+    'mobile_menu_description' => 'Menu điều hướng di động',
 ];

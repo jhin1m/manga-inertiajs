@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Contracts\MangaRepositoryInterface;
 use App\Models\Manga;
+use App\Models\TaxonomyTerm;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -325,6 +326,23 @@ class MangaRepository implements MangaRepositoryInterface
     public function incrementViewCount(Manga $manga): void
     {
         $manga->increment('views');
+    }
+
+    public function getGenres(): Collection
+    {
+        return TaxonomyTerm::select('id', 'name', 'slug')
+            ->whereHas('taxonomy', function ($query) {
+                $query->where('type', 'genre');
+            })
+            ->orderBy('name')
+            ->get()
+            ->map(function ($genre) {
+                return [
+                    'id' => $genre->id,
+                    'name' => $genre->name,
+                    'slug' => $genre->slug
+                ];
+            });
     }
 
     private function applyFilters(Builder $query, array $filters): Builder

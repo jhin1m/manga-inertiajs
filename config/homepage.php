@@ -6,6 +6,7 @@ return [
         'latest_updates_ttl' => env('HOMEPAGE_LATEST_UPDATES_TTL', 1800),
         'rankings_ttl' => env('HOMEPAGE_RANKINGS_TTL', 7200),
         'recommended_ttl' => env('HOMEPAGE_RECOMMENDED_TTL', 3600),
+        'genres_ttl' => env('HOMEPAGE_GENRES_TTL', 86400),
     ],
 
     'limits' => [

@@ -32,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
         // Share translations globally with all Inertia pages
         Inertia::share([
             'appName' => config('app.name'),
+            'seoConfig' => config('seo'),
             'layoutTranslations' => fn () => [
                 'home' => __('layout.home'),
                 'library' => __('layout.library'),
@@ -66,6 +67,11 @@ class AppServiceProvider extends ServiceProvider
                 'press_enter_to_search' => __('layout.press_enter_to_search'),
                 'manga_badge' => __('layout.manga_badge'),
                 'genre_badge' => __('layout.genre_badge'),
+                // Genres
+                'genres' => __('layout.genres'),
+                'view_all_genres' => __('layout.view_all_genres'),
+                // Mobile menu
+                'mobile_menu_description' => __('layout.mobile_menu_description'),
             ],
             'breadcrumbTranslations' => fn () => [
                 'home' => __('breadcrumb.home'),

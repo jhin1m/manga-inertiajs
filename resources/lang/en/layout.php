@@ -34,4 +34,9 @@ return [
     'press_enter_to_search' => 'Press Enter to search for',
     'manga_badge' => 'Manga',
     'genre_badge' => 'Genre',
+    // Genres
+    'genres' => 'Genres',
+    'view_all_genres' => 'View All Genres',
+    // Mobile menu
+    'mobile_menu_description' => 'Mobile navigation menu',
 ];

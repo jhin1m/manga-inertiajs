@@ -1,4 +1,24 @@
+import { usePage } from '@inertiajs/react';
+
 export default function ApplicationLogo(props) {
+    const { seoConfig } = usePage().props;
+    
+    // Check if we have a custom logo path from SEO config
+    const logoPath = seoConfig?.schema?.organization?.logo;
+    
+    // If custom logo path is provided, use img tag
+    if (logoPath) {
+        return (
+            <img
+                {...props}
+                src={logoPath}
+                alt="Application Logo"
+                className={`${props.className || ''} object-contain`}
+            />
+        );
+    }
+    
+    // Otherwise use the default SVG logo
     return (
         <svg
             {...props}

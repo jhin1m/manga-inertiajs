@@ -10,7 +10,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu.jsx";
-import { Sheet, SheetContent, SheetTrigger } from "@/Components/ui/sheet.jsx";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/Components/ui/sheet.jsx";
+import { VisuallyHidden } from "@/Components/ui/visually-hidden.jsx";
 import { ScrollArea } from "@/Components/ui/scroll-area.jsx";
 import { Separator } from "@/Components/ui/separator.jsx";
 import { 
@@ -28,21 +29,44 @@ import {
     Menu,
     Heart,
     History,
-    Star
+    Star,
+    Tags,
+    ChevronDown
 } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function Header({ onSearchOpen }) {
-    const { auth, appName, layoutTranslations = {} } = usePage().props;
+    const { auth, appName, layoutTranslations = {}, genres = [] } = usePage().props;
     const user = auth?.user;
     
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [genresOpen, setGenresOpen] = useState(false);
+    const [mobileGenresOpen, setMobileGenresOpen] = useState(false);
 
     const navigationItems = [
         { name: layoutTranslations.home || 'Home', href: route('home'), icon: Home, current: route().current('home') },
         { name: layoutTranslations.library || 'Library', href: route('manga.index'), icon: Library, current: route().current('manga.*') },
+        { 
+            name: layoutTranslations.genres || 'Genres', 
+            href: '#', 
+            icon: Tags, 
+            current: false,
+            hasDropdown: true,
+            onClick: (e) => {
+                e.preventDefault();
+                setGenresOpen(!genresOpen);
+            }
+        },
         { name: layoutTranslations.search || 'Search', href: route('search'), icon: Search, current: route().current('search') },
     ];
+
+    // Group genres into rows of 6
+    const genreRows = [];
+    for (let i = 0; i < genres.length; i += 6) {
+        genreRows.push(genres.slice(i, i + 6));
+    }
+    // Limit to 3 rows
+    const limitedGenreRows = genreRows.slice(0, 3);
 
     const userMenuItems = user ? [
         { name: layoutTranslations.favorites || 'Favorites', href: route('favorites'), icon: Heart },
@@ -55,9 +79,8 @@ export default function Header({ onSearchOpen }) {
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
                 {/* Logo */}
                 <div className="flex items-center space-x-4">
-                    <Link href={route('home')} className="flex items-center space-x-2">
-                        <ApplicationLogo className="h-8 w-8 text-primary" />
-                        <span className="font-bold text-xl text-primary">{appName || 'MangaReader'}</span>
+                    <Link href={route('home')} className="flex items-center">
+                        <ApplicationLogo className="h-8 text-primary" />
                     </Link>
                 </div>
 
@@ -66,17 +89,67 @@ export default function Header({ onSearchOpen }) {
                     <NavigationMenuList>
                         {navigationItems.map((item) => (
                             <NavigationMenuItem key={item.name}>
-                                <NavigationMenuLink asChild>
-                                    <Link
-                                        href={item.href}
-                                        className={`group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
-                                            item.current ? 'text-primary' : 'text-foreground'
-                                        }`}
-                                    >
-                                        <item.icon className="mr-2 h-4 w-4" />
-                                        {item.name}
-                                    </Link>
-                                </NavigationMenuLink>
+                                {item.hasDropdown ? (
+                                    <DropdownMenu open={genresOpen} onOpenChange={setGenresOpen}>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                className={`group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none ${
+                                                    item.current ? 'text-primary' : 'text-foreground'
+                                                }`}
+                                            >
+                                                <item.icon className="mr-2 h-4 w-4" />
+                                                {item.name}
+                                                <ChevronDown className="ml-1 h-3 w-3" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent className="w-[600px] p-4">
+                                            <div className="space-y-3">
+                                                {limitedGenreRows.map((row, rowIndex) => (
+                                                    <div key={rowIndex} className="grid grid-cols-6 gap-2">
+                                                        {row.map((genre) => (
+                                                            <DropdownMenuItem key={genre.id} asChild>
+                                                                <Link 
+                                                                    href={route('manga.index', { genre: genre.slug })}
+                                                                    className="flex flex-col items-center p-2 rounded-md hover:bg-accent text-center min-h-[60px] justify-center"
+                                                                >
+                                                                    <span className="text-xs font-medium text-foreground truncate w-full">
+                                                                        {genre.name}
+                                                                    </span>
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                        ))}
+                                                    </div>
+                                                ))}
+                                                {genres.length > 18 && (
+                                                    <>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem asChild>
+                                                            <Link 
+                                                                href={route('manga.index')}
+                                                                className="w-full text-center text-primary hover:text-primary/80"
+                                                            >
+                                                                {layoutTranslations.view_all_genres || 'Xem tất cả thể loại'}
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                ) : (
+                                    <NavigationMenuLink asChild>
+                                        <Link
+                                            href={item.href}
+                                            className={`group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
+                                                item.current ? 'text-primary' : 'text-foreground'
+                                            }`}
+                                        >
+                                            <item.icon className="mr-2 h-4 w-4" />
+                                            {item.name}
+                                        </Link>
+                                    </NavigationMenuLink>
+                                )}
                             </NavigationMenuItem>
                         ))}
                     </NavigationMenuList>
@@ -185,11 +258,17 @@ export default function Header({ onSearchOpen }) {
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                            <VisuallyHidden>
+                                <SheetTitle>{layoutTranslations.navigation || 'Navigation'}</SheetTitle>
+                                <SheetDescription>
+                                    {layoutTranslations.mobile_menu_description || 'Mobile navigation menu'}
+                                </SheetDescription>
+                            </VisuallyHidden>
+                            
                             <div className="flex flex-col h-full">
                                 {/* Mobile Logo */}
-                                <div className="flex items-center space-x-2 pb-4">
-                                    <ApplicationLogo className="h-6 w-6 text-primary" />
-                                    <span className="font-bold text-lg text-primary">{appName || 'MangaReader'}</span>
+                                <div className="flex items-center pb-4">
+                                    <ApplicationLogo className="h-8 text-primary" />
                                 </div>
                                 
                                 <Separator />
@@ -198,17 +277,66 @@ export default function Header({ onSearchOpen }) {
                                 <ScrollArea className="flex-1 py-4">
                                     <div className="space-y-2">
                                         {navigationItems.map((item) => (
-                                            <Button
-                                                key={item.name}
-                                                variant={item.current ? "secondary" : "ghost"}
-                                                className="w-full justify-start"
-                                                asChild
-                                            >
-                                                <Link href={item.href}>
-                                                    <item.icon className="mr-2 h-4 w-4" />
-                                                    {item.name}
-                                                </Link>
-                                            </Button>
+                                            item.hasDropdown ? (
+                                                <div key={item.name} className="space-y-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="w-full justify-between"
+                                                        onClick={() => setMobileGenresOpen(!mobileGenresOpen)}
+                                                    >
+                                                        <div className="flex items-center">
+                                                            <item.icon className="mr-2 h-4 w-4" />
+                                                            {item.name}
+                                                        </div>
+                                                        <ChevronDown className={`h-4 w-4 transition-transform ${mobileGenresOpen ? 'rotate-180' : ''}`} />
+                                                    </Button>
+                                                    {mobileGenresOpen && (
+                                                        <div className="ml-6 space-y-1 max-h-60 overflow-y-auto">
+                                                            {genres.map((genre) => (
+                                                                <Button
+                                                                    key={genre.id}
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="w-full justify-start text-sm"
+                                                                    asChild
+                                                                >
+                                                                    <Link href={route('manga.index', { genre: genre.slug })}>
+                                                                        {genre.name}
+                                                                    </Link>
+                                                                </Button>
+                                                            ))}
+                                                            {genres.length > 0 && (
+                                                                <>
+                                                                    <Separator className="my-2" />
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="w-full justify-start text-sm text-primary"
+                                                                        asChild
+                                                                    >
+                                                                        <Link href={route('manga.index')}>
+                                                                            <Tags className="mr-2 h-3 w-3" />
+                                                                            {layoutTranslations.view_all_genres || 'Xem tất cả thể loại'}
+                                                                        </Link>
+                                                                    </Button>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <Button
+                                                    key={item.name}
+                                                    variant={item.current ? "secondary" : "ghost"}
+                                                    className="w-full justify-start"
+                                                    asChild
+                                                >
+                                                    <Link href={item.href}>
+                                                        <item.icon className="mr-2 h-4 w-4" />
+                                                        {item.name}
+                                                    </Link>
+                                                </Button>
+                                            )
                                         ))}
                                         
                                         {user && (

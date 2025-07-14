@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Contracts\MangaRepositoryInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-
+use Illuminate\Support\Facades\Route;
 class HomePageService
 {
     public function __construct(
@@ -15,14 +15,15 @@ class HomePageService
     public function getHomePageData(): array
     {
         return [
-            'canLogin' => \Route::has('login'),
-            'canRegister' => \Route::has('register'),
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
             'hotManga' => $this->getCachedHotManga(),
             // latestUpdates now handled via defer in controller
             'featuredManga' => [],
             'rankings' => $this->getCachedRankings(),
             'recentComments' => [],
             'recommended' => $this->getCachedRecommended(),
+            'genres' => $this->getCachedGenres(),
             'translations' => [
                 // Page specific translations
                 'latest_updates_title' => __('page.home.latest_updates_title'),
@@ -61,11 +62,19 @@ class HomePageService
         });
     }
 
+    private function getCachedGenres(): Collection
+    {
+        return Cache::remember('homepage.genres', config('homepage.cache.genres_ttl'), function () {
+            return $this->mangaRepository->getGenres();
+        });
+    }
+
     public function clearCache(): void
     {
         Cache::forget('homepage.hot_manga');
         Cache::forget('homepage.latest_updates');
         Cache::forget('homepage.rankings');
         Cache::forget('homepage.recommended');
+        Cache::forget('homepage.genres');
     }
 }

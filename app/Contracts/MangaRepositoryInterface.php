@@ -28,6 +28,8 @@ interface MangaRepositoryInterface
 
     public function getRelatedManga(Manga $manga, ?int $limit = null): Collection;
 
+    public function getGenres(): Collection;
+
     public function searchManga(string $query, ?int $perPage = null): LengthAwarePaginator;
 
     public function createManga(array $data): Manga;

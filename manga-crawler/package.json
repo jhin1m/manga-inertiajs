@@ -1,0 +1,30 @@
+{
+  "name": "manga-crawler",
+  "version": "1.0.0",
+  "description": "Standalone JavaScript manga crawler for Laravel manga application",
+  "main": "crawler.js",
+  "scripts": {
+    "start": "node crawler.js",
+    "crawl": "node crawler.js",
+    "test": "node run-tests.js",
+    "test:manga-slug": "node test-manga-slug.js",
+    "test:chapter-slug": "node test-chapter-slug.js",
+    "test:genres": "node test-genres-import.js"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1691.0",
+    "axios": "^1.5.0",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^17.2.0",
+    "https-proxy-agent": "^7.0.0",
+    "kuromoji": "^0.1.2",
+    "kuroshiro": "^1.2.0",
+    "kuroshiro-analyzer-kuromoji": "^1.1.0",
+    "mysql2": "^3.6.0",
+    "slugify": "^1.6.6",
+    "transliteration": "^2.3.5",
+    "yargs": "^17.7.2"
+  },
+  "author": "Manga Crawler",
+  "license": "MIT"
+}
