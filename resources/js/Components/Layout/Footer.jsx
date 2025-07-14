@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Badge } from "@/Components/ui/badge.jsx";
 import { Separator } from "@/Components/ui/separator.jsx";
 import { 
@@ -7,11 +7,12 @@ import {
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function Footer() {
+    const { appName, layoutTranslations = {} } = usePage().props;
     const currentYear = new Date().getFullYear();
 
     const quickLinks = [
-        { name: 'Manga List', href: route('manga.index'), icon: BookOpen },
-        { name: 'Search', href: route('search'), icon: BookOpen },
+        { name: layoutTranslations.library || 'Manga List', href: route('manga.index'), icon: BookOpen },
+        { name: layoutTranslations.search || 'Search', href: route('search'), icon: BookOpen },
     ];
 
     return (
@@ -23,10 +24,10 @@ export default function Footer() {
                     <div className="space-y-4">
                         <div className="flex items-center space-x-2">
                             <ApplicationLogo className="h-8 w-8 text-primary" />
-                            <span className="font-bold text-xl text-primary">MangaReader</span>
+                            <span className="font-bold text-xl text-primary">{appName || 'MangaReader'}</span>
                         </div>
                         <p className="text-sm text-muted-foreground leading-relaxed">
-                            Nền tảng đọc manga trực tuyến với trải nghiệm đọc mượt mà trên mọi thiết bị.
+                            {layoutTranslations.footer_description || 'Nền tảng đọc manga trực tuyến với trải nghiệm đọc mượt mà trên mọi thiết bị.'}
                         </p>
                         
                         {/* Version Badge */}
@@ -35,14 +36,17 @@ export default function Footer() {
                                 v1.0.0
                             </Badge>
                             <Badge variant="outline" className="text-xs bg-green-100 text-green-800">
-                                Online
+                                {layoutTranslations.online_status || 'Online'}
                             </Badge>
                         </div>
                     </div>
 
-                    {/* Quick Links */}
+                    {/* Empty middle column for spacing */}
+                    <div></div>
+
+                    {/* Quick Links - moved to the right */}
                     <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-foreground">Khám phá</h4>
+                        <h4 className="text-sm font-semibold text-foreground">{layoutTranslations.explore || 'Khám phá'}</h4>
                         <nav className="space-y-3">
                             {quickLinks.map((link) => (
                                 <Link
@@ -63,12 +67,12 @@ export default function Footer() {
                 {/* Bottom Footer */}
                 <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
                     <div className="text-sm text-muted-foreground">
-                        <p>© {currentYear} MangaReader. Tất cả quyền được bảo lưu.</p>
+                        <p>© {currentYear} {appName || 'MangaReader'}. {layoutTranslations.copyright || 'Tất cả quyền được bảo lưu.'}</p>
                     </div>
                     
                     <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                         <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span>Máy chủ hoạt động</span>
+                        <span>{layoutTranslations.server_status || 'Máy chủ hoạt động'}</span>
                     </div>
                 </div>
             </div>

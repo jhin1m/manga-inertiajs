@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { 
     Command,
     CommandDialog,
@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 
 export default function SearchDialog({ open, setOpen }) {
+    const { layoutTranslations = {} } = usePage().props;
     const [query, setQuery] = useState('');
     const [recentSearches, setRecentSearches] = useState([]);
 
@@ -84,15 +85,15 @@ export default function SearchDialog({ open, setOpen }) {
     return (
         <CommandDialog open={open} onOpenChange={setOpen}>
             <VisuallyHidden>
-                <DialogTitle>Tìm kiếm manga</DialogTitle>
+                <DialogTitle>{layoutTranslations.search_dialog_title || 'Tìm kiếm manga'}</DialogTitle>
                 <DialogDescription>
-                    Tìm kiếm manga, tác giả, thể loại và nhiều hơn nữa
+                    {layoutTranslations.search_dialog_description || 'Tìm kiếm manga, tác giả, thể loại và nhiều hơn nữa'}
                 </DialogDescription>
             </VisuallyHidden>
             
             <Command className="rounded-lg border shadow-md">
                 <CommandInput
-                    placeholder="Tìm kiếm manga, tác giả, thể loại..."
+                    placeholder={layoutTranslations.search_dialog_placeholder || 'Tìm kiếm manga, tác giả, thể loại...'}
                     value={query}
                     onValueChange={setQuery}
                     onKeyDown={handleKeyDown}
@@ -103,7 +104,7 @@ export default function SearchDialog({ open, setOpen }) {
                         <>
                             {/* Recent Searches */}
                             {recentSearches.length > 0 && (
-                                <CommandGroup heading="Tìm kiếm gần đây">
+                                <CommandGroup heading={layoutTranslations.recent_searches || 'Tìm kiếm gần đây'}>
                                     {recentSearches.map((term, index) => (
                                         <CommandItem
                                             key={`recent-${index}`}
@@ -118,13 +119,13 @@ export default function SearchDialog({ open, setOpen }) {
                                         onSelect={clearRecentSearches}
                                         className="text-xs text-muted-foreground justify-center"
                                     >
-                                        Xóa lịch sử tìm kiếm
+                                        {layoutTranslations.clear_history || 'Xóa lịch sử tìm kiếm'}
                                     </CommandItem>
                                 </CommandGroup>
                             )}
 
                             {/* Popular Manga */}
-                            <CommandGroup heading="Manga phổ biến">
+                            <CommandGroup heading={layoutTranslations.popular_manga || 'Manga phổ biến'}>
                                 {popularManga.map((manga, index) => (
                                     <CommandItem
                                         key={`popular-manga-${index}`}
@@ -133,14 +134,14 @@ export default function SearchDialog({ open, setOpen }) {
                                         <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                                         {manga}
                                         <Badge variant="secondary" className="ml-auto text-xs">
-                                            Manga
+                                            {layoutTranslations.manga_badge || 'Manga'}
                                         </Badge>
                                     </CommandItem>
                                 ))}
                             </CommandGroup>
 
                             {/* Popular Genres */}
-                            <CommandGroup heading="Thể loại phổ biến">
+                            <CommandGroup heading={layoutTranslations.popular_genres || 'Thể loại phổ biến'}>
                                 {popularGenres.map((genre, index) => (
                                     <CommandItem
                                         key={`popular-genre-${index}`}
@@ -149,7 +150,7 @@ export default function SearchDialog({ open, setOpen }) {
                                         <Tag className="mr-2 h-4 w-4 text-green-500" />
                                         {genre}
                                         <Badge variant="outline" className="ml-auto text-xs">
-                                            Thể loại
+                                            {layoutTranslations.genre_badge || 'Thể loại'}
                                         </Badge>
                                     </CommandItem>
                                 ))}
@@ -165,7 +166,7 @@ export default function SearchDialog({ open, setOpen }) {
                                     className="font-medium"
                                 >
                                     <Search className="mr-2 h-4 w-4" />
-                                    Tìm kiếm "{query}"
+                                    {layoutTranslations.search_for || 'Tìm kiếm'} "{query}"
                                 </CommandItem>
                             </CommandGroup>
                         </>
@@ -175,7 +176,7 @@ export default function SearchDialog({ open, setOpen }) {
                         <CommandEmpty>
                             <div className="flex flex-col items-center gap-2 py-6">
                                 <Search className="h-8 w-8 text-muted-foreground" />
-                                <p>Nhấn Enter để tìm kiếm "{query}"</p>
+                                <p>{layoutTranslations.press_enter_to_search || 'Nhấn Enter để tìm kiếm'} "{query}"</p>
                             </div>
                         </CommandEmpty>
                     )}

@@ -49,7 +49,7 @@ return [
             '@type' => 'Organization',
             'name' => env('SEO_SITE_NAME', 'Manga Reader'),
             'url' => env('APP_URL'),
-            'logo' => env('APP_URL').env('SEO_SCHEMA_LOGO_PATH', '/images/logo.png'),
+            'logo' => env('SEO_SCHEMA_LOGO_PATH', '/images/logo.png'),
             'description' => env('SEO_DEFAULT_DESCRIPTION', 'Website đọc truyện tranh manga online miễn phí'),
             'sameAs' => array_filter(explode(',', env('SEO_SCHEMA_SOCIAL_MEDIA_LINKS', ''))),
         ],

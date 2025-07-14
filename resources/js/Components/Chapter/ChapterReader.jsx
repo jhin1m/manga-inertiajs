@@ -53,7 +53,7 @@ export function ChapterReader({ pages }) {
                             ) : (
                                 <img
                                     src={page.image_url}
-                                    alt={`Trang ${page.page_number}`}
+                                    alt={`Page ${page.page_number}`}
                                     className="max-w-full h-auto shadow-sm"
                                     loading={index < 3 ? 'eager' : 'lazy'}
                                     onError={(e) => handleImageError(page.id, page, e)}

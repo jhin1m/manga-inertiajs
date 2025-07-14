@@ -16,4 +16,22 @@ return [
     'toggle_menu' => 'Toggle menu',
     'user_menu' => 'User menu',
     'navigation' => 'Navigation',
+    // Footer
+    'footer_description' => 'Online manga reading platform with smooth reading experience on all devices.',
+    'explore' => 'Explore',
+    'copyright' => 'All rights reserved.',
+    'online_status' => 'Online',
+    'server_status' => 'Server running',
+    // Search Dialog
+    'search_dialog_title' => 'Search manga',
+    'search_dialog_description' => 'Search for manga, authors, genres and more',
+    'search_dialog_placeholder' => 'Search manga, authors, genres...',
+    'recent_searches' => 'Recent searches',
+    'clear_history' => 'Clear search history',
+    'popular_manga' => 'Popular manga',
+    'popular_genres' => 'Popular genres',
+    'search_for' => 'Search for',
+    'press_enter_to_search' => 'Press Enter to search for',
+    'manga_badge' => 'Manga',
+    'genre_badge' => 'Genre',
 ];

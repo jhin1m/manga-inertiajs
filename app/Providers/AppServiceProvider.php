@@ -20,10 +20,6 @@ class AppServiceProvider extends ServiceProvider
         // Register Repository bindings
         $this->app->bind(MangaRepositoryInterface::class, MangaRepository::class);
         $this->app->bind(ChapterRepositoryInterface::class, ChapterRepository::class);
-
-        if ($this->app->environment('local')) {
-            $this->app->register(\App\Providers\TelescopeServiceProvider::class);
-        }
     }
 
     /**
@@ -52,6 +48,24 @@ class AppServiceProvider extends ServiceProvider
                 'toggle_menu' => __('layout.toggle_menu'),
                 'user_menu' => __('layout.user_menu'),
                 'navigation' => __('layout.navigation'),
+                // Footer translations
+                'footer_description' => __('layout.footer_description'),
+                'explore' => __('layout.explore'),
+                'copyright' => __('layout.copyright'),
+                'online_status' => __('layout.online_status'),
+                'server_status' => __('layout.server_status'),
+                // Search dialog translations
+                'search_dialog_title' => __('layout.search_dialog_title'),
+                'search_dialog_description' => __('layout.search_dialog_description'),
+                'search_dialog_placeholder' => __('layout.search_dialog_placeholder'),
+                'recent_searches' => __('layout.recent_searches'),
+                'clear_history' => __('layout.clear_history'),
+                'popular_manga' => __('layout.popular_manga'),
+                'popular_genres' => __('layout.popular_genres'),
+                'search_for' => __('layout.search_for'),
+                'press_enter_to_search' => __('layout.press_enter_to_search'),
+                'manga_badge' => __('layout.manga_badge'),
+                'genre_badge' => __('layout.genre_badge'),
             ],
             'breadcrumbTranslations' => fn () => [
                 'home' => __('breadcrumb.home'),

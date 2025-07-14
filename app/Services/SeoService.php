@@ -213,7 +213,7 @@ class SeoService
                 [
                     '@type' => 'ListItem',
                     'position' => 1,
-                    'name' => Config::get('seo.labels.home', 'Trang chủ'),
+                    'name' => Config::get('seo.labels.home', 'Home'),
                     'item' => url('/'),
                 ],
                 [
@@ -241,8 +241,8 @@ class SeoService
         return [
             '@context' => 'https://schema.org',
             '@type' => 'Article',
-            'headline' => $manga->name.' - '.Config::get('seo.labels.chapter', 'Chương').' '.$chapter->chapter_number,
-            'description' => Config::get('seo.labels.chapter_description_prefix', 'Đọc').' '.$manga->name.' '.Config::get('seo.labels.chapter_description_suffix', 'chương').' '.$chapter->chapter_number,
+            'headline' => $manga->name.' - '.Config::get('seo.labels.chapter', 'Chapter').' '.$chapter->chapter_number,
+            'description' => Config::get('seo.labels.chapter_description_prefix', 'Read').' '.$manga->name.' '.Config::get('seo.labels.chapter_description_suffix', 'chapter').' '.$chapter->chapter_number,
             'url' => route('manga.chapters.show', [$manga->slug, $chapter->slug]),
             'image' => $manga->cover_image ? url($manga->cover_image) : null,
             'datePublished' => $chapter->created_at?->toISOString(),
@@ -266,7 +266,7 @@ class SeoService
                     [
                         '@type' => 'ListItem',
                         'position' => 1,
-                        'name' => Config::get('seo.labels.home', 'Trang chủ'),
+                        'name' => Config::get('seo.labels.home', 'Home'),
                         'item' => url('/'),
                     ],
                     [
@@ -284,7 +284,7 @@ class SeoService
                     [
                         '@type' => 'ListItem',
                         'position' => 4,
-                        'name' => Config::get('seo.labels.chapter', 'Chương').' '.$chapter->chapter_number,
+                        'name' => Config::get('seo.labels.chapter', 'Chapter').' '.$chapter->chapter_number,
                         'item' => route('manga.chapters.show', [$manga->slug, $chapter->slug]),
                     ],
                 ],
