@@ -62,7 +62,8 @@ class MangaRepository implements MangaRepositoryInterface
                 },
             ])
             ->whereHas('chapters')
-            ->orderByRaw('(SELECT MAX(updated_at) FROM chapters WHERE chapters.manga_id = mangas.id) DESC');
+            ->withMax('chapters', 'updated_at')
+            ->orderBy('chapters_max_updated_at', 'desc');
 
         if ($limit) {
             $query->limit($limit);
@@ -324,7 +325,7 @@ class MangaRepository implements MangaRepositoryInterface
 
     public function incrementViewCount(Manga $manga): void
     {
-        \DB::statement('UPDATE mangas SET views = views + 1 WHERE id = ?', [$manga->id]);
+        $manga->increment('views');
     }
 
     public function getGenres(): Collection
@@ -382,7 +383,8 @@ class MangaRepository implements MangaRepositoryInterface
                 break;
             case 'latest':
             default:
-                $query->orderBy('updated_at', 'desc');
+                $query->withMax('chapters', 'updated_at')
+                    ->orderBy('chapters_max_updated_at', 'desc');
                 break;
         }
 

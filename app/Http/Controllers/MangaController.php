@@ -58,10 +58,12 @@ class MangaController extends Controller
 
     public function show(Manga $manga, Request $request)
     {
-        $manga = $this->mangaService->getMangaDetail($manga);
+        // Only increment view count on the initial HTML request, not on subsequent asset requests.
+        if ($request->acceptsHtml() && ! $request->header('X-Inertia')) {
+            $this->mangaService->incrementViewCount($manga);
+        }
 
-        // Increment view count
-        $this->mangaService->incrementViewCount($manga);
+        $manga = $this->mangaService->getMangaDetail($manga);
 
         // Get first and last chapters for navigation
         $firstChapter = $manga->chapters()->orderBy('chapter_number', 'asc')->first();
