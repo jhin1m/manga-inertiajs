@@ -55,7 +55,6 @@ class MangaRepository implements MangaRepositoryInterface
     {
         $query = Manga::select('id', 'name', 'slug', 'cover', 'status', 'updated_at')
             ->with([
-                'taxonomyTerms:id,name,slug',
                 'chapters' => function ($query) {
                     $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug', 'updated_at', 'created_at')
                         ->orderBy('chapter_number', 'desc')
@@ -63,7 +62,7 @@ class MangaRepository implements MangaRepositoryInterface
                 },
             ])
             ->whereHas('chapters')
-            ->orderBy('updated_at', 'desc');
+            ->orderByRaw('(SELECT MAX(updated_at) FROM chapters WHERE chapters.manga_id = mangas.id) DESC');
 
         if ($limit) {
             $query->limit($limit);
