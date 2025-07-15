@@ -325,7 +325,10 @@ class MangaRepository implements MangaRepositoryInterface
 
     public function incrementViewCount(Manga $manga): void
     {
-        $manga->increment('views');
+        // Use raw SQL to avoid updating updated_at timestamp
+        \DB::table('mangas')
+            ->where('id', $manga->id)
+            ->increment('views');
     }
 
     public function getGenres(): Collection

@@ -104,7 +104,10 @@ class ChapterRepository implements ChapterRepositoryInterface
 
     public function incrementViewCount(Chapter $chapter): void
     {
-        $chapter->increment('views');
+        // Use raw SQL to avoid updating updated_at timestamp
+        \DB::table('chapters')
+            ->where('id', $chapter->id)
+            ->increment('views');
     }
 
     public function getNextChapterNumber(Manga $manga): float

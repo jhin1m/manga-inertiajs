@@ -124,7 +124,10 @@ class Manga extends Model
 
     public function incrementViews(): void
     {
-        $this->increment('views');
+        // Use raw SQL to avoid updating updated_at timestamp
+        \DB::table('mangas')
+            ->where('id', $this->id)
+            ->increment('views');
     }
 
     public function updateRating(float $newRating): void

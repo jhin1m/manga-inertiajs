@@ -30,7 +30,7 @@ class ChapterController extends Controller
         ]);
     }
 
-    public function show(Manga $manga, Chapter $chapter)
+    public function show(Manga $manga, Chapter $chapter, Request $request)
     {
         // Ensure chapter belongs to manga
         if ($chapter->manga_id !== $manga->id) {
@@ -40,8 +40,10 @@ class ChapterController extends Controller
         $chapter = $this->chapterService->getChapterDetail($chapter);
         $adjacentChapters = $this->chapterService->getAdjacentChapters($chapter);
 
-        // Increment view count
-        $this->chapterService->incrementViewCount($chapter);
+        // Only increment view count on the initial HTML request, not on subsequent asset requests.
+        if ($request->acceptsHtml() && ! $request->header('X-Inertia')) {
+            $this->chapterService->incrementViewCount($chapter);
+        }
 
         return Inertia::render('Chapter/Show', [
             'manga' => $manga,

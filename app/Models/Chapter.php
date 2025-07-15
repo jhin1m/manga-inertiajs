@@ -134,6 +134,9 @@ class Chapter extends Model
      */
     public function incrementViews(): void
     {
-        $this->increment('views');
+        // Use raw SQL to avoid updating updated_at timestamp
+        \DB::table('chapters')
+            ->where('id', $this->id)
+            ->increment('views');
     }
 }
