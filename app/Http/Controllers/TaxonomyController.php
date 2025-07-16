@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Taxonomy;
 use App\Models\TaxonomyTerm;
+use App\Services\TaxonomyService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class TaxonomyController extends Controller
 {
+    public function __construct(
+        private TaxonomyService $taxonomyService
+    ) {}
+
     public function index()
     {
-        $taxonomies = Taxonomy::withCount('terms')
-            ->get();
+        $taxonomies = $this->taxonomyService->getAllTaxonomies();
 
         return Inertia::render('Taxonomy/Index', [
             'taxonomies' => $taxonomies,
@@ -21,10 +25,7 @@ class TaxonomyController extends Controller
 
     public function show(Taxonomy $taxonomy)
     {
-        $terms = $taxonomy->terms()
-            ->withCount('mangas')
-            ->orderBy('name')
-            ->paginate(20);
+        $terms = $this->taxonomyService->getTaxonomyWithTerms($taxonomy);
 
         return Inertia::render('Taxonomy/Show', [
             'taxonomy' => $taxonomy,
@@ -34,13 +35,7 @@ class TaxonomyController extends Controller
 
     public function terms(TaxonomyTerm $term)
     {
-        $term->load('taxonomy');
-
-        $manga = $term->mangas()
-            ->with(['taxonomyTerms', 'chapters'])
-            ->withCount('chapters')
-            ->orderBy('updated_at', 'desc')
-            ->paginate(20);
+        $manga = $this->taxonomyService->getMangaByTerm($term);
 
         return Inertia::render('Taxonomy/Terms', [
             'term' => $term,
@@ -50,37 +45,14 @@ class TaxonomyController extends Controller
 
     public function termsByType(TaxonomyTerm $term, Request $request)
     {
-        $term->load('taxonomy');
-
         // Get the type from the route name
         $routeName = $request->route()->getName();
-        $type = explode('.', $routeName)[0]; // genre.show -> genre
+        $type = $this->taxonomyService->getTypeFromRouteName($routeName);
 
-        // Validate that the term belongs to the correct taxonomy type
-        if ($term->taxonomy->type !== $type) {
-            abort(404);
-        }
+        // Note: No need to validate term type here since our custom route model binding
+        // in AppServiceProvider already ensures the term matches the taxonomy type
 
-        $manga = $term->mangas()
-            ->with(['taxonomyTerms.taxonomy', 'chapters'])
-            ->withCount('chapters')
-            ->orderBy('updated_at', 'desc')
-            ->paginate(20);
-
-        // Transform chapters to recent_chapters format for MangaCard compatibility
-        $manga->getCollection()->transform(function ($manga) {
-            $manga->recent_chapters = $manga->chapters->map(function ($chapter) {
-                return [
-                    'chapter_number' => $chapter->chapter_number,
-                    'title' => $chapter->title,
-                    'slug' => $chapter->slug,
-                    'updated_at' => $chapter->updated_at,
-                    'created_at' => $chapter->created_at,
-                ];
-            });
-
-            return $manga;
-        });
+        $manga = $this->taxonomyService->getMangaByTerm($term);
 
         return Inertia::render('Taxonomy/TermsByType', [
             'term' => $term,
@@ -228,17 +200,11 @@ class TaxonomyController extends Controller
     {
         $type = $request->get('type');
 
-        if (! in_array($type, ['genre', 'author', 'artist', 'tag', 'type', 'status', 'year'])) {
-            return response()->json(['error' => 'Invalid type'], 400);
+        try {
+            $terms = $this->taxonomyService->getTermsByType($type);
+            return response()->json($terms);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
-
-        $terms = TaxonomyTerm::whereHas('taxonomy', function ($query) use ($type) {
-            $query->where('type', $type);
-        })
-            ->select('id', 'name', 'slug')
-            ->orderBy('name')
-            ->get();
-
-        return response()->json($terms);
     }
 }
