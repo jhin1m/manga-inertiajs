@@ -34,7 +34,7 @@ export function ChapterReader({ pages }) {
 
     return (
         <div className="max-w-4xl mx-auto py-8">
-            <div className="space-y-2">
+            <div>
                 {pages.map((page, index) => {
                     const pageState = imageStates[page.id] || { showPlaceholder: false }
                     
