@@ -52,11 +52,9 @@ class TaxonomyController extends Controller
         // Note: No need to validate term type here since our custom route model binding
         // in AppServiceProvider already ensures the term matches the taxonomy type
 
-        $manga = $this->taxonomyService->getMangaByTerm($term);
-
         return Inertia::render('Taxonomy/TermsByType', [
             'term' => $term,
-            'manga' => $manga,
+            'manga' => Inertia::defer(fn () => $this->taxonomyService->getMangaByTerm($term)),
             'type' => $type,
             'translations' => [
                 'title' => __('manga.taxonomy.'.$type.'_title', ['name' => $term->name]),
@@ -64,6 +62,12 @@ class TaxonomyController extends Controller
                 'found_count' => __('manga.index.found_count'),
                 'no_manga_found' => __('manga.index.no_manga_found'),
                 'no_manga_message' => __('manga.index.no_manga_message'),
+                'genre_label' => __('manga.genre_label'),
+                'author_label' => __('manga.author_label'),
+                'artist_label' => __('manga.artist_label'),
+                'tag_label' => __('manga.tag_label'),
+                'status_label' => __('manga.status_label'),
+                'year_label' => __('manga.year_label'),
             ],
         ]);
     }

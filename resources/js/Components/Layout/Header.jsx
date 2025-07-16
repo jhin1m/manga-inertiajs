@@ -110,7 +110,7 @@ export default function Header({ onSearchOpen }) {
                                                         {row.map((genre) => (
                                                             <DropdownMenuItem key={genre.id} asChild>
                                                                 <Link 
-                                                                    href={route('manga.index', { genre: genre.slug })}
+                                                                    href={route('genre.show', genre.slug)}
                                                                     className="flex flex-col items-center p-2 rounded-md hover:bg-accent text-center min-h-[60px] justify-center"
                                                                 >
                                                                     <span className="text-xs font-medium text-foreground truncate w-full">
@@ -300,7 +300,7 @@ export default function Header({ onSearchOpen }) {
                                                                     className="w-full justify-start text-sm"
                                                                     asChild
                                                                 >
-                                                                    <Link href={route('manga.index', { genre: genre.slug })}>
+                                                                    <Link href={route('genre.show', genre.slug)}>
                                                                         {genre.name}
                                                                     </Link>
                                                                 </Button>
@@ -316,7 +316,7 @@ export default function Header({ onSearchOpen }) {
                                                                     >
                                                                         <Link href={route('manga.index')}>
                                                                             <Tags className="mr-2 h-3 w-3" />
-                                                                            {layoutTranslations.view_all_genres || 'Xem tất cả thể loại'}
+                                                                            {layoutTranslations.view_all_genres || 'View All Genres'}
                                                                         </Link>
                                                                     </Button>
                                                                 </>
@@ -390,7 +390,7 @@ export default function Header({ onSearchOpen }) {
                                                     as="button"
                                                 >
                                                     <LogOut className="mr-2 h-4 w-4" />
-                                                    {layoutTranslations.logout || 'Đăng xuất'}
+                                                    {layoutTranslations.logout || 'Logout'}
                                                 </Link>
                                             </Button>
                                         </div>

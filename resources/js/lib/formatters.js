@@ -70,5 +70,3 @@ export const formatRelativeTime = (date) => {
     }
 };
 
-// Alias for compatibility
-export const formatDistanceToNow = formatRelativeTime;

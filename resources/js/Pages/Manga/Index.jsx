@@ -35,14 +35,14 @@ export default function MangaIndex({
 
     return (
         <AppLayout breadcrumbItems={breadcrumbItems}>
-            <Head title={translations.title || 'Danh sách manga'} />
+            <Head title={translations.title || 'Manga List'} />
             
             <div className="container mx-auto px-4 py-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold">{translations.title || 'Danh sách manga'}</h1>
+                        <h1 className="text-2xl font-bold">{translations.title || 'Manga List'}</h1>
                         <p className="text-muted-foreground">
-                            {translations.found_count?.replace(':count', manga?.total || 0) || `Tìm thấy ${manga?.total || 0} manga`}
+                            {translations.found_count?.replace(':count', manga?.total || 0) || `Found ${manga?.total || 0} manga`}
                         </p>
                     </div>
                     
@@ -108,10 +108,10 @@ export default function MangaIndex({
                                 <CardContent>
                                     <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                                     <h3 className="text-lg font-semibold mb-2">
-                                        {translations.no_manga_found || 'Không tìm thấy manga'}
+                                        {translations.no_manga_found || 'No manga found'}
                                     </h3>
                                     <p className="text-muted-foreground">
-                                        {translations.no_manga_message || 'Thử thay đổi bộ lọc để tìm thêm manga'}
+                                        {translations.no_manga_message || 'Try changing the filters to find more manga'}
                                     </p>
                                 </CardContent>
                             </Card>

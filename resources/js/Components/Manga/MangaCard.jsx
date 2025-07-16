@@ -64,7 +64,7 @@ export function MangaCard({
             <CardContent className="p-3 sm:p-4">
                 {/* Title */}
                 <Link href={route('manga.show', slug)}>
-                    <h3 className="font-semibold text-sm sm:text-base line-clamp-2 mb-3 group-hover:text-primary transition-colors h-8 sm:h-11">
+                    <h3 className="font-semibold text-sm sm:text-base line-clamp-2 mb-3 group-hover:text-primary transition-colors sm:h-11">
                         {name}
                     </h3>
                 </Link>

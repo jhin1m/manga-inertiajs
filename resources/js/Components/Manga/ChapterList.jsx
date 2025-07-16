@@ -12,7 +12,7 @@ import {
 } from '@/Components/ui/table'
 import { Paginator } from '@/Components/Common/Paginator'
 import { BookOpen, Calendar, Hash, Loader2 } from 'lucide-react'
-import { formatDistanceToNow } from '@/lib/formatters'
+import { formatRelativeTime } from '@/lib/formatters'
 
 export function ChapterList({ manga, chapters, translations = {} }) {
     const t = translations.chapter_list || {}
@@ -124,7 +124,7 @@ export function ChapterList({ manga, chapters, translations = {} }) {
                                 <TableCell className="text-muted-foreground">
                                     <div className="flex items-center gap-1">
                                         <Calendar className="w-4 h-4" />
-                                        {formatDistanceToNow(chapter.published_at || chapter.created_at)}
+                                        {formatRelativeTime(chapter.updated_at || chapter.created_at)}
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-right">
@@ -161,7 +161,7 @@ export function ChapterList({ manga, chapters, translations = {} }) {
                                     </Link>
                                     <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                                         <Calendar className="w-3 h-3" />
-                                        {formatDistanceToNow(chapter.published_at || chapter.created_at)}
+                                        {formatRelativeTime(chapter.updated_at || chapter.created_at)}
                                     </div>
                                 </div>
                                 <Button size="sm" asChild>
