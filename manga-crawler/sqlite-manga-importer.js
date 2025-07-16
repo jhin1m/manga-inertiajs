@@ -3,11 +3,8 @@
 require('dotenv').config({ path: '../.env' });
 const sqlite3 = require('sqlite3').verbose();
 const mysql = require('mysql2/promise');
-const AWS = require('aws-sdk');
-const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
-const { HttpsProxyAgent } = require('https-proxy-agent');
 
 // Import configurations
 const config = require('./config');
@@ -22,14 +19,9 @@ class SQLiteMangaImporter {
     // Load genre mapping
     this.genreMapping = this.loadGenreMapping();
     
-    // Initialize S3 client
-    this.s3 = new AWS.S3({
-      accessKeyId: config.images.s3.accessKeyId,
-      secretAccessKey: config.images.s3.secretAccessKey,
-      region: config.images.s3.region,
-      endpoint: config.images.s3.endpoint,
-      s3ForcePathStyle: config.images.s3.forcePathStyle
-    });
+    // Initialize S3 uploader
+    const S3ImageUploader = require('./s3-uploader');
+    this.s3Uploader = new S3ImageUploader();
 
     // Statistics
     this.stats = {
@@ -40,9 +32,10 @@ class SQLiteMangaImporter {
       coversUploaded: 0
     };
 
-    // Load proxies for image downloads
-    this.proxies = this.loadProxies();
-    this.currentProxyIndex = 0;
+    // Batch processing configuration
+    this.batchSize = 50;
+    this.termCache = new Map(); // Cache for taxonomy terms
+    this.taxonomyCache = new Map(); // Cache for taxonomies
   }
 
   /**
@@ -69,62 +62,26 @@ class SQLiteMangaImporter {
   }
 
   /**
-   * Load proxy list from proxies.txt
+   * Preload all taxonomies into cache
    */
-  loadProxies() {
-    try {
-      const proxyFile = path.join(__dirname, 'proxies.txt');
-      if (!fs.existsSync(proxyFile)) {
-        console.log('⚠️  No proxies.txt found, proceeding without proxy');
-        return [];
-      }
-
-      const content = fs.readFileSync(proxyFile, 'utf8');
-      const proxies = content
-        .split('\n')
-        .filter(line => line.trim())
-        .map(line => {
-          const [host, port, username, password] = line.trim().split(':');
-          return { host, port: parseInt(port), username, password };
-        });
-
-      console.log(`📡 Loaded ${proxies.length} proxies`);
-      return proxies;
-    } catch (error) {
-      console.error('❌ Error loading proxies:', error.message);
-      return [];
+  async preloadTaxonomies() {
+    const [rows] = await this.mysqlDb.execute('SELECT id, type, slug FROM taxonomies');
+    for (const row of rows) {
+      this.taxonomyCache.set(row.type, row.id);
     }
+    console.log(`📋 Preloaded ${rows.length} taxonomies`);
   }
 
   /**
-   * Get next proxy in rotation
+   * Preload all taxonomy terms into cache
    */
-  getNextProxy() {
-    if (this.proxies.length === 0) return null;
-    
-    const proxy = this.proxies[this.currentProxyIndex];
-    this.currentProxyIndex = (this.currentProxyIndex + 1) % this.proxies.length;
-    return proxy;
-  }
-
-  /**
-   * Create axios instance with proxy support
-   */
-  createAxiosInstance(proxy = null) {
-    const axiosConfig = {
-      timeout: 30000,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      }
-    };
-
-    if (proxy) {
-      const proxyUrl = `http://${proxy.username}:${proxy.password}@${proxy.host}:${proxy.port}`;
-      axiosConfig.httpsAgent = new HttpsProxyAgent(proxyUrl);
-      axiosConfig.httpAgent = new HttpsProxyAgent(proxyUrl);
+  async preloadTaxonomyTerms() {
+    const [rows] = await this.mysqlDb.execute('SELECT id, taxonomy_id, name, slug FROM taxonomy_terms');
+    for (const row of rows) {
+      const cacheKey = `${row.taxonomy_id}-${row.name}`;
+      this.termCache.set(cacheKey, row.id);
     }
-
-    return axios.create(axiosConfig);
+    console.log(`📋 Preloaded ${rows.length} taxonomy terms`);
   }
 
   /**
@@ -144,6 +101,9 @@ class SQLiteMangaImporter {
       // Connect to MySQL
       this.mysqlDb = await mysql.createConnection(config.database);
       console.log('✅ Connected to MySQL database');
+      
+      // Initialize S3 uploader database connection
+      await this.s3Uploader.connectDatabase();
     } catch (error) {
       console.error('❌ Database connection failed:', error.message);
       throw error;
@@ -261,9 +221,14 @@ class SQLiteMangaImporter {
   }
 
   /**
-   * Get or create taxonomy by type
+   * Get or create taxonomy by type (with caching)
    */
   async getOrCreateTaxonomy(type) {
+    // Check cache first
+    if (this.taxonomyCache.has(type)) {
+      return this.taxonomyCache.get(type);
+    }
+    
     const slug = type === 'genre' ? 'genre' : type;
     const [rows] = await this.mysqlDb.execute(
       'SELECT id FROM taxonomies WHERE slug = ?',
@@ -271,6 +236,7 @@ class SQLiteMangaImporter {
     );
     
     if (rows.length > 0) {
+      this.taxonomyCache.set(type, rows[0].id);
       return rows[0].id;
     }
     
@@ -281,15 +247,20 @@ class SQLiteMangaImporter {
     );
     
     console.log(`📝 Created taxonomy: ${type}`);
+    this.taxonomyCache.set(type, result.insertId);
     return result.insertId;
   }
 
   /**
-   * Get or create taxonomy term
+   * Get or create taxonomy term with caching
    */
   async getOrCreateTaxonomyTerm(taxonomyId, name) {
-    // Use Utils.createSlug for proper Japanese text handling
-    const slug = await Utils.createSlug(name);
+    const cacheKey = `${taxonomyId}-${name}`;
+    
+    // Check cache first
+    if (this.termCache.has(cacheKey)) {
+      return this.termCache.get(cacheKey);
+    }
     
     const [rows] = await this.mysqlDb.execute(
       'SELECT id FROM taxonomy_terms WHERE taxonomy_id = ? AND name = ?',
@@ -297,8 +268,12 @@ class SQLiteMangaImporter {
     );
     
     if (rows.length > 0) {
+      this.termCache.set(cacheKey, rows[0].id);
       return rows[0].id;
     }
+    
+    // Use Utils.createSlug for proper Japanese text handling
+    const slug = await Utils.createSlug(name);
     
     // Create term if it doesn't exist
     const [result] = await this.mysqlDb.execute(
@@ -306,70 +281,139 @@ class SQLiteMangaImporter {
       [taxonomyId, name, slug]
     );
     
+    this.termCache.set(cacheKey, result.insertId);
     return result.insertId;
   }
 
   /**
-   * Link manga to taxonomy terms
+   * Batch create taxonomy terms for better performance
+   */
+  async batchCreateTaxonomyTerms(taxonomyId, names) {
+    const newTerms = [];
+    const existingTermIds = [];
+    
+    // Check which terms already exist
+    for (const name of names) {
+      const cacheKey = `${taxonomyId}-${name}`;
+      if (this.termCache.has(cacheKey)) {
+        existingTermIds.push(this.termCache.get(cacheKey));
+      } else {
+        newTerms.push(name);
+      }
+    }
+    
+    if (newTerms.length === 0) {
+      return existingTermIds;
+    }
+    
+    // Check database for existing terms
+    const placeholders = newTerms.map(() => '?').join(',');
+    const [rows] = await this.mysqlDb.execute(
+      `SELECT id, name FROM taxonomy_terms WHERE taxonomy_id = ? AND name IN (${placeholders})`,
+      [taxonomyId, ...newTerms]
+    );
+    
+    // Add found terms to cache and result
+    for (const row of rows) {
+      const cacheKey = `${taxonomyId}-${row.name}`;
+      this.termCache.set(cacheKey, row.id);
+      existingTermIds.push(row.id);
+    }
+    
+    // Create remaining terms
+    const foundNames = rows.map(row => row.name);
+    const termsToCreate = newTerms.filter(name => !foundNames.includes(name));
+    
+    if (termsToCreate.length > 0) {
+      const values = [];
+      const placeholders = [];
+      
+      for (const name of termsToCreate) {
+        const slug = await Utils.createSlug(name);
+        values.push(taxonomyId, name, slug);
+        placeholders.push('(?, ?, ?, NOW(), NOW())');
+      }
+      
+      const query = `INSERT INTO taxonomy_terms (taxonomy_id, name, slug, created_at, updated_at) VALUES ${placeholders.join(', ')}`;
+      const [result] = await this.mysqlDb.execute(query, values);
+      
+      // Add new terms to cache
+      let insertId = result.insertId;
+      for (const name of termsToCreate) {
+        const cacheKey = `${taxonomyId}-${name}`;
+        this.termCache.set(cacheKey, insertId);
+        existingTermIds.push(insertId);
+        insertId++;
+      }
+      
+      console.log(`📝 Batch created ${termsToCreate.length} taxonomy terms`);
+    }
+    
+    return existingTermIds;
+  }
+
+  /**
+   * Link manga to taxonomy terms with batch processing
    */
   async linkMangaToTaxonomyTerms(mangaId, termIds) {
-    for (const termId of termIds) {
-      // Check if relationship already exists
-      const [existing] = await this.mysqlDb.execute(
-        'SELECT 1 FROM manga_taxonomy_terms WHERE manga_id = ? AND taxonomy_term_id = ?',
-        [mangaId, termId]
-      );
+    if (termIds.length === 0) return;
+    
+    // Check existing relationships
+    const placeholders = termIds.map(() => '?').join(',');
+    const [existing] = await this.mysqlDb.execute(
+      `SELECT taxonomy_term_id FROM manga_taxonomy_terms WHERE manga_id = ? AND taxonomy_term_id IN (${placeholders})`,
+      [mangaId, ...termIds]
+    );
+    
+    const existingTermIds = existing.map(row => row.taxonomy_term_id);
+    const newTermIds = termIds.filter(termId => !existingTermIds.includes(termId));
+    
+    if (newTermIds.length > 0) {
+      const values = [];
+      const placeholderGroups = [];
       
-      if (existing.length === 0) {
-        await this.mysqlDb.execute(
-          'INSERT INTO manga_taxonomy_terms (manga_id, taxonomy_term_id, created_at, updated_at) VALUES (?, ?, NOW(), NOW())',
-          [mangaId, termId]
-        );
+      for (const termId of newTermIds) {
+        values.push(mangaId, termId);
+        placeholderGroups.push('(?, ?, NOW(), NOW())');
       }
+      
+      const query = `INSERT INTO manga_taxonomy_terms (manga_id, taxonomy_term_id, created_at, updated_at) VALUES ${placeholderGroups.join(', ')}`;
+      await this.mysqlDb.execute(query, values);
+      
+      console.log(`🔗 Batch linked ${newTermIds.length} taxonomy terms`);
     }
   }
 
   /**
-   * Download and upload cover image to S3
+   * Upload cover image using s3-uploader module
    */
   async uploadCoverToS3(coverUrl, mangaSlug) {
     if (!coverUrl) return null;
     
     try {
-      const proxy = this.getNextProxy();
-      const axiosInstance = this.createAxiosInstance(proxy);
+      console.log(`🖼️  Processing cover upload for: ${mangaSlug}`);
       
-      console.log(`🖼️  Downloading cover: ${coverUrl}`);
-      const response = await axiosInstance.get(coverUrl, {
-        responseType: 'arraybuffer',
-        maxRedirects: 5
-      });
+      // Download image
+      const imageData = await this.s3Uploader.downloadImage(coverUrl);
       
-      if (response.status !== 200) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+      // Determine file extension
+      const extension = imageData.contentType.includes('png') ? '.png' : '.jpg';
       
-      const buffer = Buffer.from(response.data);
-      const contentType = response.headers['content-type'] || 'image/jpeg';
-      const extension = contentType.includes('png') ? '.png' : '.jpg';
-      const s3Key = `${config.images.s3.keyPrefix}manga/${mangaSlug}/cover${extension}`;
+      // Generate S3 key using AWS_PATH + manga slug + extension format
+      const awsPath = process.env.AWS_PATH || 'data/';
+      const s3Key = `${awsPath}manga/${mangaSlug}/cover${extension}`;
       
-      const uploadParams = {
-        Bucket: config.images.s3.bucket,
-        Key: s3Key,
-        Body: buffer,
-        ContentType: contentType,
-        ACL: config.images.s3.acl,
-        CacheControl: 'max-age=31536000'
-      };
+      // Upload to S3
+      const s3Url = await this.s3Uploader.uploadToS3(imageData, s3Key);
       
-      console.log(`⬆️  Uploading to S3: ${s3Key}`);
-      await this.s3.upload(uploadParams).promise();
+      // Return the path for database storage (AWS_URL + AWS_PATH + manga slug + extension)
+      const awsUrl = process.env.AWS_URL || config.images.s3.baseUrl;
+      const fullPath = `${awsPath}manga/${mangaSlug}/cover${extension}`;
       
-      const s3Url = `${config.images.s3.baseUrl}/${s3Key}`;
       this.stats.coversUploaded++;
+      console.log(`✅ Cover uploaded: ${s3Url}`);
       
-      return s3Url;
+      return fullPath; // Return path for database storage
     } catch (error) {
       console.error(`❌ Cover upload failed for ${mangaSlug}:`, error.message);
       return null;
@@ -407,34 +451,34 @@ class SQLiteMangaImporter {
       const artistTaxonomyId = await this.getOrCreateTaxonomy('artist');
       const yearTaxonomyId = year ? await this.getOrCreateTaxonomy('year') : null;
       
-      // Create taxonomy terms and collect their IDs
+      // Batch create taxonomy terms and collect their IDs
       const termIds = [];
       
-      // Process genres
-      for (const genre of genres) {
-        const termId = await this.getOrCreateTaxonomyTerm(genreTaxonomyId, genre);
-        termIds.push(termId);
+      // Process genres in batch
+      if (genres.length > 0) {
+        const genreTermIds = await this.batchCreateTaxonomyTerms(genreTaxonomyId, genres);
+        termIds.push(...genreTermIds);
       }
       
-      // Process authors
-      for (const author of authors) {
-        const termId = await this.getOrCreateTaxonomyTerm(authorTaxonomyId, author);
-        termIds.push(termId);
+      // Process authors in batch
+      if (authors.length > 0) {
+        const authorTermIds = await this.batchCreateTaxonomyTerms(authorTaxonomyId, authors);
+        termIds.push(...authorTermIds);
       }
       
-      // Process artists
-      for (const artist of artists) {
-        const termId = await this.getOrCreateTaxonomyTerm(artistTaxonomyId, artist);
-        termIds.push(termId);
+      // Process artists in batch
+      if (artists.length > 0) {
+        const artistTermIds = await this.batchCreateTaxonomyTerms(artistTaxonomyId, artists);
+        termIds.push(...artistTermIds);
       }
       
       // Process year
       if (year && yearTaxonomyId) {
-        const termId = await this.getOrCreateTaxonomyTerm(yearTaxonomyId, year.toString());
-        termIds.push(termId);
+        const yearTermIds = await this.batchCreateTaxonomyTerms(yearTaxonomyId, [year.toString()]);
+        termIds.push(...yearTermIds);
       }
       
-      // Link manga to taxonomy terms
+      // Link manga to taxonomy terms in batch
       if (termIds.length > 0) {
         await this.linkMangaToTaxonomyTerms(manga.id, termIds);
         console.log(`🔗 Linked ${termIds.length} taxonomy terms`);
@@ -442,10 +486,8 @@ class SQLiteMangaImporter {
       
       // Handle cover upload if needed
       if (!manga.cover && sqliteData.cover_raw) {
-        const s3Url = await this.uploadCoverToS3(sqliteData.cover_raw, manga.slug);
-        if (s3Url) {
-          // Extract just the path from the S3 URL for storage
-          const coverPath = s3Url.replace(config.images.s3.baseUrl + '/', '');
+        const coverPath = await this.uploadCoverToS3(sqliteData.cover_raw, manga.slug);
+        if (coverPath) {
           await this.mysqlDb.execute(
             'UPDATE mangas SET cover = ? WHERE id = ?',
             [coverPath, manga.id]
@@ -494,6 +536,11 @@ class SQLiteMangaImporter {
       
       console.log('🚀 Starting SQLite manga import process...');
       
+      // Preload caches for better performance
+      console.log('📋 Preloading caches...');
+      await this.preloadTaxonomies();
+      await this.preloadTaxonomyTerms();
+      
       // Get all manga from Laravel database
       const allManga = await this.getAllMangaFromLaravel();
       console.log(`📚 Found ${allManga.length} manga in Laravel database`);
@@ -509,15 +556,15 @@ class SQLiteMangaImporter {
         // Process batch sequentially to avoid overwhelming the databases
         for (const manga of batch) {
           await this.processManga(manga);
-          await this.sleep(1000); // 1 second delay between manga
+          await this.sleep(500); // Reduced delay due to batch optimizations
         }
         
         this.printStats();
         
-        // Longer delay between batches
+        // Shorter delay between batches due to optimizations
         if (i + batchSize < totalToProcess) {
-          console.log('⏳ Waiting 5 seconds before next batch...');
-          await this.sleep(5000);
+          console.log('⏳ Waiting 2 seconds before next batch...');
+          await this.sleep(2000);
         }
       }
       
