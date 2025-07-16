@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { AppLayout } from '@/Layouts/AppLayout';
 import { Button } from "@/Components/ui/button.jsx";
 import { Card, CardContent } from "@/Components/ui/card.jsx";
 import { MangaList } from '@/Components/Manga/MangaList';
-import { useIsMobile } from '@/hooks/useIsMobile';
+import { Paginator } from '@/Components/Common/Paginator';
 import { Grid, List, BookOpen, Tag, User, Palette, Hash } from 'lucide-react';
 
 const getTypeIcon = (type) => {
@@ -22,19 +22,17 @@ const getTypeIcon = (type) => {
     }
 };
 
-const getTypeLabel = (type) => {
-    switch (type) {
-        case 'genre':
-            return 'Thể loại';
-        case 'author':
-            return 'Tác giả';
-        case 'artist':
-            return 'Họa sĩ';
-        case 'tag':
-            return 'Tag';
-        default:
-            return 'Taxonomy';
-    }
+const getTypeLabel = (type, translations) => {
+    const labels = {
+        genre: translations.genre_label || 'Genre',
+        author: translations.author_label || 'Author',
+        artist: translations.artist_label || 'Artist',
+        tag: translations.tag_label || 'Tag',
+        status: translations.status_label || 'Status',
+        year: translations.year_label || 'Year'
+    };
+    
+    return labels[type] || 'Taxonomy';
 };
 
 export function TermsByType({ 
@@ -44,10 +42,9 @@ export function TermsByType({
     translations = {}
 }) {
     const [viewMode, setViewMode] = useState('grid');
-    const isMobile = useIsMobile();
     
     const TypeIcon = getTypeIcon(type);
-    const typeLabel = getTypeLabel(type);
+    const typeLabel = getTypeLabel(type, translations);
 
     const breadcrumbItems = [
         { label: 'Manga', href: route('manga.index'), icon: BookOpen },
@@ -56,7 +53,6 @@ export function TermsByType({
     ];
 
     const pageTitle = translations.title || `${typeLabel}: ${term.name}`;
-    const pageDescription = translations.description || `Danh sách manga thuộc ${typeLabel.toLowerCase()} ${term.name}`;
 
     return (
         <AppLayout breadcrumbItems={breadcrumbItems}>
@@ -70,7 +66,7 @@ export function TermsByType({
                             <h1 className="text-2xl font-bold">{term.name}</h1>
                         </div>
                         <p className="text-muted-foreground">
-                            {translations.found_count?.replace(':count', manga?.total || 0) || `Tìm thấy ${manga?.total || 0} manga`}
+                            {translations.found_count?.replace(':count', manga?.total || 0) || `Found ${manga?.total || 0} manga`}
                         </p>
                         {term.description && (
                             <p className="text-sm text-muted-foreground mt-1">{term.description}</p>
@@ -101,46 +97,29 @@ export function TermsByType({
 
                 <main>
                     <MangaList
-                        mangas={manga?.data || []}
+                        mangas={manga?.data}
                         variant={viewMode}
                         columns={viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6' : 'auto'}
                         showEmpty={false}
                         translations={translations}
+                        isLoading={manga === undefined}
                     />
 
-                    {(!manga?.data || manga.data.length === 0) && (
+                    {manga && manga.data.length === 0 && (
                         <Card className="text-center py-12">
                             <CardContent>
                                 <TypeIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                                 <h3 className="text-lg font-semibold mb-2">
-                                    {translations.no_manga_found || 'Không tìm thấy manga'}
+                                    {translations.no_manga_found || `No manga found`}
                                 </h3>
                                 <p className="text-muted-foreground">
-                                    {translations.no_manga_message || `Chưa có manga nào thuộc ${typeLabel.toLowerCase()} ${term.name}`}
+                                    {translations.no_manga_message || `No manga found in ${typeLabel.toLowerCase()} ${term.name}`}
                                 </p>
                             </CardContent>
                         </Card>
                     )}
 
-                    {manga?.last_page > 1 && (
-                        <div className="flex justify-center mt-8">
-                            <div className="flex items-center gap-2">
-                                {manga?.links?.map((link, index) => (
-                                    <Button
-                                        key={index}
-                                        variant={link.active ? 'default' : 'outline'}
-                                        size="sm"
-                                        disabled={!link.url}
-                                        onClick={() => link.url && router.get(link.url, {}, {
-                                            preserveState: true,
-                                            preserveScroll: true
-                                        })}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    <Paginator paginator={manga} translations={translations} className="mt-8" />
                 </main>
             </div>
         </AppLayout>
