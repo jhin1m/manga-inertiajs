@@ -16,20 +16,20 @@ class TaxonomySeeder extends Seeder
         // Create main taxonomies
         $taxonomies = [
             [
-                'name' => 'Genres',
-                'slug' => 'genres',
+                'name' => 'Genre',
+                'slug' => 'genre',
                 'type' => 'genre',
                 'description' => 'Manga genres and categories',
             ],
             [
-                'name' => 'Authors',
-                'slug' => 'authors',
+                'name' => 'Author',
+                'slug' => 'author',
                 'type' => 'author',
                 'description' => 'Manga authors and creators',
             ],
             [
-                'name' => 'Tags',
-                'slug' => 'tags',
+                'name' => 'Tag',
+                'slug' => 'tag',
                 'type' => 'tag',
                 'description' => 'Additional tags for manga',
             ],
