@@ -92,5 +92,6 @@ Route::get('/genre/{term}', [TaxonomyController::class, 'termsByType'])->name('g
 Route::get('/author/{term}', [TaxonomyController::class, 'termsByType'])->name('author.show');
 Route::get('/artist/{term}', [TaxonomyController::class, 'termsByType'])->name('artist.show');
 Route::get('/tag/{term}', [TaxonomyController::class, 'termsByType'])->name('tag.show');
-
+Route::get('/status/{term}', [TaxonomyController::class, 'termsByType'])->name('status.show');
+Route::get('/year/{term}', [TaxonomyController::class, 'termsByType'])->name('year.show');
 require __DIR__.'/auth.php';

@@ -31,7 +31,7 @@ class TaxonomyRequest extends FormRequest
                 'max:255',
                 Rule::unique('taxonomies')->ignore($taxonomyId),
             ],
-            'type' => 'required|in:genre,author,tag,status',
+            'type' => 'required|in:genre,author,tag,status,year,artist',
             'description' => 'nullable|string|max:1000',
         ];
     }
@@ -43,7 +43,7 @@ class TaxonomyRequest extends FormRequest
             'name.max' => 'Tên taxonomy không được vượt quá 255 ký tự.',
             'name.unique' => 'Tên taxonomy này đã tồn tại.',
             'type.required' => 'Loại taxonomy là bắt buộc.',
-            'type.in' => 'Loại taxonomy phải là một trong: genre, author, tag, status.',
+            'type.in' => 'Loại taxonomy phải là một trong: genre, author, tag, status, year, artist.',
             'description.max' => 'Mô tả không được vượt quá 1000 ký tự.',
         ];
     }

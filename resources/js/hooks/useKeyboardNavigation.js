@@ -12,13 +12,13 @@ export function useKeyboardNavigation(previousChapter, nextChapter, mangaSlug) {
                 case 'ArrowLeft':
                 case 'h':
                     if (previousChapter) {
-                        window.location.href = route('manga.chapters.show', [mangaSlug, previousChapter.id])
+                        window.location.href = route('manga.chapters.show', [mangaSlug, previousChapter.slug])
                     }
                     break
                 case 'ArrowRight':
                 case 'l':
                     if (nextChapter) {
-                        window.location.href = route('manga.chapters.show', [mangaSlug, nextChapter.id])
+                        window.location.href = route('manga.chapters.show', [mangaSlug, nextChapter.slug])
                     }
                     break
                 case 'Escape':

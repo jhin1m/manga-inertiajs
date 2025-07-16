@@ -15,13 +15,9 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
     useKeyboardNavigation(previousChapter, nextChapter, manga.slug)
 
     const handleChapterSelect = (e) => {
-        const chapterId = e.target.value;
-        if (chapterId && chapterId !== chapter.id.toString() && allChapters) {
-            const selectedChapter = allChapters.find(c => c.id.toString() === chapterId);
-            if (selectedChapter) {
-                const chapterSlug = selectedChapter.slug || selectedChapter.chapter_number;
-                window.location.href = route('manga.chapters.show', [manga.slug, chapterSlug]);
-            }
+        const chapterSlug = e.target.value;
+        if (chapterSlug && chapterSlug !== chapter.slug && allChapters) {
+            window.location.href = route('manga.chapters.show', [manga.slug, chapterSlug]);
         }
     }
 
@@ -38,12 +34,12 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
 
         return (
             <select 
-                value={chapter.id.toString()} 
+                value={chapter.slug} 
                 onChange={handleChapterSelect}
                 className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
             >
                 {allChapters?.map((chap) => (
-                    <option key={chap.id} value={chap.id.toString()}>
+                    <option key={chap.id} value={chap.slug}>
                         {mobile 
                             ? `${chap.title}`
                             : `${chap.title}`

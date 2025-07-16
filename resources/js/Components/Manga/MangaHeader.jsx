@@ -81,14 +81,6 @@ export function MangaHeader({ manga, translations }) {
                         <Eye className="w-4 h-4" />
                         {formatViews(manga.views)} {translations.views_label}
                     </div>
-                    <div className="flex items-center gap-1">
-                        <BookOpen className="w-4 h-4" />
-                        {formatViews(manga.total_chapters)} {translations.chapters_label}
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(manga.updated_at).toLocaleDateString('vi-VN')}
-                    </div>
                 </div>
 
                 {/* Status & Taxonomy Info */}

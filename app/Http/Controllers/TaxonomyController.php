@@ -100,7 +100,7 @@ class TaxonomyController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'type' => 'required|in:genre,author,tag,status',
+            'type' => 'required|in:genre,author,tag,status,year,artist',
             'description' => 'nullable|string',
         ]);
 
@@ -116,7 +116,7 @@ class TaxonomyController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'type' => 'required|in:genre,author,tag,status',
+            'type' => 'required|in:genre,author,tag,status,year,artist',
             'description' => 'nullable|string',
         ]);
 
@@ -228,7 +228,7 @@ class TaxonomyController extends Controller
     {
         $type = $request->get('type');
 
-        if (! in_array($type, ['genre', 'author', 'tag', 'status'])) {
+        if (! in_array($type, ['genre', 'author', 'artist', 'tag', 'type', 'status', 'year'])) {
             return response()->json(['error' => 'Invalid type'], 400);
         }
 
