@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import { Card, CardContent } from '@/Components/ui/card';
-import { Badge } from '@/Components/ui/badge';
 import { formatRelativeTime } from '@/lib/formatters';
 import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx';
 
@@ -16,7 +15,6 @@ export function MangaCard({
         slug,
         cover,
         status,
-        status_label,
         recent_chapters = [],
     } = manga;
 
@@ -52,13 +50,6 @@ export function MangaCard({
                         )}
                     </div>
                 </Link>
-                
-                {/* Status Badge */}
-                <div className="absolute top-2 right-2">
-                    <Badge variant={statusConfig.variant} className="text-xs">
-                        {status_label || status}
-                    </Badge>
-                </div>
             </div>
 
             <CardContent className="p-3 sm:p-4">
