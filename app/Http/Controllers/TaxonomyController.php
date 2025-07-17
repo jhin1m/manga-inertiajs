@@ -6,6 +6,7 @@ use App\Models\Taxonomy;
 use App\Models\TaxonomyTerm;
 use App\Services\TaxonomyService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class TaxonomyController extends Controller
@@ -52,10 +53,22 @@ class TaxonomyController extends Controller
         // Note: No need to validate term type here since our custom route model binding
         // in AppServiceProvider already ensures the term matches the taxonomy type
 
+        // Cache genres for 1 hour since they don't change frequently
+        $genres = Cache::remember('search_genres', config('cache.ttl.search_genres'), function () {
+            return TaxonomyTerm::whereHas('taxonomy', function ($q) {
+                $q->where('type', 'genre');
+            })
+                ->withCount('mangas')
+                ->having('mangas_count', '>', 0) // Only genres with manga
+                ->orderBy('mangas_count', 'desc')
+                ->get(['id', 'name', 'slug']);
+        });
+
         return Inertia::render('Taxonomy/TermsByType', [
             'term' => $term,
             'manga' => Inertia::defer(fn () => $this->taxonomyService->getMangaByTerm($term)),
             'type' => $type,
+            'genres' => $genres,
             'translations' => [
                 'title' => __('manga.taxonomy.'.$type.'_title', ['name' => $term->name]),
                 'description' => __('manga.taxonomy.'.$type.'_description', ['name' => $term->name]),

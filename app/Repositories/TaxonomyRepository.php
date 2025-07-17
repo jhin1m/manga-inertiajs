@@ -75,9 +75,17 @@ class TaxonomyRepository implements TaxonomyRepositoryInterface
     public function getTermWithMangas(TaxonomyTerm $term, ?int $perPage = null): LengthAwarePaginator
     {
         $query = $term->mangas()
-            ->with(['taxonomyTerms.taxonomy', 'chapters'])
+            ->with([
+                'taxonomyTerms.taxonomy',
+                'chapters' => function ($query) {
+                    $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug', 'updated_at', 'created_at')
+                        ->orderBy('chapter_number', 'desc')
+                        ->limit(config('manga.limits.recent_chapters'));
+                },
+            ])
             ->withCount('chapters')
-            ->orderBy('updated_at', 'desc');
+            ->withMax('chapters', 'updated_at')
+            ->orderBy('chapters_max_updated_at', 'desc');
 
         return $query->paginate($perPage ?? config('manga.pagination.per_page', 20));
     }

@@ -86,6 +86,17 @@ class MangaController extends Controller
             return $term->taxonomy->type === 'tag';
         })->values();
 
+        // Cache genres for header navigation
+        $allGenres = Cache::remember('search_genres', config('cache.ttl.search_genres'), function () {
+            return TaxonomyTerm::whereHas('taxonomy', function ($q) {
+                $q->where('type', 'genre');
+            })
+                ->withCount('mangas')
+                ->having('mangas_count', '>', 0) // Only genres with manga
+                ->orderBy('mangas_count', 'desc')
+                ->get(['id', 'name', 'slug']);
+        });
+
         return Inertia::render('Manga/Show', [
             'manga' => array_merge($manga->toArray(), [
                 'genres' => $genres,
@@ -96,6 +107,7 @@ class MangaController extends Controller
                 'last_chapter' => $lastChapter,
             ]),
             'seo' => $manga->getSeoData(),
+            'genres' => $allGenres,
             // Use deferred props for chapters to improve initial page load performance
 
             'chapters' => Inertia::defer(function () use ($manga) {
