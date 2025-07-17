@@ -13,7 +13,7 @@ class MangaRepository implements MangaRepositoryInterface
 {
     public function getHotManga(?int $limit = null): Collection
     {
-        $query = Manga::select('id', 'name', 'slug', 'cover', 'status', 'views', 'rating', 'total_rating')
+        $query = Manga::select('id', 'name', 'slug', 'cover', 'views', 'rating', 'total_rating')
             ->with([
                 'chapters' => function ($query) {
                     $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug', 'updated_at')
@@ -36,7 +36,6 @@ class MangaRepository implements MangaRepositoryInterface
                     'name' => $manga->name,
                     'slug' => $manga->slug,
                     'cover' => $manga->cover,
-                    'status' => $manga->status,
                     'recent_chapters' => $manga->chapters->map(function ($chapter) {
                         return [
                             'chapter_number' => $chapter->chapter_number,
@@ -53,7 +52,7 @@ class MangaRepository implements MangaRepositoryInterface
 
     public function getLatestUpdates(?int $limit = null): Collection
     {
-        $query = Manga::select('id', 'name', 'slug', 'cover', 'status', 'updated_at')
+        $query = Manga::select('id', 'name', 'slug', 'cover', 'updated_at')
             ->with([
                 'chapters' => function ($query) {
                     $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug', 'updated_at', 'created_at')
