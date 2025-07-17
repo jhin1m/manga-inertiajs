@@ -59,8 +59,8 @@ class SeoService
             : $cleanDescription;
 
         $description = str_replace(
-            '{manga_description}',
-            $limitedDescription,
+            ['{manga_description}', '{manga_name}'],
+            [$limitedDescription, $manga->name],
             $template['description']
         );
         $keywords = str_replace(['{manga_name}', '{manga_genres}'], [$manga->name, $genres], $template['keywords']);
