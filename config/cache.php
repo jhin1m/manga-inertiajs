@@ -116,8 +116,8 @@ return [
     */
 
     'ttl' => [
-        'search_genres' => env('CACHE_SEARCH_GENRES_TTL', 3600),
-        'popular_manga' => env('CACHE_POPULAR_MANGA_TTL', 1800),
+        'search_genres' => env('CACHE_SEARCH_GENRES_TTL', 86400),
+        'popular_manga' => env('CACHE_POPULAR_MANGA_TTL', 86400),
         'sitemap' => env('CACHE_SITEMAP_TTL', 3600),
     ],
 
