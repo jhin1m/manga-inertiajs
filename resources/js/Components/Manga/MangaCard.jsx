@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from '@inertiajs/react';
 import { Card, CardContent } from '@/Components/ui/card';
 import { formatRelativeTime } from '@/lib/formatters';
-import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx';
 
 export function MangaCard({ 
     manga, 
@@ -17,6 +16,12 @@ export function MangaCard({
         status,
         recent_chapters = [],
     } = manga;
+
+    const handleImageError = (e) => {
+        if (e.target.src.includes('default.jpg')) return;
+        e.target.onerror = null;
+        e.target.src = '/default.jpg';
+    };
 
     const statusVariants = {
         'ongoing': { variant: 'default' },
@@ -37,17 +42,14 @@ export function MangaCard({
             <div className="relative overflow-hidden rounded-t-xl">
                 <Link href={route('manga.show', slug)}>
                     <div className="aspect-[3/4] bg-gray-100">
-                        {isValidCover(cover) ? (
-                            <img
-                                src={cover}
-                                alt={name}
-                                className="w-full h-full object-cover"
-                                loading={priority ? "eager" : "lazy"}
-                                decoding={priority ? "sync" : "async"}
-                            />
-                        ) : (
-                            getContextualDefaultCover('card')
-                        )}
+                        <img
+                            src={cover || '/default.jpg'}
+                            alt={name}
+                            className="w-full h-full object-cover"
+                            loading={priority ? "eager" : "lazy"}
+                            decoding={priority ? "sync" : "async"}
+                            onError={handleImageError}
+                        />
                     </div>
                 </Link>
             </div>

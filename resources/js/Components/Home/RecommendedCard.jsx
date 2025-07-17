@@ -1,9 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card.jsx";
-import { Badge } from "@/Components/ui/badge.jsx";
 import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar.jsx";
 import { Star, Heart, Sparkles } from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
-import { getContextualDefaultCover, isValidCover } from '@/lib/image-utils.jsx';
 
 export function RecommendedCard({ recommended = [] }) {
     const { mangaTranslations = {} } = usePage().props;
@@ -55,17 +53,14 @@ export function RecommendedCard({ recommended = [] }) {
                         {/* Cover Image */}
                         <div className="relative flex-shrink-0">
                             <Avatar className="h-16 w-12 rounded-md">
-                                {isValidCover(manga.cover) ? (
-                                    <AvatarImage 
-                                        src={manga.cover} 
-                                        alt={manga.name}
-                                        className="object-cover"
-                                    />
-                                ) : (
-                                    <AvatarFallback className="rounded-md text-xs">
-                                        {getContextualDefaultCover('comment')}
-                                    </AvatarFallback>
-                                )}
+                                <AvatarImage 
+                                    src={manga.cover}
+                                    alt={manga.name}
+                                    className="object-cover"
+                                />
+                                <AvatarFallback className="rounded-md bg-muted">
+                                    <img src="/default.jpg" alt="Manga cover placeholder" className="w-full h-full object-contain p-1" />
+                                </AvatarFallback>
                             </Avatar>
                         </div>
 

@@ -3,7 +3,6 @@ import { Link } from "@inertiajs/react";
 import { MangaCard } from "./MangaCard";
 import { Card, CardContent } from "@/Components/ui/card";
 import { Skeleton } from "@/Components/ui/skeleton";
-import { getContextualDefaultCover, isValidCover } from "@/lib/image-utils.jsx";
 import { formatRelativeTime } from "@/lib/formatters";
 import { Loader2 } from "lucide-react";
 
@@ -18,7 +17,7 @@ export function MangaList({
     isLoading = false,
 }) {
     const defaultEmptyMessage = emptyMessage || translations.empty_message || 'Hello World!';
-    
+
     // Grid columns configuration
     const getGridColumns = () => {
         if (columns !== "auto") return columns;
@@ -26,7 +25,7 @@ export function MangaList({
         // Default responsive grid
         return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
     };
-    
+
     // Loading state for deferred props
     if (mangas === undefined || isLoading) {
         return (
@@ -169,21 +168,24 @@ export function MangaList({
                 ? manga.recent_chapters
                 : [];
 
+        const handleImageError = (e) => {
+            if (e.target.src.includes('default.jpg')) return;
+            e.target.onerror = null;
+            e.target.src = '/default.jpg';
+        };
+
         return (
             <Card className="group hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden">
                 <div className="flex">
                     {/* Cover Image - Full bleed */}
                     <div className="w-26 h-40 bg-muted flex-shrink-0 overflow-hidden">
                         <Link href={route("manga.show", manga.slug)}>
-                            {isValidCover(manga.cover) ? (
-                                <img
-                                    src={manga.cover}
-                                    alt={manga.name}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                />
-                            ) : (
-                                getContextualDefaultCover("list")
-                            )}
+                            <img
+                                src={manga.cover || '/default.jpg'}
+                                alt={manga.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                onError={handleImageError}
+                            />
                         </Link>
                     </div>
 

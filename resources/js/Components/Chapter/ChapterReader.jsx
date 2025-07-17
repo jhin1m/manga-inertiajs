@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { getDefaultCover, handleImageError as handleImageErrorUtil } from '@/lib/image-utils'
 
 export function ChapterReader({ pages }) {
     const [imageStates, setImageStates] = useState({})
@@ -26,9 +25,6 @@ export function ChapterReader({ pages }) {
                 ...prev,
                 [pageId]: { ...currentState, failedUrls: newFailedUrls, showPlaceholder: true }
             }))
-            
-            // Log the error using utility
-            handleImageErrorUtil(e, () => {})
         }
     }
 
@@ -42,7 +38,7 @@ export function ChapterReader({ pages }) {
                         <div key={page.id} className="flex justify-center">
                             {pageState.showPlaceholder ? (
                                 <div className="w-full max-w-md h-96 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg shadow-sm flex flex-col items-center justify-center">
-                                    {getDefaultCover('xl', 'image')}
+                                    <img src="/default.jpg" alt="Page failed to load" className="w-24 h-24 opacity-50" />
                                     <p className="mt-4 text-sm text-gray-500">
                                         Page {page.page_number}
                                     </p>
