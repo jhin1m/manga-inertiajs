@@ -157,6 +157,8 @@ class MangaCrawler {
     try {
       // Handle API data structure
       if (this.source.type === 'api') {
+        Utils.log(`[DEBUG] Original API manga data: ${JSON.stringify(mangaData, null, 2)}`);
+        
         const apiManga = {
           title: mangaData.name,
           slug: await this.generateUniqueMangaSlug(mangaData.name), // Generate unique slug from name
@@ -167,6 +169,8 @@ class MangaCrawler {
           rating: mangaData.rate,
           is_adult: mangaData.is_adult === 'yes'
         };
+        
+        Utils.log(`[DEBUG] Transformed manga data: ${JSON.stringify(apiManga, null, 2)}`);
         mangaData = apiManga;
       }
 
@@ -200,12 +204,18 @@ class MangaCrawler {
           const genreCount = await this.db.getMangaGenreCount(mangaId);
           if (genreCount === 0) {
             Utils.log(`Manga has no genres, updating with crawled genres: ${mangaData.title}`);
+            Utils.log(`[DEBUG] About to request details for manga: ${mangaData.title}`);
+            Utils.log(`[DEBUG] Using URL/slug: ${mangaData.url}`);
+            Utils.log(`[DEBUG] Source type: ${this.source.type}`);
+            
             // Get detailed manga info to extract genres
             const detailedManga = await this.getMangaDetails(mangaData.url);
             if (detailedManga.genres && detailedManga.genres.length > 0) {
               // Process only genres for existing manga
               await this.processGenresOnly(mangaId, detailedManga.genres);
               Utils.log(`Updated ${detailedManga.genres.length} genres for existing manga: ${mangaData.title}`);
+            } else {
+              Utils.log(`[DEBUG] No genres found in detailed manga response`, 'warn');
             }
           } else {
             Utils.log(`Manga already has ${genreCount} genres, skipping genre update`);
@@ -268,16 +278,56 @@ class MangaCrawler {
       
       if (this.source.type === 'api') {
         // For API, use slug to build detail URL
-        url = this.source.mangaDetailUrl.replace('{slug}', mangaUrlOrSlug);
+        // Try to extract ID from slug if it ends with a number
+        let apiSlug = mangaUrlOrSlug;
+        
+        // Check if slug ends with a number pattern like "-7518"
+        const idMatch = mangaUrlOrSlug.match(/-(\d+)$/);
+        if (idMatch) {
+          const extractedId = idMatch[1];
+          Utils.log(`[DEBUG] Extracted ID from slug: ${extractedId}`);
+          
+          // Try using just the ID first
+          apiSlug = extractedId;
+        }
+        
+        url = this.source.mangaDetailUrl.replace('{slug}', apiSlug);
       } else {
         // For HTML scraping, use direct URL
         url = mangaUrlOrSlug;
       }
 
-      const response = await axios.get(url, {
-        headers: this.source.headers,
-        timeout: config.crawler.timeout
-      });
+      Utils.log(`[DEBUG] Requesting manga details from: ${url}`);
+      Utils.log(`[DEBUG] Using slug/URL: ${mangaUrlOrSlug}`);
+      Utils.log(`[DEBUG] API slug used: ${apiSlug || 'N/A'}`);
+      Utils.log(`[DEBUG] Source mangaDetailUrl template: ${this.source.mangaDetailUrl}`);
+
+      let response;
+      let finalUrl = url;
+      
+      try {
+        response = await axios.get(url, {
+          headers: this.source.headers,
+          timeout: config.crawler.timeout
+        });
+      } catch (error) {
+        // If first attempt fails and we tried with extracted ID, try with original slug
+        if (this.source.type === 'api' && apiSlug !== mangaUrlOrSlug && error.response && error.response.status === 404) {
+          Utils.log(`[DEBUG] ID-based request failed, trying with original slug: ${mangaUrlOrSlug}`);
+          finalUrl = this.source.mangaDetailUrl.replace('{slug}', mangaUrlOrSlug);
+          
+          response = await axios.get(finalUrl, {
+            headers: this.source.headers,
+            timeout: config.crawler.timeout
+          });
+        } else {
+          throw error; // Re-throw if it's not a 404 or we didn't try ID extraction
+        }
+      }
+
+      Utils.log(`[DEBUG] Response status: ${response.status}`);
+      Utils.log(`[DEBUG] Final URL used: ${finalUrl}`);
+      Utils.log(`[DEBUG] Response size: ${JSON.stringify(response.data).length} characters`);
 
       if (this.source.type === 'api') {
         // Handle API response
@@ -341,7 +391,20 @@ class MangaCrawler {
         };
       }
     } catch (error) {
-      Utils.log(`Error getting manga details: ${error.message}`, 'error');
+      Utils.log(`[ERROR] Error getting manga details: ${error.message}`, 'error');
+      Utils.log(`[ERROR] URL that failed: ${url}`, 'error');
+      Utils.log(`[ERROR] Original slug/URL: ${mangaUrlOrSlug}`, 'error');
+      
+      if (error.response) {
+        Utils.log(`[ERROR] HTTP Status: ${error.response.status}`, 'error');
+        Utils.log(`[ERROR] Response headers: ${JSON.stringify(error.response.headers)}`, 'error');
+        if (error.response.data) {
+          Utils.log(`[ERROR] Response data: ${JSON.stringify(error.response.data)}`, 'error');
+        }
+      } else if (error.request) {
+        Utils.log(`[ERROR] No response received. Request: ${error.request}`, 'error');
+      }
+      
       return {};
     }
   }
