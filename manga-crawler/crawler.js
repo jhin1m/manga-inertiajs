@@ -160,7 +160,7 @@ class MangaCrawler {
         const apiManga = {
           title: mangaData.name,
           slug: await this.generateUniqueMangaSlug(mangaData.name), // Generate unique slug from name
-          url: mangaData.slug, // Use API slug for API calls
+          url: mangaData.slug, // Use API slug for getMangaDetails calls
           thumbnail: mangaData.thumbnail,
           status: mangaData.type === 'complete' ? 'completed' : 'ongoing',
           views: mangaData.views,
@@ -264,9 +264,9 @@ class MangaCrawler {
 
   // Get detailed manga information
   async getMangaDetails(mangaUrlOrSlug) {
+    let url = 'unknown'; // Initialize to prevent undefined reference in catch block
+    
     try {
-      let url;
-      
       if (this.source.type === 'api') {
         // Extract slug from URL if it's a full URL
         let slug;
