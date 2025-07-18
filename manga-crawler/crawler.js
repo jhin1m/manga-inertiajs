@@ -533,40 +533,50 @@ class MangaCrawler {
   async processGenresOnly(mangaId, genres) {
     try {
       if (genres && genres.length > 0) {
-        Utils.log(`Processing ${genres.length} genres: ${genres.join(', ')}`);
+        Utils.log(`[DEBUG] Processing ${genres.length} genres for manga ID ${mangaId}: ${genres.join(', ')}`);
         const genreTaxonomy = await this.db.findTaxonomyByType('genre');
         if (genreTaxonomy) {
+          Utils.log(`[DEBUG] Found genre taxonomy: ID=${genreTaxonomy.id}`);
           for (const genre of genres) {
             // Double check that genre is valid in genres.json (with normalization)
             if (isValidGenre(genre)) {
               // Use normalized genre name for consistency
               const normalizedGenre = normalizeGenre(genre);
-              Utils.log(`Mapping API genre "${genre}" -> DB genre "${normalizedGenre}"`);
+              Utils.log(`[DEBUG] Mapping API genre "${genre}" -> DB genre "${normalizedGenre}"`);
               await this.attachTaxonomyTerm(mangaId, genreTaxonomy.id, normalizedGenre);
             } else {
-              Utils.log(`Skipping invalid genre: ${genre}`, 'warn');
+              Utils.log(`[DEBUG] Skipping invalid genre: ${genre}`, 'warn');
             }
           }
+        } else {
+          Utils.log(`[DEBUG] Genre taxonomy not found in database!`, 'error');
         }
+      } else {
+        Utils.log(`[DEBUG] No genres to process`);
       }
     } catch (error) {
-      Utils.log(`Error processing genres: ${error.message}`, 'error');
+      Utils.log(`[DEBUG] Error processing genres: ${error.message}`, 'error');
     }
   }
 
   // Helper to attach taxonomy term to manga
   async attachTaxonomyTerm(mangaId, taxonomyId, termName) {
     try {
+      Utils.log(`[DEBUG] attachTaxonomyTerm: mangaId=${mangaId}, taxonomyId=${taxonomyId}, termName="${termName}"`);
+      
       if (this.dryRun) {
         // Skip taxonomy processing in dry run mode to keep output clean
+        Utils.log(`[DEBUG] Skipping taxonomy processing in dry run mode`);
         return;
       }
 
       // Normalize term name for comparison
       const normalizedTermName = termName.trim();
+      Utils.log(`[DEBUG] Normalized term name: "${normalizedTermName}"`);
       
       // First check if term exists by name (case-insensitive to prevent duplicates)
       let taxonomyTerm = await this.db.findTaxonomyTerm(taxonomyId, normalizedTermName);
+      Utils.log(`[DEBUG] findTaxonomyTerm result: ${taxonomyTerm ? 'FOUND' : 'NOT FOUND'}`);
       
       if (!taxonomyTerm) {
         // Check if a term with similar name exists (case-insensitive and normalized)
@@ -627,9 +637,12 @@ class MangaCrawler {
       }
 
       // Attach the term to manga (with duplicate check)
+      Utils.log(`[DEBUG] Attaching taxonomy term to manga: mangaId=${mangaId}, termId=${taxonomyTerm.id}`);
       await this.db.attachTaxonomyToManga(mangaId, taxonomyTerm.id);
+      Utils.log(`[DEBUG] Successfully attached taxonomy term to manga`);
     } catch (error) {
-      Utils.log(`Error attaching taxonomy term: ${error.message}`, 'error');
+      Utils.log(`[DEBUG] Error attaching taxonomy term: ${error.message}`, 'error');
+      throw error;
     }
   }
 
