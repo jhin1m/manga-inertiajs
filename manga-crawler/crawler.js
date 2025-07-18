@@ -206,10 +206,8 @@ class MangaCrawler {
             if (detailedManga.genres && detailedManga.genres.length > 0) {
               // Process only genres for existing manga
               await this.processGenresOnly(mangaId, detailedManga.genres);
-              Utils.log(`Updated ${detailedManga.genres.length} genres for existing manga: ${mangaData.title}`);
             }
           } else {
-            Utils.log(`Manga already has ${genreCount} genres, skipping genre update`);
           }
         }
       } else {
@@ -359,11 +357,8 @@ class MangaCrawler {
       if (error.response && error.response.status === 404) {
         Utils.log(`[ERROR] Error getting manga details: ${error.message}`, 'error');
         Utils.log(`[DEBUG] 404 ERROR - URL that failed: ${url}`, 'error');
-        Utils.log(`[DEBUG] 404 ERROR - Original slug/URL: ${mangaUrlOrSlug}`, 'error');
-        Utils.log(`[DEBUG] 404 ERROR - Source mangaDetailUrl template: ${this.source.mangaDetailUrl}`, 'error');
         
         if (error.response.data) {
-          Utils.log(`[DEBUG] 404 ERROR - Response data: ${JSON.stringify(error.response.data)}`, 'error');
         }
       } else {
         Utils.log(`[ERROR] Error getting manga details: ${error.message}`, 'error');
