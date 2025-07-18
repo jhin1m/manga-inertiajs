@@ -24,3 +24,6 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 manga-crawler/node_modules
+**/caddy
+frankenphp
+frankenphp-worker.php
