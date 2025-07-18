@@ -413,6 +413,7 @@ class MangaCrawler {
     try {
       // Process genres - only use genres that are valid in genres.json
       if (mangaData.genres && mangaData.genres.length > 0) {
+        Utils.log(`Processing ${mangaData.genres.length} genres: ${mangaData.genres.join(', ')}`);
         const genreTaxonomy = await this.db.findTaxonomyByType('genre');
         if (genreTaxonomy) {
           for (const genre of mangaData.genres) {
@@ -420,7 +421,10 @@ class MangaCrawler {
             if (isValidGenre(genre)) {
               // Use normalized genre name for consistency
               const normalizedGenre = normalizeGenre(genre);
+              Utils.log(`Mapping API genre "${genre}" -> DB genre "${normalizedGenre}"`);
               await this.attachTaxonomyTerm(mangaId, genreTaxonomy.id, normalizedGenre);
+            } else {
+              Utils.log(`Skipping invalid genre: ${genre}`, 'warn');
             }
           }
         }
@@ -450,6 +454,7 @@ class MangaCrawler {
   async processGenresOnly(mangaId, genres) {
     try {
       if (genres && genres.length > 0) {
+        Utils.log(`Processing ${genres.length} genres: ${genres.join(', ')}`);
         const genreTaxonomy = await this.db.findTaxonomyByType('genre');
         if (genreTaxonomy) {
           for (const genre of genres) {
@@ -457,6 +462,7 @@ class MangaCrawler {
             if (isValidGenre(genre)) {
               // Use normalized genre name for consistency
               const normalizedGenre = normalizeGenre(genre);
+              Utils.log(`Mapping API genre "${genre}" -> DB genre "${normalizedGenre}"`);
               await this.attachTaxonomyTerm(mangaId, genreTaxonomy.id, normalizedGenre);
             } else {
               Utils.log(`Skipping invalid genre: ${genre}`, 'warn');

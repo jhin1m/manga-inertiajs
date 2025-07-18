@@ -8,74 +8,77 @@ const validGenres = JSON.parse(fs.readFileSync(genresPath, 'utf8'));
 // Create a Set of valid genre names for fast lookup
 const validGenreNames = new Set(validGenres.map(g => g.genre));
 
-// Create genre mapping for common API variations
-const genreMapping = {
-  'ロマンス': '恋愛',  // API uses ロマンス, but we have 恋愛 (Romance)
-  'アクション': 'アクション',  // Both use same
-  'ドラマ': 'ドラマ',  // Both use same
-  'コメディ': 'コメディ',  // Both use same
-  'ファンタジー': 'ファンタジー',  // Both use same
-  'ホラー': 'ホラー',  // Both use same
-  'ミステリー': 'ミステリー',  // Both use same
-  'ＳＦ': 'ＳＦ',  // Both use same
-  'スポーツ': 'スポーツ',  // Both use same
-  'スリラー': 'スリラー',  // Both use same
-  'サスペンス': 'サスペンス',  // Both use same
-  'エッチ': 'エッチ',  // Both use same
-  'ハーレム': 'ハーレム',  // Both use same
-  'メカ': 'メカ',  // Both use same
-  'スマット': 'スマット',  // Both use same
-  'やおい': 'やおい',  // Both use same
-  '百合': '百合',  // Both use same
-  'ボーイズラブ': 'ボーイズラブ',  // Both use same
-  'ガールズラブ': 'ガールズラブ',  // Both use same
-  '少年愛': '少年愛',  // Both use same
-  '少女愛': '少女愛',  // Both use same
-  'エロ': 'エロ',  // Both use same
-  'アダルト': 'アダルト',  // Both use same
-  '成人向け': '成人向け',  // Both use same
-  '変態': '変態',  // Both use same
-  'ロリコン': 'ロリコン',  // Both use same
-  'ショタコン': 'ショタコン',  // Both use same
-  '冒険': '冒険',  // Both use same
-  '歴史': '歴史',  // Both use same
-  '音楽系': '音楽系',  // Both use same
-  '心理': '心理',  // Both use same
-  '学園物': '学園物',  // Both use same
-  '日常系': '日常系',  // Both use same
-  '超能力': '超能力',  // Both use same
-  '悲劇': '悲劇',  // Both use same
-  '格闘技': '格闘技',  // Both use same
-  '魔法少女': '魔法少女',  // Both use same
-  '性転換': '性転換',  // Both use same
-  'グルメ': 'グルメ',  // Both use same
-  '前衛系': '前衛系',  // Both use same
-  '受賞作': '受賞作',  // Both use same
-  '同人誌': '同人誌',  // Both use same
-  '女性向け': '女性向け',  // Both use same
-  '青年向け': '青年向け',  // Both use same
-  '少女向け': '少女向け',  // Both use same
-  '少年向け': '少年向け',  // Both use same
+// Create lookup maps for flexible genre matching
+const genreByJapanese = new Map(validGenres.map(g => [g.genre, g.genre]));
+const genreByEnglish = new Map(validGenres.map(g => [g.genre_en?.toLowerCase(), g.genre]));
+
+// Common Japanese romanizations and synonyms
+const genreSynonyms = {
+  'ロマンス': '恋愛',      // Romance romanization -> Japanese word
+  'アクション': 'アクション',  // Action (already matches)
+  'ドラマ': 'ドラマ',       // Drama (already matches)
+  'コメディ': 'コメディ',    // Comedy (already matches)
+  'ファンタジー': 'ファンタジー', // Fantasy (already matches)
+  'ホラー': 'ホラー',       // Horror (already matches)
+  'ミステリー': 'ミステリー',  // Mystery (already matches)
+  'サスペンス': 'サスペンス',  // Suspense (already matches)
+  'スリラー': 'スリラー',    // Thriller (already matches)
+  'romance': '恋愛',       // English romance -> Japanese
+  'action': 'アクション',    // English action -> Japanese
+  'drama': 'ドラマ',       // English drama -> Japanese
+  'comedy': 'コメディ',     // English comedy -> Japanese
+  'fantasy': 'ファンタジー', // English fantasy -> Japanese
+  'horror': 'ホラー',      // English horror -> Japanese
+  'mystery': 'ミステリー',  // English mystery -> Japanese
+  'suspense': 'サスペンス', // English suspense -> Japanese
+  'thriller': 'スリラー',   // English thriller -> Japanese
 };
 
 /**
- * Normalize genre name using mapping
- * @param {string} genre - Genre name to normalize
- * @returns {string} Normalized genre name
+ * Find matching genre name in database
+ * @param {string} apiGenre - Genre name from API
+ * @returns {string|null} Matching database genre name or null if not found
  */
-function normalizeGenre(genre) {
-  return genreMapping[genre] || genre;
+function findMatchingGenre(apiGenre) {
+  // Try exact match with Japanese names first
+  if (genreByJapanese.has(apiGenre)) {
+    return apiGenre;
+  }
+  
+  // Try common synonyms and romanizations
+  const synonym = genreSynonyms[apiGenre] || genreSynonyms[apiGenre.toLowerCase()];
+  if (synonym && genreByJapanese.has(synonym)) {
+    return synonym;
+  }
+  
+  // Try matching with English names (case-insensitive)
+  const englishMatch = genreByEnglish.get(apiGenre.toLowerCase());
+  if (englishMatch) {
+    return englishMatch;
+  }
+  
+  // Try partial matching for common variations
+  const apiLower = apiGenre.toLowerCase();
+  
+  // Check if API genre matches any English name
+  for (const [englishName, dbGenre] of genreByEnglish) {
+    if (englishName && (englishName === apiLower || englishName.includes(apiLower) || apiLower.includes(englishName))) {
+      return dbGenre;
+    }
+  }
+  
+  return null;
 }
 
 /**
  * Filter genres to only include those in genres.json
  * @param {string[]} genres - Array of genre names to filter
- * @returns {string[]} Array of valid genre names
+ * @returns {string[]} Array of valid genre names from database
  */
 function filterValidGenres(genres) {
   return genres
-    .map(genre => normalizeGenre(genre))
-    .filter(genre => validGenreNames.has(genre));
+    .map(genre => findMatchingGenre(genre))
+    .filter(genre => genre !== null);
 }
 
 /**
@@ -84,8 +87,16 @@ function filterValidGenres(genres) {
  * @returns {boolean} True if genre exists in genres.json
  */
 function isValidGenre(genre) {
-  const normalized = normalizeGenre(genre);
-  return validGenreNames.has(normalized);
+  return findMatchingGenre(genre) !== null;
+}
+
+/**
+ * Get the database genre name for an API genre
+ * @param {string} apiGenre - Genre name from API
+ * @returns {string} Database genre name
+ */
+function normalizeGenre(apiGenre) {
+  return findMatchingGenre(apiGenre) || apiGenre;
 }
 
 module.exports = {
@@ -94,5 +105,5 @@ module.exports = {
   filterValidGenres,
   isValidGenre,
   normalizeGenre,
-  genreMapping
+  findMatchingGenre
 };
