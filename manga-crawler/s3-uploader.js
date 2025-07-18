@@ -122,6 +122,7 @@ class S3ImageUploader {
    * Get pages that need S3 upload (have image_url but no image_url_2)
    */
   async getPagesToUpload(limit = 100, offset = 0) {
+    // Sử dụng query() thay vì execute() để tránh lỗi prepared statement
     const query = `
       SELECT 
         p.id, 
@@ -137,10 +138,10 @@ class S3ImageUploader {
         AND p.image_url != '' 
         AND (p.image_url_2 IS NULL OR p.image_url_2 = '')
       ORDER BY p.id ASC
-      LIMIT ? OFFSET ?
+      LIMIT ${mysql.escape(limit)} OFFSET ${mysql.escape(offset)}
     `;
     
-    const [rows] = await this.db.execute(query, [limit, offset]);
+    const [rows] = await this.db.query(query);
     return rows;
   }
 
@@ -235,8 +236,9 @@ class S3ImageUploader {
    * Update page with S3 URL
    */
   async updatePageS3Url(pageId, s3Url) {
-    const query = 'UPDATE pages SET image_url_2 = ? WHERE id = ?';
-    await this.db.execute(query, [s3Url, pageId]);
+    // Sử dụng query() với escape để tránh lỗi prepared statement
+    const query = `UPDATE pages SET image_url_2 = ${mysql.escape(s3Url)} WHERE id = ${mysql.escape(pageId)}`;
+    await this.db.query(query);
   }
 
   /**
