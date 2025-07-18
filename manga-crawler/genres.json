@@ -44,5 +44,6 @@
   { "genre": "スリラー", "slug": "suriraa", "genre_en": "Thriller" },
   { "genre": "悲劇", "slug": "higeki", "genre_en": "Tragedy" },
   { "genre": "やおい", "slug": "yaoi", "genre_en": "Yaoi" },
-  { "genre": "百合", "slug": "yuri", "genre_en": "Yuri" }
+  { "genre": "百合", "slug": "yuri", "genre_en": "Yuri" },
+  { "genre": "18禁", "slug": "seijin", "genre_en": "18+" }
 ]
