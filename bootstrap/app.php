@@ -15,7 +15,18 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
-        $middleware->trustProxies(at: '*');
+        $middleware->trustProxies(
+            at: [
+                '127.0.0.1',
+                '10.0.0.0/8',
+                '172.16.0.0/12', 
+                '192.168.0.0/16'
+            ],
+            headers: \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR |
+                     \Illuminate\Http\Request::HEADER_X_FORWARDED_HOST |
+                     \Illuminate\Http\Request::HEADER_X_FORWARDED_PORT |
+                     \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO
+        );
 
         //
     })
