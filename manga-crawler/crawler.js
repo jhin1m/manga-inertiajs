@@ -268,8 +268,18 @@ class MangaCrawler {
       let url;
       
       if (this.source.type === 'api') {
+        // Extract slug from URL if it's a full URL
+        let slug;
+        if (mangaUrlOrSlug.includes('://')) {
+          // It's a full URL, extract slug from it
+          slug = mangaUrlOrSlug.split('/').pop();
+        } else {
+          // It's already a slug
+          slug = mangaUrlOrSlug;
+        }
+        
         // For API, use slug to build detail URL
-        url = this.source.mangaDetailUrl.replace('{slug}', mangaUrlOrSlug);
+        url = this.source.mangaDetailUrl.replace('{slug}', slug);
       } else {
         // For HTML scraping, use direct URL
         url = mangaUrlOrSlug;
