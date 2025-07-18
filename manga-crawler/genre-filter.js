@@ -10,7 +10,7 @@ const validGenreNames = new Set(validGenres.map(g => g.genre));
 
 // Create lookup maps for flexible genre matching
 const genreByJapanese = new Map(validGenres.map(g => [g.genre, g.genre]));
-const genreByEnglish = new Map(validGenres.map(g => [g.genre_en?.toLowerCase(), g.genre]));
+const genreByEnglish = new Map(validGenres.map(g => [g.genre_en?.toLowerCase(), g.genre]).filter(([key]) => key != null));
 
 // Common Japanese romanizations and synonyms
 const genreSynonyms = {
@@ -40,29 +40,34 @@ const genreSynonyms = {
  * @returns {string|null} Matching database genre name or null if not found
  */
 function findMatchingGenre(apiGenre) {
+  // Handle null or undefined input
+  if (!apiGenre) {
+    return null;
+  }
+  
   // Try exact match with Japanese names first
   if (genreByJapanese.has(apiGenre)) {
     return apiGenre;
   }
   
   // Try common synonyms and romanizations
-  const synonym = genreSynonyms[apiGenre] || genreSynonyms[apiGenre.toLowerCase()];
+  const synonym = genreSynonyms[apiGenre] || genreSynonyms[apiGenre?.toLowerCase()];
   if (synonym && genreByJapanese.has(synonym)) {
     return synonym;
   }
   
   // Try matching with English names (case-insensitive)
-  const englishMatch = genreByEnglish.get(apiGenre.toLowerCase());
+  const englishMatch = genreByEnglish.get(apiGenre?.toLowerCase());
   if (englishMatch) {
     return englishMatch;
   }
   
   // Try partial matching for common variations
-  const apiLower = apiGenre.toLowerCase();
+  const apiLower = apiGenre?.toLowerCase();
   
   // Check if API genre matches any English name
   for (const [englishName, dbGenre] of genreByEnglish) {
-    if (englishName && (englishName === apiLower || englishName.includes(apiLower) || apiLower.includes(englishName))) {
+    if (englishName && apiLower && (englishName === apiLower || englishName.includes(apiLower) || apiLower.includes(englishName))) {
       return dbGenre;
     }
   }
