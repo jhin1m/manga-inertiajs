@@ -146,8 +146,8 @@ class Database {
   // Taxonomy operations
   async findTaxonomyByType(type) {
     const [rows] = await this.connection.execute(
-      'SELECT * FROM taxonomies WHERE slug = ?',
-      [type + 's'] // Convert 'genre' to 'genres', 'author' to 'authors'
+      'SELECT * FROM taxonomies WHERE type = ?',
+      [type] // Search by type directly, not slug
     );
     return rows[0] || null;
   }
