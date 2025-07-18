@@ -135,7 +135,8 @@ return [
     ],
 
     'flush' => [
-        //
+        'translator',
+        'inertia',
     ],
 
     /*
