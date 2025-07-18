@@ -172,24 +172,13 @@ class MangaCrawler {
 
       Utils.log(`Processing manga: ${mangaData.title}`);
 
-      // Check if manga already exists (check even in dry run for accurate preview)
+      // Check if manga already exists (skip in dry run)
       let existingManga = null;
-      Utils.log(`[DEBUG] Searching for existing manga:`);
-      Utils.log(`[DEBUG] Title: "${mangaData.title}"`);
-      Utils.log(`[DEBUG] Slug: "${mangaData.slug}"`);
-      
-      existingManga = await this.db.findMangaByTitle(mangaData.title);
-      Utils.log(`[DEBUG] findMangaByTitle result: ${existingManga ? 'FOUND' : 'NOT FOUND'}`);
-      
-      if (!existingManga) {
-        existingManga = await this.db.findMangaBySlug(mangaData.slug);
-        Utils.log(`[DEBUG] findMangaBySlug result: ${existingManga ? 'FOUND' : 'NOT FOUND'}`);
-      }
-      
-      if (existingManga) {
-        Utils.log(`[DEBUG] Found existing manga: ID=${existingManga.id}, Name="${existingManga.name}"`);
-      } else {
-        Utils.log(`[DEBUG] No existing manga found - will be treated as new manga`);
+      if (!this.dryRun) {
+        existingManga = await this.db.findMangaByTitle(mangaData.title);
+        if (!existingManga) {
+          existingManga = await this.db.findMangaBySlug(mangaData.slug);
+        }
       }
 
       let mangaId;
@@ -222,35 +211,6 @@ class MangaCrawler {
           } else {
             Utils.log(`Manga already has ${genreCount} genres, skipping genre update`);
           }
-        } else {
-          // Show genre update preview in dry-run mode
-          Utils.log(`\n[DRY RUN] EXISTING MANGA GENRE UPDATE PREVIEW:`);
-          Utils.log(`=====================================`);
-          Utils.log(`Manga: ${mangaData.title} (đã tồn tại)`);
-          Utils.log(`Sẽ kiểm tra: Manga có genre không?`);
-          Utils.log(`Nếu không có genre -> lấy thông tin chi tiết và cập nhật`);
-          
-          // Get detailed manga info to show what would be updated
-          const detailedManga = await this.getMangaDetails(mangaData.url);
-          if (detailedManga.genres && detailedManga.genres.length > 0) {
-            Utils.log(`Genres sẽ được thêm: ${detailedManga.genres.join(', ')}`);
-            
-            // Show genre validation
-            Utils.log(`\n[GENRE VALIDATION]:`);
-            const { isValidGenre, normalizeGenre } = require('./genre-filter');
-            detailedManga.genres.forEach(genre => {
-              const isValid = isValidGenre(genre);
-              const normalized = normalizeGenre(genre);
-              if (isValid) {
-                Utils.log(`  ✓ ${genre} -> ${normalized} (hợp lệ)`);
-              } else {
-                Utils.log(`  ✗ ${genre} (không hợp lệ - sẽ bỏ qua)`);
-              }
-            });
-          } else {
-            Utils.log(`Không tìm thấy genre nào để cập nhật`);
-          }
-          Utils.log(`=====================================`);
         }
       } else {
         // Get detailed manga info
@@ -273,18 +233,6 @@ class MangaCrawler {
           if (detailedManga.genres && detailedManga.genres.length > 0) {
             Utils.log(`Thể loại: ${detailedManga.genres.join(', ')}`);
             
-            // Show genre validation details in dry run
-            Utils.log(`\n[GENRE VALIDATION]:`);
-            const { isValidGenre, normalizeGenre } = require('./genre-filter');
-            detailedManga.genres.forEach(genre => {
-              const isValid = isValidGenre(genre);
-              const normalized = normalizeGenre(genre);
-              if (isValid) {
-                Utils.log(`  ✓ ${genre} -> ${normalized} (hợp lệ)`);
-              } else {
-                Utils.log(`  ✗ ${genre} (không hợp lệ - sẽ bỏ qua)`);
-              }
-            });
           } else {
             Utils.log(`Thể loại: Không có`);
           }
@@ -533,50 +481,36 @@ class MangaCrawler {
   async processGenresOnly(mangaId, genres) {
     try {
       if (genres && genres.length > 0) {
-        Utils.log(`[DEBUG] Processing ${genres.length} genres for manga ID ${mangaId}: ${genres.join(', ')}`);
         const genreTaxonomy = await this.db.findTaxonomyByType('genre');
         if (genreTaxonomy) {
-          Utils.log(`[DEBUG] Found genre taxonomy: ID=${genreTaxonomy.id}`);
           for (const genre of genres) {
             // Double check that genre is valid in genres.json (with normalization)
             if (isValidGenre(genre)) {
               // Use normalized genre name for consistency
               const normalizedGenre = normalizeGenre(genre);
-              Utils.log(`[DEBUG] Mapping API genre "${genre}" -> DB genre "${normalizedGenre}"`);
               await this.attachTaxonomyTerm(mangaId, genreTaxonomy.id, normalizedGenre);
-            } else {
-              Utils.log(`[DEBUG] Skipping invalid genre: ${genre}`, 'warn');
             }
           }
-        } else {
-          Utils.log(`[DEBUG] Genre taxonomy not found in database!`, 'error');
         }
-      } else {
-        Utils.log(`[DEBUG] No genres to process`);
       }
     } catch (error) {
-      Utils.log(`[DEBUG] Error processing genres: ${error.message}`, 'error');
+      Utils.log(`Error processing genres: ${error.message}`, 'error');
     }
   }
 
   // Helper to attach taxonomy term to manga
   async attachTaxonomyTerm(mangaId, taxonomyId, termName) {
     try {
-      Utils.log(`[DEBUG] attachTaxonomyTerm: mangaId=${mangaId}, taxonomyId=${taxonomyId}, termName="${termName}"`);
-      
       if (this.dryRun) {
         // Skip taxonomy processing in dry run mode to keep output clean
-        Utils.log(`[DEBUG] Skipping taxonomy processing in dry run mode`);
         return;
       }
 
       // Normalize term name for comparison
       const normalizedTermName = termName.trim();
-      Utils.log(`[DEBUG] Normalized term name: "${normalizedTermName}"`);
       
       // First check if term exists by name (case-insensitive to prevent duplicates)
       let taxonomyTerm = await this.db.findTaxonomyTerm(taxonomyId, normalizedTermName);
-      Utils.log(`[DEBUG] findTaxonomyTerm result: ${taxonomyTerm ? 'FOUND' : 'NOT FOUND'}`);
       
       if (!taxonomyTerm) {
         // Check if a term with similar name exists (case-insensitive and normalized)
@@ -588,7 +522,6 @@ class MangaCrawler {
         if (existingTerms.length > 0) {
           // Use existing term instead of creating duplicate
           taxonomyTerm = existingTerms[0];
-          Utils.log(`Using existing taxonomy term: ${normalizedTermName} (found: ${taxonomyTerm.name})`, 'info');
         } else {
           // Create new term with unique slug using improved slug generation
           let termSlug = await Utils.createSlug(normalizedTermName);
@@ -609,7 +542,6 @@ class MangaCrawler {
               if (existingSlugTerm.name.toLowerCase().trim() === normalizedTermName.toLowerCase()) {
                 // Same name, use existing term
                 taxonomyTerm = existingSlugTerm;
-                Utils.log(`Using existing taxonomy term with same name: ${normalizedTermName}`, 'info');
                 break;
               } else {
                 // Different name but same slug, increment counter
@@ -629,19 +561,15 @@ class MangaCrawler {
           if (!taxonomyTerm) {
             const termId = await this.db.createTaxonomyTerm(taxonomyId, normalizedTermName, termSlug);
             taxonomyTerm = { id: termId };
-            Utils.log(`Created new taxonomy term: ${normalizedTermName} (${termSlug})`, 'info');
           }
         }
       } else {
-        Utils.log(`Found existing taxonomy term: ${normalizedTermName}`, 'info');
       }
 
       // Attach the term to manga (with duplicate check)
-      Utils.log(`[DEBUG] Attaching taxonomy term to manga: mangaId=${mangaId}, termId=${taxonomyTerm.id}`);
       await this.db.attachTaxonomyToManga(mangaId, taxonomyTerm.id);
-      Utils.log(`[DEBUG] Successfully attached taxonomy term to manga`);
     } catch (error) {
-      Utils.log(`[DEBUG] Error attaching taxonomy term: ${error.message}`, 'error');
+      Utils.log(`Error attaching taxonomy term: ${error.message}`, 'error');
       throw error;
     }
   }
