@@ -269,47 +269,16 @@ class MangaCrawler {
       
       if (this.source.type === 'api') {
         // For API, use slug to build detail URL
-        // Try to extract ID from slug if it ends with a number
-        let apiSlug = mangaUrlOrSlug;
-        
-        // Check if slug ends with a number pattern like "-7518"
-        const idMatch = mangaUrlOrSlug.match(/-(\d+)$/);
-        if (idMatch) {
-          const extractedId = idMatch[1];
-          Utils.log(`[DEBUG] Extracted ID from slug: ${extractedId}`);
-          
-          // Try using just the ID first
-          apiSlug = extractedId;
-        }
-        
-        url = this.source.mangaDetailUrl.replace('{slug}', apiSlug);
+        url = this.source.mangaDetailUrl.replace('{slug}', mangaUrlOrSlug);
       } else {
         // For HTML scraping, use direct URL
         url = mangaUrlOrSlug;
       }
 
-      let response;
-      let finalUrl = url;
-      
-      try {
-        response = await axios.get(url, {
-          headers: this.source.headers,
-          timeout: config.crawler.timeout
-        });
-      } catch (error) {
-        // If first attempt fails and we tried with extracted ID, try with original slug
-        if (this.source.type === 'api' && apiSlug !== mangaUrlOrSlug && error.response && error.response.status === 404) {
-          Utils.log(`[DEBUG] ID-based request failed, trying with original slug: ${mangaUrlOrSlug}`);
-          finalUrl = this.source.mangaDetailUrl.replace('{slug}', mangaUrlOrSlug);
-          
-          response = await axios.get(finalUrl, {
-            headers: this.source.headers,
-            timeout: config.crawler.timeout
-          });
-        } else {
-          throw error; // Re-throw if it's not a 404 or we didn't try ID extraction
-        }
-      }
+      const response = await axios.get(url, {
+        headers: this.source.headers,
+        timeout: config.crawler.timeout
+      });
 
       if (this.source.type === 'api') {
         // Handle API response
@@ -376,14 +345,9 @@ class MangaCrawler {
       // Only debug URLs that fail with 404 errors
       if (error.response && error.response.status === 404) {
         Utils.log(`[ERROR] Error getting manga details: ${error.message}`, 'error');
-        Utils.log(`[DEBUG] 404 ERROR - URL that failed: ${finalUrl || url}`, 'error');
+        Utils.log(`[DEBUG] 404 ERROR - URL that failed: ${url}`, 'error');
         Utils.log(`[DEBUG] 404 ERROR - Original slug/URL: ${mangaUrlOrSlug}`, 'error');
         Utils.log(`[DEBUG] 404 ERROR - Source mangaDetailUrl template: ${this.source.mangaDetailUrl}`, 'error');
-        
-        if (this.source.type === 'api' && apiSlug !== mangaUrlOrSlug) {
-          Utils.log(`[DEBUG] 404 ERROR - Extracted ID: ${apiSlug}`, 'error');
-          Utils.log(`[DEBUG] 404 ERROR - ID-based URL tried: ${this.source.mangaDetailUrl.replace('{slug}', apiSlug)}`, 'error');
-        }
         
         if (error.response.data) {
           Utils.log(`[DEBUG] 404 ERROR - Response data: ${JSON.stringify(error.response.data)}`, 'error');
