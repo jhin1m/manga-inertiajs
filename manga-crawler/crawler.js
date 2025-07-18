@@ -194,6 +194,23 @@ class MangaCrawler {
             await this.db.query('UPDATE mangas SET cover = ? WHERE id = ?', [coverImagePath, mangaId]);
           }
         }
+
+        // Check if manga has any genres, if not, update with genres from crawl
+        if (!this.dryRun) {
+          const genreCount = await this.db.getMangaGenreCount(mangaId);
+          if (genreCount === 0) {
+            Utils.log(`Manga has no genres, updating with crawled genres: ${mangaData.title}`);
+            // Get detailed manga info to extract genres
+            const detailedManga = await this.getMangaDetails(mangaData.url);
+            if (detailedManga.genres && detailedManga.genres.length > 0) {
+              // Process only genres for existing manga
+              await this.processGenresOnly(mangaId, detailedManga.genres);
+              Utils.log(`Updated ${detailedManga.genres.length} genres for existing manga: ${mangaData.title}`);
+            }
+          } else {
+            Utils.log(`Manga already has ${genreCount} genres, skipping genre update`);
+          }
+        }
       } else {
         // Get detailed manga info
         const detailedManga = await this.getMangaDetails(mangaData.url);
@@ -424,6 +441,27 @@ class MangaCrawler {
       }
     } catch (error) {
       Utils.log(`Error processing taxonomies: ${error.message}`, 'error');
+    }
+  }
+
+  // Process only genres for existing manga (used when manga has no genres)
+  async processGenresOnly(mangaId, genres) {
+    try {
+      if (genres && genres.length > 0) {
+        const genreTaxonomy = await this.db.findTaxonomyByType('genre');
+        if (genreTaxonomy) {
+          for (const genre of genres) {
+            // Double check that genre is valid in genres.json
+            if (isValidGenre(genre)) {
+              await this.attachTaxonomyTerm(mangaId, genreTaxonomy.id, genre);
+            } else {
+              Utils.log(`Skipping invalid genre: ${genre}`, 'warn');
+            }
+          }
+        }
+      }
+    } catch (error) {
+      Utils.log(`Error processing genres: ${error.message}`, 'error');
     }
   }
 

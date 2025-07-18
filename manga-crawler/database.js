@@ -191,6 +191,17 @@ class Database {
     }
   }
 
+  async getMangaGenreCount(mangaId) {
+    const [rows] = await this.connection.execute(
+      `SELECT COUNT(*) as count FROM manga_taxonomy_terms mtt 
+       JOIN taxonomy_terms tt ON mtt.taxonomy_term_id = tt.id 
+       JOIN taxonomies t ON tt.taxonomy_id = t.id 
+       WHERE mtt.manga_id = ? AND t.type = 'genre'`,
+      [mangaId]
+    );
+    return rows[0].count;
+  }
+
   // Helper method to execute raw queries
   async query(sql, params = []) {
     const [rows, result] = await this.connection.execute(sql, params);
