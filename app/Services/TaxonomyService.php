@@ -10,6 +10,9 @@ use Illuminate\Support\Collection;
 
 class TaxonomyService
 {
+    /** @var array Valid taxonomy types for Octane memory optimization */
+    private const VALID_TYPES = ['genre', 'author', 'artist', 'tag', 'status', 'year'];
+
     public function __construct(
         private TaxonomyRepositoryInterface $taxonomyRepository
     ) {}
@@ -26,9 +29,7 @@ class TaxonomyService
 
     public function getTermsByType(string $type): Collection
     {
-        $validTypes = ['genre', 'author', 'artist', 'tag', 'status', 'year'];
-        
-        if (!in_array($type, $validTypes)) {
+        if (!in_array($type, self::VALID_TYPES)) {
             throw new \InvalidArgumentException("Invalid taxonomy type: {$type}");
         }
 
@@ -37,9 +38,7 @@ class TaxonomyService
 
     public function getTermBySlugAndType(string $slug, string $type): ?TaxonomyTerm
     {
-        $validTypes = ['genre', 'author', 'artist', 'tag', 'status', 'year'];
-        
-        if (!in_array($type, $validTypes)) {
+        if (!in_array($type, self::VALID_TYPES)) {
             throw new \InvalidArgumentException("Invalid taxonomy type: {$type}");
         }
 
