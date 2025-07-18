@@ -285,16 +285,10 @@ class MangaCrawler {
         url = mangaUrlOrSlug;
       }
 
-      console.log(`[DEBUG] Making request to: ${url}`);
-      console.log(`[DEBUG] Headers:`, this.source.headers);
-      
       const response = await axios.get(url, {
         headers: this.source.headers,
         timeout: config.crawler.timeout
       });
-      
-      console.log(`[DEBUG] Response status: ${response.status}`);
-      console.log(`[DEBUG] Response headers:`, response.headers);
 
       if (this.source.type === 'api') {
         // Handle API response
@@ -364,18 +358,12 @@ class MangaCrawler {
         Utils.log(`[DEBUG] 404 ERROR - URL that failed: ${url}`, 'error');
         Utils.log(`[DEBUG] 404 ERROR - Original slug/URL: ${mangaUrlOrSlug}`, 'error');
         Utils.log(`[DEBUG] 404 ERROR - Source mangaDetailUrl template: ${this.source.mangaDetailUrl}`, 'error');
-        Utils.log(`[DEBUG] 404 ERROR - Request headers sent:`, JSON.stringify(this.source.headers), 'error');
-        Utils.log(`[DEBUG] 404 ERROR - Response headers received:`, JSON.stringify(error.response.headers), 'error');
         
         if (error.response.data) {
           Utils.log(`[DEBUG] 404 ERROR - Response data: ${JSON.stringify(error.response.data)}`, 'error');
         }
       } else {
         Utils.log(`[ERROR] Error getting manga details: ${error.message}`, 'error');
-        if (error.response) {
-          Utils.log(`[DEBUG] Error response status: ${error.response.status}`, 'error');
-          Utils.log(`[DEBUG] Error response headers:`, JSON.stringify(error.response.headers), 'error');
-        }
       }
       
       return {};

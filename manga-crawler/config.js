@@ -62,8 +62,7 @@ const config = {
         'Accept-Language': 'en-US,en;q=0.5',
         'Accept-Encoding': 'gzip, deflate',
         'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-        'Referer': 'http://135.181.16.141:3003/'
+        'Upgrade-Insecure-Requests': '1'
       }
     },
 
