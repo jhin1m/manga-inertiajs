@@ -198,9 +198,7 @@ class MangaCrawler {
         // Check if manga has any genres, if not, update with genres from crawl
         if (!this.dryRun) {
           const genreCount = await this.db.getMangaGenreCount(mangaId);
-          if (genreCount === 0) {
-            Utils.log(`Manga has no genres, updating with crawled genres: ${mangaData.title}`);
-            
+          if (genreCount === 0) {            
             // Get detailed manga info to extract genres
             const detailedManga = await this.getMangaDetails(mangaData.url);
             if (detailedManga.genres && detailedManga.genres.length > 0) {
