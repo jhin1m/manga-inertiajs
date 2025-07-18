@@ -8,7 +8,7 @@ const path = require('path');
 const Database = require('./database');
 const Utils = require('./utils');
 const config = require('./config');
-const { filterValidGenres, isValidGenre } = require('./genre-filter');
+const { filterValidGenres, isValidGenre, normalizeGenre } = require('./genre-filter');
 
 class MangaCrawler {
   constructor(sourceName = config.defaultSource, dryRun = false, downloadImages = false) {
@@ -416,9 +416,11 @@ class MangaCrawler {
         const genreTaxonomy = await this.db.findTaxonomyByType('genre');
         if (genreTaxonomy) {
           for (const genre of mangaData.genres) {
-            // Double check that genre is valid in genres.json
+            // Double check that genre is valid in genres.json (with normalization)
             if (isValidGenre(genre)) {
-              await this.attachTaxonomyTerm(mangaId, genreTaxonomy.id, genre);
+              // Use normalized genre name for consistency
+              const normalizedGenre = normalizeGenre(genre);
+              await this.attachTaxonomyTerm(mangaId, genreTaxonomy.id, normalizedGenre);
             }
           }
         }
@@ -451,9 +453,11 @@ class MangaCrawler {
         const genreTaxonomy = await this.db.findTaxonomyByType('genre');
         if (genreTaxonomy) {
           for (const genre of genres) {
-            // Double check that genre is valid in genres.json
+            // Double check that genre is valid in genres.json (with normalization)
             if (isValidGenre(genre)) {
-              await this.attachTaxonomyTerm(mangaId, genreTaxonomy.id, genre);
+              // Use normalized genre name for consistency
+              const normalizedGenre = normalizeGenre(genre);
+              await this.attachTaxonomyTerm(mangaId, genreTaxonomy.id, normalizedGenre);
             } else {
               Utils.log(`Skipping invalid genre: ${genre}`, 'warn');
             }
