@@ -232,6 +232,21 @@ class MangaCrawler {
           }
           if (detailedManga.genres && detailedManga.genres.length > 0) {
             Utils.log(`Thể loại: ${detailedManga.genres.join(', ')}`);
+            
+            // Show genre validation details in dry run
+            Utils.log(`\n[GENRE VALIDATION]:`);
+            const { isValidGenre, normalizeGenre } = require('./genre-filter');
+            detailedManga.genres.forEach(genre => {
+              const isValid = isValidGenre(genre);
+              const normalized = normalizeGenre(genre);
+              if (isValid) {
+                Utils.log(`  ✓ ${genre} -> ${normalized} (hợp lệ)`);
+              } else {
+                Utils.log(`  ✗ ${genre} (không hợp lệ - sẽ bỏ qua)`);
+              }
+            });
+          } else {
+            Utils.log(`Thể loại: Không có`);
           }
           Utils.log(`Trạng thái: ${detailedManga.status || mangaData.status || 'Không xác định'}`);
           if (detailedManga.description) {
