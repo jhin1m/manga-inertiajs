@@ -10,10 +10,18 @@ const STORAGE_KEYS = {
 const STORAGE_VERSION = '1.0'
 
 /**
- * Safe localStorage access with error handling
+ * Check if we're in a browser environment
+ */
+const isBrowser = typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+
+/**
+ * Safe localStorage access with SSR compatibility and error handling
  */
 const safeLocalStorage = {
     getItem(key) {
+        if (!isBrowser) {
+            return null
+        }
         try {
             return localStorage.getItem(key)
         } catch (error) {
@@ -23,6 +31,9 @@ const safeLocalStorage = {
     },
     
     setItem(key, value) {
+        if (!isBrowser) {
+            return false
+        }
         try {
             localStorage.setItem(key, value)
             return true
@@ -33,6 +44,9 @@ const safeLocalStorage = {
     },
     
     removeItem(key) {
+        if (!isBrowser) {
+            return false
+        }
         try {
             localStorage.removeItem(key)
             return true

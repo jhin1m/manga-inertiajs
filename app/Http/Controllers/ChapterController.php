@@ -6,6 +6,7 @@ use App\Http\Requests\ChapterRequest;
 use App\Models\Chapter;
 use App\Models\Manga;
 use App\Services\ChapterService;
+use App\Services\ImageEncryptionService;
 use App\Services\SeoService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,7 +15,8 @@ class ChapterController extends Controller
 {
     public function __construct(
         private ChapterService $chapterService,
-        private SeoService $seoService
+        private SeoService $seoService,
+        private ImageEncryptionService $encryptionService
     ) {}
 
     public function index(Manga $manga, Request $request)
@@ -61,6 +63,17 @@ class ChapterController extends Controller
             $this->chapterService->incrementViewCount($chapter);
         }
 
+        // Encrypt page image URLs for frontend
+        $encryptedPages = $chapter->pages->map(function ($page) {
+            return [
+                'id' => $page->id,
+                'chapter_id' => $page->chapter_id,
+                'page_number' => $page->page_number,
+                'image_url' => $this->encryptionService->encrypt($page->image_url),
+                'image_url_2' => $page->image_url_2 ? $this->encryptionService->encrypt($page->image_url_2) : null,
+            ];
+        });
+
         return Inertia::render('Chapter/Show', [
             'manga' => array_merge($manga->toArray(), [
                 'recent_chapters' => $recentChapters,
@@ -73,7 +86,7 @@ class ChapterController extends Controller
             'allChapters' => Inertia::defer(function () use ($manga) {
                 return $this->chapterService->getAllChaptersByManga($manga);
             }),
-            'pages' => $chapter->pages,
+            'pages' => $encryptedPages,
             'translations' => [
                 'home' => __('chapter.home'),
                 'chapter_list' => __('chapter.chapter_list'),

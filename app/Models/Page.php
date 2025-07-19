@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\ImageEncryptionService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -66,5 +67,61 @@ class Page extends Model
     public function getPrimaryImageUrl(): ?string
     {
         return $this->image_url ?: $this->image_url_2;
+    }
+
+    /**
+     * Get encrypted image URLs for frontend consumption
+     */
+    public function getEncryptedImageUrls(): array
+    {
+        $encryptionService = app(ImageEncryptionService::class);
+        $urls = [];
+
+        if ($this->image_url) {
+            $urls[] = $encryptionService->encrypt($this->image_url);
+        }
+
+        if ($this->image_url_2) {
+            $urls[] = $encryptionService->encrypt($this->image_url_2);
+        }
+
+        return $urls;
+    }
+
+    /**
+     * Get primary encrypted image URL for frontend
+     */
+    public function getEncryptedPrimaryImageUrl(): ?string
+    {
+        $encryptionService = app(ImageEncryptionService::class);
+        $primaryUrl = $this->getPrimaryImageUrl();
+        
+        return $primaryUrl ? $encryptionService->encrypt($primaryUrl) : null;
+    }
+
+    /**
+     * Get encrypted image_url attribute
+     */
+    public function getEncryptedImageUrlAttribute(): ?string
+    {
+        if (!$this->image_url) {
+            return null;
+        }
+        
+        $encryptionService = app(ImageEncryptionService::class);
+        return $encryptionService->encrypt($this->image_url);
+    }
+
+    /**
+     * Get encrypted image_url_2 attribute
+     */
+    public function getEncryptedImageUrl2Attribute(): ?string
+    {
+        if (!$this->image_url_2) {
+            return null;
+        }
+        
+        $encryptionService = app(ImageEncryptionService::class);
+        return $encryptionService->encrypt($this->image_url_2);
     }
 }

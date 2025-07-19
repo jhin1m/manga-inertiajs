@@ -10,8 +10,14 @@ export function useBookmarks() {
     })
     const [isLoading, setIsLoading] = useState(true)
 
-    // Load bookmarks from localStorage
+    // Load bookmarks from localStorage (client-side only)
     const loadBookmarks = useCallback(() => {
+        if (typeof window === 'undefined') {
+            setBookmarks({ manga: [] })
+            setIsLoading(false)
+            return
+        }
+        
         setIsLoading(true)
         try {
             const data = bookmarkStorage.getBookmarks()
@@ -24,13 +30,19 @@ export function useBookmarks() {
         }
     }, [])
 
-    // Initialize bookmarks on mount
+    // Initialize bookmarks on mount (client-side only)
     useEffect(() => {
-        loadBookmarks()
+        if (typeof window !== 'undefined') {
+            loadBookmarks()
+        }
     }, [loadBookmarks])
 
     // Add manga bookmark
     const addMangaBookmark = useCallback((manga) => {
+        if (typeof window === 'undefined') {
+            return false
+        }
+        
         try {
             const success = bookmarkStorage.addMangaBookmark(manga)
             if (success) {
@@ -45,6 +57,10 @@ export function useBookmarks() {
 
     // Remove manga bookmark
     const removeMangaBookmark = useCallback((mangaId) => {
+        if (typeof window === 'undefined') {
+            return false
+        }
+        
         try {
             const success = bookmarkStorage.removeMangaBookmark(mangaId)
             if (success) {
@@ -59,6 +75,10 @@ export function useBookmarks() {
 
     // Toggle manga bookmark
     const toggleMangaBookmark = useCallback((manga) => {
+        if (typeof window === 'undefined') {
+            return false
+        }
+        
         const isBookmarked = bookmarkStorage.isMangaBookmarked(manga.id)
         if (isBookmarked) {
             return removeMangaBookmark(manga.id)
@@ -69,16 +89,26 @@ export function useBookmarks() {
 
     // Check if manga is bookmarked
     const isMangaBookmarked = useCallback((mangaId) => {
+        if (typeof window === 'undefined') {
+            return false
+        }
         return bookmarkStorage.isMangaBookmarked(mangaId)
     }, [])
 
     // Get bookmarks count
     const getCount = useCallback(() => {
+        if (typeof window === 'undefined') {
+            return { manga: 0, total: 0 }
+        }
         return bookmarkStorage.getBookmarksCount()
     }, [])
 
     // Clear all bookmarks
     const clearBookmarks = useCallback(() => {
+        if (typeof window === 'undefined') {
+            return false
+        }
+        
         try {
             const success = bookmarkStorage.clearBookmarks()
             if (success) {

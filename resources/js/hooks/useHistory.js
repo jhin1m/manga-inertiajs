@@ -10,8 +10,14 @@ export function useHistory() {
     })
     const [isLoading, setIsLoading] = useState(true)
 
-    // Load history from localStorage
+    // Load history from localStorage (client-side only)
     const loadHistory = useCallback(() => {
+        if (typeof window === 'undefined') {
+            setHistory({ chapters: [] })
+            setIsLoading(false)
+            return
+        }
+        
         setIsLoading(true)
         try {
             const data = historyStorage.getHistory()
@@ -24,13 +30,19 @@ export function useHistory() {
         }
     }, [])
 
-    // Initialize history on mount
+    // Initialize history on mount (client-side only)
     useEffect(() => {
-        loadHistory()
+        if (typeof window !== 'undefined') {
+            loadHistory()
+        }
     }, [loadHistory])
 
     // Add chapter to history (simplified)
     const addToHistory = useCallback((chapter, manga) => {
+        if (typeof window === 'undefined') {
+            return false
+        }
+        
         try {
             const success = historyStorage.addToHistory(chapter, manga)
             if (success) {
@@ -45,6 +57,10 @@ export function useHistory() {
 
     // Remove from history
     const removeFromHistory = useCallback((chapterId) => {
+        if (typeof window === 'undefined') {
+            return false
+        }
+        
         try {
             const success = historyStorage.removeFromHistory(chapterId)
             if (success) {
@@ -59,6 +75,10 @@ export function useHistory() {
 
     // Clear all history
     const clearHistory = useCallback(() => {
+        if (typeof window === 'undefined') {
+            return false
+        }
+        
         try {
             const success = historyStorage.clearHistory()
             if (success) {
@@ -73,16 +93,25 @@ export function useHistory() {
 
     // Get recent chapters
     const getRecentChapters = useCallback(() => {
+        if (typeof window === 'undefined') {
+            return []
+        }
         return historyStorage.getRecentChapters()
     }, [])
 
     // Get reading statistics
     const getStats = useCallback(() => {
+        if (typeof window === 'undefined') {
+            return { totalManga: 0, totalChapters: 0 }
+        }
         return historyStorage.getStats()
     }, [])
 
     // Get history count
     const getCount = useCallback(() => {
+        if (typeof window === 'undefined') {
+            return 0
+        }
         return historyStorage.getHistoryCount()
     }, [])
 

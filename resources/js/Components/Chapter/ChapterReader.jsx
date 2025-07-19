@@ -1,7 +1,36 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { safeDecryptImageUrl } from '../../lib/crypto'
 
 export function ChapterReader({ pages }) {
     const [imageStates, setImageStates] = useState({})
+    const [isClient, setIsClient] = useState(false)
+
+    // Detect if we're on the client side (not SSR)
+    useEffect(() => {
+        setIsClient(true)
+    }, [])
+
+    // Decrypt image URLs only on client side to avoid SSR issues
+    const decryptedPages = useMemo(() => {
+        // Check if we're in a browser environment
+        const isBrowser = typeof window !== 'undefined'
+        
+        if (!isBrowser || !isClient) {
+            // During SSR or before client hydration, use placeholder URLs
+            return pages.map(page => ({
+                ...page,
+                image_url: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', // Transparent 1x1 gif
+                image_url_2: null
+            }))
+        }
+
+        // On client side, decrypt the URLs
+        return pages.map(page => ({
+            ...page,
+            image_url: safeDecryptImageUrl(page.image_url),
+            image_url_2: page.image_url_2 ? safeDecryptImageUrl(page.image_url_2) : null
+        }))
+    }, [pages, isClient])
 
     const handleImageError = (pageId, page, e) => {
         const currentState = imageStates[pageId] || { failedUrls: [], showPlaceholder: false }
@@ -31,7 +60,7 @@ export function ChapterReader({ pages }) {
     return (
         <div className="max-w-4xl mx-auto py-8">
             <div>
-                {pages.map((page, index) => {
+                {decryptedPages.map((page, index) => {
                     const pageState = imageStates[page.id] || { showPlaceholder: false }
                     
                     return (

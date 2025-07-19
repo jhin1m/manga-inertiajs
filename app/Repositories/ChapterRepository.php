@@ -23,7 +23,7 @@ class ChapterRepository implements ChapterRepositoryInterface
         return $chapter->load([
             'manga:id,name,slug,status',
             'pages' => function ($query) {
-                $query->select('id', 'chapter_id', 'page_number', 'image_url')
+                $query->select('id', 'chapter_id', 'page_number', 'image_url', 'image_url_2')
                     ->orderBy('page_number');
             },
         ]);
