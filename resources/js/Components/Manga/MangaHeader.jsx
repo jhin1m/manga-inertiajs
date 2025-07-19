@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react'
 import { Button } from '@/Components/ui/button'
 import { Badge } from '@/Components/ui/badge'
 import { AspectRatio } from '@/Components/ui/aspect-ratio'
+import BookmarkButton from '@/Components/Bookmark/BookmarkButton'
 import { BookOpen, Heart, Star, Eye } from 'lucide-react'
 import { formatViews, formatRating } from '@/lib/formatters'
 
@@ -167,10 +168,13 @@ export function MangaHeader({ manga, translations }) {
                         </Button>
                     )}
 
-                    <Button variant="outline" size="lg">
-                        <Heart className="w-4 h-4 mr-2" />
-                        {translations.favorite}
-                    </Button>
+                    <BookmarkButton
+                        item={manga}
+                        size="lg"
+                        variant="outline"
+                        showText={true}
+                        translations={translations}
+                    />
                 </div>
             </div>
         </div>

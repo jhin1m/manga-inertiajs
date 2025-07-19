@@ -28,6 +28,7 @@ import {
     LogOut, 
     Menu,
     Heart,
+    Bookmark,
     History,
     Star,
     Tags,
@@ -62,6 +63,8 @@ export default function Header({ onSearchOpen }) {
                 setGenresOpen(!genresOpen);
             }
         },
+        { name: layoutTranslations.bookmarks || 'Bookmarks', href: route('bookmarks'), icon: Bookmark, current: route().current('bookmarks') },
+        { name: layoutTranslations.history || 'History', href: route('history'), icon: History, current: route().current('history') },
         { name: layoutTranslations.search || 'Search', href: route('search'), icon: Search, current: route().current('search') },
     ];
 
@@ -73,7 +76,6 @@ export default function Header({ onSearchOpen }) {
 
     const userMenuItems = user ? [
         { name: layoutTranslations.favorites || 'Favorites', href: route('favorites'), icon: Heart },
-        { name: layoutTranslations.history || 'History', href: route('history'), icon: History },
         { name: layoutTranslations.ratings || 'Ratings', href: route('ratings'), icon: Star },
     ] : [];
 
@@ -207,16 +209,21 @@ export default function Header({ onSearchOpen }) {
                                             </p>
                                         </div>
                                     </DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    {userMenuItems.map((item) => (
-                                        <DropdownMenuItem key={item.name} asChild>
-                                            <Link href={item.href} className="flex items-center">
-                                                <item.icon className="mr-2 h-4 w-4" />
-                                                <span>{item.name}</span>
-                                            </Link>
-                                        </DropdownMenuItem>
-                                    ))}
-                                    <DropdownMenuSeparator />
+                                    {userMenuItems.length > 0 && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            {userMenuItems.map((item) => (
+                                                <DropdownMenuItem key={item.name} asChild>
+                                                    <Link href={item.href} className="flex items-center">
+                                                        <item.icon className="mr-2 h-4 w-4" />
+                                                        <span>{item.name}</span>
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                            ))}
+                                            <DropdownMenuSeparator />
+                                        </>
+                                    )}
+                                    {userMenuItems.length === 0 && <DropdownMenuSeparator />}
                                     <DropdownMenuItem asChild>
                                         <Link href={route('profile.edit')} className="flex items-center">
                                             <Settings className="mr-2 h-4 w-4" />
@@ -344,7 +351,7 @@ export default function Header({ onSearchOpen }) {
                                             )
                                         ))}
                                         
-                                        {user && (
+                                        {user && userMenuItems.length > 0 && (
                                             <>
                                                 <Separator className="my-4" />
                                                 <div className="space-y-2">

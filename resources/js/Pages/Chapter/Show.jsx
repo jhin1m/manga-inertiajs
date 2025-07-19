@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Head, Link } from '@inertiajs/react'
 import { AppLayout } from '@/Layouts/AppLayout'
 import { Button } from '@/Components/ui/button'
@@ -5,14 +6,27 @@ import { Card } from '@/Components/ui/card'
 import { Skeleton } from '@/Components/ui/skeleton'
 import { BreadcrumbBuilder } from '@/Components/Layout/Breadcrumb'
 import SeoHead from '@/Components/SeoHead'
+import BookmarkButton from '@/Components/Bookmark/BookmarkButton'
 import { ChevronLeft, ChevronRight, List, Eye, Home, Loader2 } from 'lucide-react'
 import { ChapterReader, ChapterNavigation } from '@/Components/Chapter'
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation'
 import { useAutoHideNavigation } from '@/hooks/useAutoHideNavigation'
+import { useHistory } from '@/hooks/useHistory'
 
 export default function ChapterShow({ manga, chapter, previousChapter, nextChapter, allChapters, pages, seo, translations = {} }) {
     const isNavVisible = useAutoHideNavigation(100)
     useKeyboardNavigation(previousChapter, nextChapter, manga.slug)
+    const { trackChapterReading } = useHistory()
+
+    // Track chapter reading in history
+    useEffect(() => {
+        // Add a small delay to ensure the page is loaded
+        const timer = setTimeout(() => {
+            trackChapterReading(chapter, manga)
+        }, 1000)
+
+        return () => clearTimeout(timer)
+    }, [chapter.id, manga.id, trackChapterReading])
 
     const handleChapterSelect = (e) => {
         const chapterSlug = e.target.value;
@@ -116,6 +130,13 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                             {translations.chapter_list || 'Chapter List'}
                                         </Link>
                                     </Button>
+
+                                    <BookmarkButton
+                                        manga={manga}
+                                        variant="outline"
+                                        showText={true}
+                                        translations={translations}
+                                    />
                                     
                                     <Button 
                                         variant="outline" 
@@ -172,6 +193,14 @@ export default function ChapterShow({ manga, chapter, previousChapter, nextChapt
                                                 {translations.chapter_list || 'Chapter List'}
                                             </Link>
                                         </Button>
+
+                                        <BookmarkButton
+                                            manga={manga}
+                                            size="sm"
+                                            variant="outline"
+                                            showText={true}
+                                            translations={translations}
+                                        />
                                     </div>
                                     {/* Chapter Select */}
                                     <ChapterSelect mobile={true} />

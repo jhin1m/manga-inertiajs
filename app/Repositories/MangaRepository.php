@@ -242,6 +242,11 @@ class MangaRepository implements MangaRepositoryInterface
     {
         return $manga->load([
             'taxonomyTerms.taxonomy',
+            'chapters' => function ($query) {
+                $query->select('id', 'manga_id', 'chapter_number', 'title', 'slug', 'updated_at', 'created_at')
+                    ->orderBy('chapter_number', 'desc')
+                    ->limit(config('manga.limits.recent_chapters', 3));
+            },
         ]);
     }
 

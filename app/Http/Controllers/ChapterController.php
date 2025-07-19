@@ -40,13 +40,31 @@ class ChapterController extends Controller
         $chapter = $this->chapterService->getChapterDetail($chapter);
         $adjacentChapters = $this->chapterService->getAdjacentChapters($chapter);
 
+        // Only load recent chapters for bookmark functionality (optimized)
+        $recentChapters = $manga->chapters()
+            ->select('chapter_number', 'title', 'slug', 'updated_at', 'created_at')
+            ->orderBy('chapter_number', 'desc')
+            ->limit(config('manga.limits.recent_chapters', 3))
+            ->get()
+            ->map(function ($ch) {
+                return [
+                    'chapter_number' => $ch->chapter_number,
+                    'title' => $ch->title,
+                    'slug' => $ch->slug,
+                    'updated_at' => $ch->updated_at,
+                    'created_at' => $ch->created_at,
+                ];
+            })->toArray();
+
         // Only increment view count on the initial HTML request, not on subsequent asset requests.
         if ($request->acceptsHtml() && ! $request->header('X-Inertia')) {
             $this->chapterService->incrementViewCount($chapter);
         }
 
         return Inertia::render('Chapter/Show', [
-            'manga' => $manga,
+            'manga' => array_merge($manga->toArray(), [
+                'recent_chapters' => $recentChapters,
+            ]),
             'chapter' => $chapter,
             'previousChapter' => $adjacentChapters['previous'],
             'nextChapter' => $adjacentChapters['next'],

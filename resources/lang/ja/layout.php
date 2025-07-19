@@ -6,6 +6,7 @@ return [
     'search' => '検索',
     'search_placeholder' => 'マンガを検索...',
     'favorites' => 'お気に入り',
+    'bookmarks' => 'ブックマーク',
     'history' => '履歴',
     'ratings' => '評価',
     'settings' => '設定',

@@ -6,6 +6,7 @@ return [
     'search' => 'Tìm kiếm',
     'search_placeholder' => 'Tìm kiếm manga...',
     'favorites' => 'Yêu thích',
+    'bookmarks' => 'Yêu thích',
     'history' => 'Lịch sử',
     'ratings' => 'Đánh giá',
     'settings' => 'Cài đặt',

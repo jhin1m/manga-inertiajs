@@ -62,6 +62,7 @@ class HandleInertiaRequests extends Middleware
             'search' => __('layout.search'),
             'search_placeholder' => __('layout.search_placeholder'),
             'favorites' => __('layout.favorites'),
+            'bookmarks' => __('layout.bookmarks'),
             'history' => __('layout.history'),
             'ratings' => __('layout.ratings'),
             'settings' => __('layout.settings'),

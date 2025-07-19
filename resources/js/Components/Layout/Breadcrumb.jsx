@@ -239,6 +239,20 @@ export function BreadcrumbBuilder() {
             return builder;
         },
         
+        addHome: () => {
+            items.push({
+                label: breadcrumbTranslations.home || 'Trang chủ',
+                href: route('home'),
+                icon: null
+            });
+            return builder;
+        },
+        
+        addCustom: (label, href, icon = null) => {
+            items.push({ label, href, icon });
+            return builder;
+        },
+        
         addManga: (manga) => {
             items.push({ 
                 label: manga.name || manga.title, 

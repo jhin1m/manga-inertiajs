@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\ChapterController;
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MangaController;
 use App\Http\Controllers\PageController;
@@ -14,6 +16,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Search routes
 Route::get('/search', [MangaController::class, 'search'])->name('search');
+
+// Bookmark and History routes
+Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks');
+Route::get('/history', [HistoryController::class, 'index'])->name('history');
 
 // Live search API routes (minimal JSON API for performance)
 Route::get('/api/search/suggestions', [SearchSuggestionController::class, 'suggestions'])->name('search.suggestions');

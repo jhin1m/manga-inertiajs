@@ -6,6 +6,7 @@ return [
     'search' => 'Search',
     'search_placeholder' => 'Search manga...',
     'favorites' => 'Favorites',
+    'bookmarks' => 'Bookmarks',
     'history' => 'History',
     'ratings' => 'Ratings',
     'settings' => 'Settings',

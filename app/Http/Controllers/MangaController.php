@@ -105,6 +105,15 @@ class MangaController extends Controller
                 'tags' => $tags,
                 'first_chapter' => $firstChapter,
                 'last_chapter' => $lastChapter,
+                'recent_chapters' => $manga->chapters->map(function ($chapter) {
+                    return [
+                        'chapter_number' => $chapter->chapter_number,
+                        'title' => $chapter->title,
+                        'slug' => $chapter->slug,
+                        'updated_at' => $chapter->updated_at,
+                        'created_at' => $chapter->created_at,
+                    ];
+                })->toArray(),
             ]),
             'seo' => $manga->getSeoData(),
             'genres' => $allGenres,
