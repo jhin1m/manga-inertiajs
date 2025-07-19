@@ -1,5 +1,5 @@
 import { formatDistanceStrict } from 'date-fns';
-import { vi, enUS } from 'date-fns/locale';
+import { vi, enUS, ja } from 'date-fns/locale';
 import { usePage } from '@inertiajs/react';
 
 /**
@@ -37,6 +37,7 @@ export const formatRating = (rating) => {
 const locales = {
     vi,
     en: enUS,
+    ja,
 };
 
 /**
@@ -65,6 +66,8 @@ export const formatRelativeTime = (date) => {
     // Manually add suffix based on locale
     if (locale === 'vi') {
         return `${formatted} trước`;
+    } else if (locale === 'ja') {
+        return `${formatted}前`;
     } else {
         return `${formatted} ago`;
     }
