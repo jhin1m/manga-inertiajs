@@ -14,17 +14,42 @@ A modern manga reading platform built with Laravel, React, and Inertia.js.
 ```bash
 # Install dependencies
 composer install
-npm install
+bun run install
 
 # Setup environment
 cp .env.example .env
 php artisan key:generate
 
 # Database setup
-php artisan migrate --seed
+php artisan migrate
 
 # Start development
 composer run dev
+```
+
+## Production
+```bash
+# Install dependencies
+composer install --no-dev --optimize-autoloader
+bun run install
+
+# Setup environment
+cp .env.example .env
+php artisan key:generate
+
+# Database setup
+php artisan migrate
+
+# Build SSR
+bun run build
+
+# Start SSR if you need
+php artisan inertia:start-ssr --runtime=bun
+# Im using bun so (--runtime=bun), if you install with npm or pnpm, no need --runtime=bun here:
+php artisan inertia:start-ssr
+
+# Start app with Octane
+php artisan octane:start
 ```
 
 ## Tech Stack
@@ -42,8 +67,11 @@ composer run dev
 composer run test
 
 # Build production
-npm run build
+bun run build
 
 # Clear caches
 php artisan config:clear
+
+# Optimize app
+php artisan optimize:clear
 ```

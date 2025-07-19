@@ -1,3 +1,7 @@
+# Important Note:
+
+# This is just a sample Crawler, it doesn't work, please consider.
+
 # Manga Crawler
 
 A standalone JavaScript crawler for manga websites that integrates with your Laravel manga application database.
