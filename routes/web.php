@@ -21,6 +21,9 @@ Route::get('/api/search/popular', [SearchSuggestionController::class, 'popular']
 
 // SEO Routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/sitemap-static.xml', [SitemapController::class, 'static'])->name('sitemap.static');
+Route::get('/sitemap-manga-{page}.xml', [SitemapController::class, 'manga'])->name('sitemap.manga')->where('page', '[0-9]+');
+Route::get('/sitemap-chapters-{page}.xml', [SitemapController::class, 'chapters'])->name('sitemap.chapters')->where('page', '[0-9]+');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
 
 Route::middleware('auth')->group(function () {

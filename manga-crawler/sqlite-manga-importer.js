@@ -401,14 +401,14 @@ class SQLiteMangaImporter {
       
       // Generate S3 key using AWS_PATH + manga slug + extension format
       const awsPath = process.env.AWS_PATH || 'data/';
-      const s3Key = `${awsPath}manga/${mangaSlug}/cover${extension}`;
+      const s3Key = `${awsPath}/${mangaSlug}${extension}`;
       
       // Upload to S3
       const s3Url = await this.s3Uploader.uploadToS3(imageData, s3Key);
       
       // Return the path for database storage (AWS_URL + AWS_PATH + manga slug + extension)
       const awsUrl = process.env.AWS_URL || config.images.s3.baseUrl;
-      const fullPath = `${awsPath}manga/${mangaSlug}/cover${extension}`;
+      const fullPath = `${awsPath}/${mangaSlug}${extension}`;
       
       this.stats.coversUploaded++;
       console.log(`✅ Cover uploaded: ${s3Url}`);
@@ -485,8 +485,8 @@ class SQLiteMangaImporter {
       }
       
       // Handle cover upload if needed
-      if (!manga.cover && sqliteData.cover_raw) {
-        const coverPath = await this.uploadCoverToS3(sqliteData.cover_raw, manga.slug);
+      if (!manga.cover && sqliteData.cover_small) {
+        const coverPath = await this.uploadCoverToS3(sqliteData.cover_small, manga.slug);
         if (coverPath) {
           await this.mysqlDb.execute(
             'UPDATE mangas SET cover = ? WHERE id = ?',

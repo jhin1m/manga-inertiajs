@@ -8,9 +8,55 @@ use Illuminate\Support\Facades\Cache;
 
 class SitemapController extends Controller
 {
+    const MANGA_PER_SITEMAP = 1000;
+    const CHAPTERS_PER_SITEMAP = 5000;
+
     public function index()
     {
-        $sitemap = Cache::remember('sitemap', config('cache.ttl.sitemap'), function () {
+        $sitemap = Cache::remember('sitemap_index', config('cache.ttl.sitemap', 3600), function () {
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+            $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+            // Static pages sitemap
+            $xml .= '<sitemap>';
+            $xml .= '<loc>'.url('/sitemap-static.xml').'</loc>';
+            $xml .= '<lastmod>'.now()->toISOString().'</lastmod>';
+            $xml .= '</sitemap>';
+
+            // Manga sitemaps
+            $mangaCount = Manga::count();
+            $mangaPages = ceil($mangaCount / self::MANGA_PER_SITEMAP);
+            
+            for ($page = 1; $page <= $mangaPages; $page++) {
+                $xml .= '<sitemap>';
+                $xml .= '<loc>'.url("/sitemap-manga-{$page}.xml").'</loc>';
+                $xml .= '<lastmod>'.now()->toISOString().'</lastmod>';
+                $xml .= '</sitemap>';
+            }
+
+            // Chapter sitemaps
+            $chapterCount = Chapter::count();
+            $chapterPages = ceil($chapterCount / self::CHAPTERS_PER_SITEMAP);
+            
+            for ($page = 1; $page <= $chapterPages; $page++) {
+                $xml .= '<sitemap>';
+                $xml .= '<loc>'.url("/sitemap-chapters-{$page}.xml").'</loc>';
+                $xml .= '<lastmod>'.now()->toISOString().'</lastmod>';
+                $xml .= '</sitemap>';
+            }
+
+            $xml .= '</sitemapindex>';
+
+            return $xml;
+        });
+
+        return response($sitemap, 200)
+            ->header('Content-Type', 'application/xml');
+    }
+
+    public function static()
+    {
+        $sitemap = Cache::remember('sitemap_static', config('cache.ttl.sitemap', 3600), function () {
             $xml = '<?xml version="1.0" encoding="UTF-8"?>';
             $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
@@ -30,18 +76,28 @@ class SitemapController extends Controller
             $xml .= '<lastmod>'.now()->toISOString().'</lastmod>';
             $xml .= '</url>';
 
-            // Search page
-            $xml .= '<url>';
-            $xml .= '<loc>'.route('search').'</loc>';
-            $xml .= '<changefreq>weekly</changefreq>';
-            $xml .= '<priority>0.8</priority>';
-            $xml .= '<lastmod>'.now()->toISOString().'</lastmod>';
-            $xml .= '</url>';
+            $xml .= '</urlset>';
 
-            // All manga
+            return $xml;
+        });
+
+        return response($sitemap, 200)
+            ->header('Content-Type', 'application/xml');
+    }
+
+    public function manga($page = 1)
+    {
+        $sitemap = Cache::remember("sitemap_manga_{$page}", config('cache.ttl.sitemap', 3600), function () use ($page) {
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+            $offset = ($page - 1) * self::MANGA_PER_SITEMAP;
+            
             Manga::select('slug', 'updated_at')
                 ->orderBy('updated_at', 'desc')
-                ->chunk(config('manga.sitemap.chunk_size'), function ($mangas) use (&$xml) {
+                ->offset($offset)
+                ->limit(self::MANGA_PER_SITEMAP)
+                ->chunk(100, function ($mangas) use (&$xml) {
                     foreach ($mangas as $manga) {
                         $xml .= '<url>';
                         $xml .= '<loc>'.route('manga.show', $manga->slug).'</loc>';
@@ -52,14 +108,32 @@ class SitemapController extends Controller
                     }
                 });
 
-            // All chapters
+            $xml .= '</urlset>';
+
+            return $xml;
+        });
+
+        return response($sitemap, 200)
+            ->header('Content-Type', 'application/xml');
+    }
+
+    public function chapters($page = 1)
+    {
+        $sitemap = Cache::remember("sitemap_chapters_{$page}", config('cache.ttl.sitemap', 3600), function () use ($page) {
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+            $offset = ($page - 1) * self::CHAPTERS_PER_SITEMAP;
+            
             Chapter::with('manga:id,slug')
                 ->select('slug', 'manga_id', 'updated_at')
                 ->orderBy('updated_at', 'desc')
-                ->chunk(config('manga.sitemap.chunk_size'), function ($chapters) use (&$xml) {
+                ->offset($offset)
+                ->limit(self::CHAPTERS_PER_SITEMAP)
+                ->chunk(100, function ($chapters) use (&$xml) {
                     foreach ($chapters as $chapter) {
                         $xml .= '<url>';
-                        $xml .= '<loc>'.route('chapter.show', [$chapter->manga->slug, $chapter->slug]).'</loc>';
+                        $xml .= '<loc>'.route('manga.chapters.show', [$chapter->manga->slug, $chapter->slug]).'</loc>';
                         $xml .= '<changefreq>monthly</changefreq>';
                         $xml .= '<priority>0.6</priority>';
                         $xml .= '<lastmod>'.$chapter->updated_at->toISOString().'</lastmod>';
