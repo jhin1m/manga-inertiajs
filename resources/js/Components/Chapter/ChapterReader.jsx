@@ -16,19 +16,19 @@ export function ChapterReader({ pages }) {
         const isBrowser = typeof window !== 'undefined'
         
         if (!isBrowser || !isClient) {
-            // During SSR or before client hydration, use placeholder URLs
+            // During SSR, return pages with only encrypted URLs (no decryption)
             return pages.map(page => ({
                 ...page,
-                image_url: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', // Transparent 1x1 gif
+                image_url: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', // Transparent 1x1 gif for SSR
                 image_url_2: null
             }))
         }
 
-        // On client side, decrypt the URLs
+        // On client side, decrypt the URLs from encrypted fields
         return pages.map(page => ({
             ...page,
-            image_url: safeDecryptImageUrl(page.image_url),
-            image_url_2: page.image_url_2 ? safeDecryptImageUrl(page.image_url_2) : null
+            image_url: page.encrypted_image_url ? safeDecryptImageUrl(page.encrypted_image_url) : null,
+            image_url_2: page.encrypted_image_url_2 ? safeDecryptImageUrl(page.encrypted_image_url_2) : null
         }))
     }, [pages, isClient])
 

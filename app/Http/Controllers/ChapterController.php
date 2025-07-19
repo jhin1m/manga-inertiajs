@@ -63,22 +63,26 @@ class ChapterController extends Controller
             $this->chapterService->incrementViewCount($chapter);
         }
 
-        // Encrypt page image URLs for frontend
+        // Encrypt page image URLs for frontend - only encrypted URLs will be in SSR HTML
         $encryptedPages = $chapter->pages->map(function ($page) {
             return [
                 'id' => $page->id,
                 'chapter_id' => $page->chapter_id,
                 'page_number' => $page->page_number,
-                'image_url' => $this->encryptionService->encrypt($page->image_url),
-                'image_url_2' => $page->image_url_2 ? $this->encryptionService->encrypt($page->image_url_2) : null,
+                'encrypted_image_url' => $this->encryptionService->encrypt($page->image_url),
+                'encrypted_image_url_2' => $page->image_url_2 ? $this->encryptionService->encrypt($page->image_url_2) : null,
             ];
         });
+
+        // Remove pages from chapter object to avoid exposing original URLs
+        $chapterData = $chapter->toArray();
+        unset($chapterData['pages']);
 
         return Inertia::render('Chapter/Show', [
             'manga' => array_merge($manga->toArray(), [
                 'recent_chapters' => $recentChapters,
             ]),
-            'chapter' => $chapter,
+            'chapter' => $chapterData,
             'previousChapter' => $adjacentChapters['previous'],
             'nextChapter' => $adjacentChapters['next'],
             'seo' => $chapter->getSeoData(),
