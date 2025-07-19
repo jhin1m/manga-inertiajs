@@ -39,4 +39,5 @@ return [
     'view_all_genres' => 'View All Genres',
     // Mobile menu
     'mobile_menu_description' => 'Mobile navigation menu',
+    'searching' => 'Searching...',
 ];

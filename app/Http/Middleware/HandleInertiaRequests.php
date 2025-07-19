@@ -95,6 +95,7 @@ class HandleInertiaRequests extends Middleware
             'view_all_genres' => __('layout.view_all_genres'),
             // Mobile menu
             'mobile_menu_description' => __('layout.mobile_menu_description'),
+            'searching' => __('layout.searching'),
         ];
     }
 

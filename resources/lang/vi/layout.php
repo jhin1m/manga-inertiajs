@@ -40,4 +40,5 @@ return [
     'view_all_genres' => 'Xem tất cả thể loại',
     // Mobile menu
     'mobile_menu_description' => 'Menu điều hướng di động',
+    'searching' => 'Đang tìm kiếm...',
 ];

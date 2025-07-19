@@ -28,23 +28,19 @@ class SearchService
         return Manga::with(['taxonomyTerms.taxonomy', 'chapters'])
             ->withCount('chapters')
             ->where(function ($q) use ($query) {
-                $q->where('title', 'like', "%{$query}%")
-                    ->orWhere('description', 'like', "%{$query}%")
-                    ->orWhere('author', 'like', "%{$query}%")
-                    ->orWhere('artist', 'like', "%{$query}%");
+                $q->where('name', 'like', "%{$query}%")
+                    ->orWhere('description', 'like', "%{$query}%");
             })
             ->orWhereHas('taxonomyTerms', function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%");
             })
             ->orderByRaw('
                 CASE 
-                    WHEN title LIKE ? THEN 1
-                    WHEN author LIKE ? THEN 2
-                    WHEN artist LIKE ? THEN 3
-                    WHEN description LIKE ? THEN 4
-                    ELSE 5
+                    WHEN name LIKE ? THEN 1
+                    WHEN description LIKE ? THEN 2
+                    ELSE 3
                 END
-            ', ["%{$query}%", "%{$query}%", "%{$query}%", "%{$query}%"])
+            ', ["%{$query}%", "%{$query}%"])
             ->orderBy('views', 'desc')
             ->paginate($perPage);
     }
@@ -56,7 +52,7 @@ class SearchService
         return Chapter::with(['manga'])
             ->where('title', 'like', "%{$query}%")
             ->orWhereHas('manga', function ($q) use ($query) {
-                $q->where('title', 'like', "%{$query}%");
+                $q->where('name', 'like', "%{$query}%");
             })
             ->orderByRaw('
                 CASE 
@@ -96,10 +92,8 @@ class SearchService
         if (! empty($criteria['search'])) {
             $search = $criteria['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('author', 'like', "%{$search}%")
-                    ->orWhere('artist', 'like', "%{$search}%");
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -168,17 +162,17 @@ class SearchService
     {
         $limit = $limit ?? config('search.pagination.suggestions_limit');
 
-        $mangaTitles = Manga::where('title', 'like', "%{$query}%")
+        $mangaTitles = Manga::where('name', 'like', "%{$query}%")
             ->limit($limit)
-            ->pluck('title')
+            ->pluck('name')
             ->toArray();
 
-        $authors = Manga::where('author', 'like', "%{$query}%")
-            ->whereNotNull('author')
+        $authors = TaxonomyTerm::whereHas('taxonomy', function ($q) {
+            $q->where('type', 'author');
+        })
+            ->where('name', 'like', "%{$query}%")
             ->limit($limit)
-            ->pluck('author')
-            ->unique()
-            ->values()
+            ->pluck('name')
             ->toArray();
 
         $genres = TaxonomyTerm::whereHas('taxonomy', function ($q) {
@@ -225,6 +219,17 @@ class SearchService
         ];
     }
 
+    public function getPopularManga(?int $limit = null): array
+    {
+        $limit = $limit ?? 5;
+        
+        return Manga::orderBy('views', 'desc')
+            ->limit($limit)
+            ->pluck('name')
+            ->toArray();
+    }
+
+
     private function applySorting(Builder $query, array $criteria): void
     {
         $sortBy = $criteria['sort'] ?? 'relevance';
@@ -261,13 +266,11 @@ class SearchService
                     $search = $criteria['search'];
                     $query->orderByRaw('
                         CASE 
-                            WHEN title LIKE ? THEN 1
-                            WHEN author LIKE ? THEN 2
-                            WHEN artist LIKE ? THEN 3
-                            WHEN description LIKE ? THEN 4
-                            ELSE 5
+                            WHEN name LIKE ? THEN 1
+                            WHEN description LIKE ? THEN 2
+                            ELSE 3
                         END
-                    ', ["%{$search}%", "%{$search}%", "%{$search}%", "%{$search}%"]);
+                    ', ["%{$search}%", "%{$search}%"]);
                 }
                 $query->orderBy('views', 'desc');
                 break;

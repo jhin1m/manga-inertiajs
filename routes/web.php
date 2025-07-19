@@ -5,14 +5,19 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MangaController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchSuggestionController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TaxonomyController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Search route
+// Search routes
 Route::get('/search', [MangaController::class, 'search'])->name('search');
+
+// Live search API routes (minimal JSON API for performance)
+Route::get('/api/search/suggestions', [SearchSuggestionController::class, 'suggestions'])->name('search.suggestions');
+Route::get('/api/search/popular', [SearchSuggestionController::class, 'popular'])->name('search.popular');
 
 // SEO Routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

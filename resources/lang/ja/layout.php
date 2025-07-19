@@ -39,4 +39,5 @@ return [
     'view_all_genres' => 'すべてのジャンルを見る',
     // Mobile menu
     'mobile_menu_description' => 'モバイルナビゲーションメニュー',
+    'searching' => '検索中...',
 ];
