@@ -43,6 +43,11 @@ export default function Header({ onSearchOpen }) {
     const [genresOpen, setGenresOpen] = useState(false);
     const [mobileGenresOpen, setMobileGenresOpen] = useState(false);
 
+    const handleAuthClick = (e) => {
+        e.preventDefault();
+        alert('this function is being deployed');
+    };
+
     const navigationItems = [
         { name: layoutTranslations.home || 'Home', href: route('home'), icon: Home, current: route().current('home') },
         { name: layoutTranslations.library || 'Library', href: route('manga.index'), icon: Library, current: route().current('manga.*') },
@@ -65,8 +70,6 @@ export default function Header({ onSearchOpen }) {
     for (let i = 0; i < genres.length; i += 6) {
         genreRows.push(genres.slice(i, i + 6));
     }
-    // Limit to 3 rows
-    const limitedGenreRows = genreRows.slice(0, 3);
 
     const userMenuItems = user ? [
         { name: layoutTranslations.favorites || 'Favorites', href: route('favorites'), icon: Heart },
@@ -103,9 +106,9 @@ export default function Header({ onSearchOpen }) {
                                                 <ChevronDown className="ml-1 h-3 w-3" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent className="w-[600px] p-4">
+                                        <DropdownMenuContent className="w-[600px] p-4 max-h-[400px] overflow-y-auto">
                                             <div className="space-y-3">
-                                                {limitedGenreRows.map((row, rowIndex) => (
+                                                {genreRows.map((row, rowIndex) => (
                                                     <div key={rowIndex} className="grid grid-cols-6 gap-2">
                                                         {row.map((genre) => (
                                                             <DropdownMenuItem key={genre.id} asChild>
@@ -121,7 +124,7 @@ export default function Header({ onSearchOpen }) {
                                                         ))}
                                                     </div>
                                                 ))}
-                                                {genres.length > 18 && (
+                                                {genres.length > 0 && (
                                                     <>
                                                         <DropdownMenuSeparator />
                                                         <DropdownMenuItem asChild>
@@ -236,11 +239,11 @@ export default function Header({ onSearchOpen }) {
                         </>
                     ) : (
                         <div className="hidden md:flex items-center space-x-2">
-                            <Button variant="ghost" asChild>
-                                <Link href={route('login')}>{layoutTranslations.login || 'Login'}</Link>
+                            <Button variant="ghost" onClick={handleAuthClick}>
+                                {layoutTranslations.login || 'Login'}
                             </Button>
-                            <Button asChild>
-                                <Link href={route('register')}>{layoutTranslations.register || 'Register'}</Link>
+                            <Button onClick={handleAuthClick}>
+                                {layoutTranslations.register || 'Register'}
                             </Button>
                         </div>
                     )}
@@ -291,20 +294,22 @@ export default function Header({ onSearchOpen }) {
                                                         <ChevronDown className={`h-4 w-4 transition-transform ${mobileGenresOpen ? 'rotate-180' : ''}`} />
                                                     </Button>
                                                     {mobileGenresOpen && (
-                                                        <div className="ml-6 space-y-1 max-h-60 overflow-y-auto">
-                                                            {genres.map((genre) => (
-                                                                <Button
-                                                                    key={genre.id}
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    className="w-full justify-start text-sm"
-                                                                    asChild
-                                                                >
-                                                                    <Link href={route('genre.show', genre.slug)}>
-                                                                        {genre.name}
-                                                                    </Link>
-                                                                </Button>
-                                                            ))}
+                                                        <div className="ml-6 max-h-60 overflow-y-auto">
+                                                            <div className="grid grid-cols-2 gap-1">
+                                                                {genres.map((genre) => (
+                                                                    <Button
+                                                                        key={genre.id}
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="w-full justify-start text-sm"
+                                                                        asChild
+                                                                    >
+                                                                        <Link href={route('genre.show', genre.slug)}>
+                                                                            {genre.name}
+                                                                        </Link>
+                                                                    </Button>
+                                                                ))}
+                                                            </div>
                                                             {genres.length > 0 && (
                                                                 <>
                                                                     <Separator className="my-2" />
@@ -396,11 +401,11 @@ export default function Header({ onSearchOpen }) {
                                         </div>
                                     ) : (
                                         <div className="space-y-2">
-                                            <Button className="w-full" asChild>
-                                                <Link href={route('login')}>{layoutTranslations.login || 'Login'}</Link>
+                                            <Button className="w-full" onClick={handleAuthClick}>
+                                                {layoutTranslations.login || 'Login'}
                                             </Button>
-                                            <Button variant="outline" className="w-full" asChild>
-                                                <Link href={route('register')}>{layoutTranslations.register || 'Register'}</Link>
+                                            <Button variant="outline" className="w-full" onClick={handleAuthClick}>
+                                                {layoutTranslations.register || 'Register'}
                                             </Button>
                                         </div>
                                     )}

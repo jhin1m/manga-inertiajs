@@ -8,7 +8,8 @@ import FilterSidebar from '@/Components/Sidebar/FilterSidebar';
 import MobileFilterButton from '@/Components/Sidebar/MobileFilterButton';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { Paginator } from '@/Components/Common/Paginator';
-import { Grid, List, Search, BookOpen } from 'lucide-react';
+import { BreadcrumbBuilder } from '@/Components/Layout/Breadcrumb';
+import { Grid, List, Search } from 'lucide-react';
 
 export default function MangaIndex({ 
     manga, 
@@ -29,9 +30,9 @@ export default function MangaIndex({
 
 
 
-    const breadcrumbItems = [
-        { label: 'Manga', href: route('manga.index'), icon: BookOpen }
-    ];
+    const breadcrumbItems = new BreadcrumbBuilder()
+        .addMangaList()
+        .build();
 
     return (
         <AppLayout breadcrumbItems={breadcrumbItems}>
